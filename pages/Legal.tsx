@@ -12,7 +12,7 @@ export const Legal: React.FC = () => {
           <p>
             Le site <strong>SimplePlate.ai</strong> est édité par [simpleplate] .<br/>
             <strong>Siège social :</strong> 239 chemin du carry, cogolin.<br/>
-            <strong>SIRET :</strong> 123 456 789 00012<br/>
+            <strong>SIRET :</strong> 00000000<br/>
             <strong>Contact :</strong> contact@simpleplate.dev
           </p>
         </section>
