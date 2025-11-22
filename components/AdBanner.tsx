@@ -15,7 +15,7 @@ const FUN_ADS = [
         color: 'bg-neo-yellow',
         icon: Coffee,
         title: "Moins cher qu'un café.",
-        text: "Sérieux, 9.99€ pour 50 outils IA ? Starbucks vous vole, pas nous.",
+        text: "Sérieux, 9.99€ pour 50 outils IA ? Certains vous vole, pas nous.",
         cta: "Arrêter de me ruiner en latte",
         borderColor: "border-black"
     },
