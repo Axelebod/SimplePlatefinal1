@@ -11,7 +11,7 @@ export const Legal: React.FC = () => {
           <h2 className="text-xl font-bold border-b-2 border-black pb-2 mb-4">1. Éditeur du site</h2>
           <p>
             Le site <strong>SimplePlate.ai</strong> est édité par [simpleplate] .<br/>
-            <strong>Siège social :</strong> 239 chemin du carry, cogolin.<br/>
+            <strong>Siège social :</strong> Cogolin<br/>
             <strong>SIRET :</strong> 00000000<br/>
             <strong>Contact :</strong> contact@simpleplate.dev
           </p>
