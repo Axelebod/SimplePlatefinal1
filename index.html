@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>SimplePlate AI - 50+ Outils IA Professionnels (Dev, Image, Business)</title>
+    <meta name="description" content="Plateforme SaaS avec 50+ outils IA professionnels : Générateur de texte, analyse d'image, outils pour développeurs et entrepreneurs. Système de crédits et abonnement PRO disponible.">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Dynamic Favicon (Neo-Brutalist SP Logo) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23050505%22 rx=%2210%22/><text y=%22.9em%22 font-size=%2270%22 font-family=%22sans-serif%22 font-weight=%22bold%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%23fde047%22 dy=%2210%22>SP</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // Activation manuelle via classe 'dark'
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              'neo-white': '#FAFAFA',
+              'neo-black': '#050505',
+              'neo-violet': '#d8b4fe',
+              'neo-orange': '#fdba74',
+              'neo-blue': '#93c5fd',
+              'neo-green': '#86efac',
+              'neo-red': '#fca5a5',
+              'neo-yellow': '#fde047',
+            },
+            boxShadow: {
+              'neo': '4px 4px 0px 0px #000000',
+              'neo-sm': '2px 2px 0px 0px #000000',
+              'neo-white': '4px 4px 0px 0px #e5e7eb', // Ombres plus douces en mode sombre
+              'neo-white-sm': '2px 2px 0px 0px #e5e7eb',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #FAFAFA;
+        color: #050505;
+        transition: background-color 0.3s, color 0.3s;
+        /* Empêche le "pull-to-refresh" agressif sur mobile qui peut gêner l'app */
+        overscroll-behavior-y: none;
+      }
+      
+      /* PREVENT IOS ZOOM ON INPUT FOCUS */
+      @media screen and (max-width: 768px) {
+        input, textarea, select {
+          font-size: 16px !important; /* Taille min pour éviter le zoom iOS */
+        }
+      }
+      
+      /* Dark Mode Global Overrides - Soft Dark */
+      .dark body {
+        background-color: #111827; /* Gray 900 */
+        color: #F3F4F6; /* Gray 100 */
+      }
+
+      /* Markdown Styles */
+      .markdown-body h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; font-family: 'Space Grotesk'; }
+      .markdown-body h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk'; }
+      .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
+      .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+      .markdown-body pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #000; margin-bottom: 1rem; }
+      .markdown-body code { background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; font-family: monospace; }
+      .markdown-body a { color: #581c87; font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; }
+
+      /* Markdown Dark Mode */
+      .dark .markdown-body pre { background: #1f2937; border-color: #4b5563; color: #fff; } /* Gray 800 background */
+      .dark .markdown-body code { background: #374151; color: #e5e7eb; }
+      .dark .markdown-body a { color: #d8b4fe; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.8",
+    "zustand/": "https://aistudiocdn.com/zustand@^5.0.8/",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.84.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
