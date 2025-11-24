@@ -8,7 +8,7 @@ import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, credits, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
+  const { user, credits, creditsFree, creditsPaid, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const location = useLocation();
@@ -125,22 +125,27 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
              {user ? (
                  <>
-                    <div 
-                        onClick={() => buyCredits(50)}
+                    <Link 
+                        to="/pricing"
                         className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-700 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         title="Acheter des crédits"
                     >
                         <Zap className="w-4 h-4 text-neo-orange fill-current" />
-                        <span className="font-bold dark:text-white">{credits} Crédits</span>
-                    </div>
+                        <div className="flex flex-col items-start leading-tight">
+                            <span className="font-bold dark:text-white text-sm">{credits} Total</span>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                {creditsFree} gratuits + {creditsPaid} payants
+                            </span>
+                        </div>
+                    </Link>
 
-                    <div 
-                        onClick={togglePro}
+                    <Link 
+                        to="/pricing"
                         className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-gray-100 dark:bg-gray-900'}`}
                     >
                         <Crown className={`w-4 h-4 ${isPro ? 'fill-white text-white' : 'text-gray-500 dark:text-gray-400'}`} />
                         <span className="font-bold dark:text-white">{isPro ? 'PRO' : 'Passer PRO'}</span>
-                    </div>
+                    </Link>
                     
                     <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700 flex items-center gap-3">
                         <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors">
@@ -195,9 +200,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-gray-600 rounded-md bg-neo-yellow text-black font-bold">
                         <LayoutDashboard className="w-4 h-4" /> Mon Tableau de Bord
                     </Link>
-                    <div className="flex justify-between items-center p-3 border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
-                        <span className="font-bold dark:text-white">Crédits: {credits}</span>
-                        <button onClick={() => { buyCredits(50); setIsMenuOpen(false); navigate('/pricing'); }} className="text-sm underline text-neo-blue font-bold">Recharger</button>
+                    <div className="p-3 border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
+                        <div className="flex justify-between items-center mb-1">
+                            <span className="font-bold dark:text-white">Crédits: {credits}</span>
+                            <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="text-sm underline text-neo-blue font-bold">Recharger</Link>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                            {creditsFree} gratuits (hebdo) + {creditsPaid} payants
+                        </div>
                     </div>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
                         Voir les Outils

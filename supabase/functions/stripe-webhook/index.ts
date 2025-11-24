@@ -70,23 +70,23 @@ async function addCreditsToUser(userId: string | null, email: string | null, cre
     return false;
   }
 
-  // Récupérer les crédits actuels
+  // Récupérer les crédits payants actuels
   const { data: profile, error: fetchError } = await supabaseAdmin
     .from('profiles')
-    .select('credits')
+    .select('credits_paid')
     .eq('id', profileId)
     .single();
 
   if (fetchError || !profile) {
-    console.error('Failed to fetch current credits', fetchError);
+    console.error('Failed to fetch current paid credits', fetchError);
     return false;
   }
 
-  const newBalance = (profile.credits ?? 0) + creditsToAdd;
+  const newPaidBalance = (profile.credits_paid ?? 0) + creditsToAdd;
 
   const { error: updateError } = await supabaseAdmin
     .from('profiles')
-    .update({ credits: newBalance })
+    .update({ credits_paid: newPaidBalance })
     .eq('id', profileId);
 
   if (updateError) {
@@ -142,10 +142,10 @@ async function activatePro(userId: string | null, email: string | null, isRenewa
     return false;
   }
 
-  // Récupérer les crédits actuels pour déterminer si c'est un renouvellement
+  // Récupérer les crédits payants actuels pour déterminer si c'est un renouvellement
   const { data: currentProfile, error: fetchError } = await supabaseAdmin
     .from('profiles')
-    .select('credits, is_pro')
+    .select('credits_paid, is_pro')
     .eq('id', profileId)
     .single();
 
@@ -155,18 +155,18 @@ async function activatePro(userId: string | null, email: string | null, isRenewa
   }
 
   const wasAlreadyPro = currentProfile.is_pro ?? false;
-  const currentCredits = currentProfile.credits ?? 0;
+  const currentPaidCredits = currentProfile.credits_paid ?? 0;
 
-  // Si c'est un renouvellement (déjà PRO), AJOUTER les crédits au lieu de remplacer
+  // Si c'est un renouvellement (déjà PRO), AJOUTER les crédits payants au lieu de remplacer
   if (isRenewal || wasAlreadyPro) {
-    const newBalance = currentCredits + PRO_MONTHLY_CREDITS;
+    const newPaidBalance = currentPaidCredits + PRO_MONTHLY_CREDITS;
     
     const { error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({ 
         is_pro: true, 
-        credits: newBalance,
-        last_credit_reset: new Date().toISOString()
+        credits_paid: newPaidBalance,
+        pro_credits_reset_date: new Date().toISOString()
       })
       .eq('id', profileId);
 
@@ -181,15 +181,15 @@ async function activatePro(userId: string | null, email: string | null, isRenewa
       description: 'Renouvellement abonnement PRO (100 crédits mensuels)',
     });
 
-    console.log(`Renouvellement PRO : ${PRO_MONTHLY_CREDITS} crédits ajoutés (nouveau solde: ${newBalance})`);
+    console.log(`Renouvellement PRO : ${PRO_MONTHLY_CREDITS} crédits payants ajoutés (nouveau solde: ${newPaidBalance})`);
   } else {
-    // Première activation : définir les crédits à 100
+    // Première activation : définir les crédits payants à 100
     const { error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({ 
         is_pro: true, 
-        credits: PRO_MONTHLY_CREDITS,
-        last_credit_reset: new Date().toISOString()
+        credits_paid: PRO_MONTHLY_CREDITS,
+        pro_credits_reset_date: new Date().toISOString()
       })
       .eq('id', profileId);
 

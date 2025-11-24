@@ -24,6 +24,7 @@ export interface ToolSEO {
 
 export interface ToolConfig {
   id: string;
+  slug?: string; // Slug français pour les URLs SEO-friendly (optionnel, utilise id si absent)
   title: string;
   description: string;
   category: ToolCategory;
@@ -47,7 +48,9 @@ export interface User {
 
 export interface UserState {
   user: User | null; // L'utilisateur connecté
-  credits: number;
+  credits: number; // Total (credits_free + credits_paid) - pour compatibilité
+  creditsFree: number; // Crédits gratuits (rechargent chaque semaine)
+  creditsPaid: number; // Crédits achetés (ne s'expirent jamais)
   isPro: boolean;
   isDarkMode: boolean; // ÉTAT DU MODE NUIT
   

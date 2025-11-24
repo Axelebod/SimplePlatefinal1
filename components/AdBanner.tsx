@@ -77,18 +77,26 @@ export const AdBanner: React.FC<AdBannerProps> = ({ location }) => {
       if (ADSENSE_CLIENT_ID && ADSENSE_SLOT_ID && Math.random() < 0.5) {
           setShowAdSense(true);
           
-          // Charger le script AdSense si pas déjà chargé
-          if (!(window as any).adsbygoogle && !document.querySelector('script[src*="adsbygoogle"]')) {
-              const script = document.createElement('script');
-              script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`;
-              script.async = true;
-              script.crossOrigin = 'anonymous';
-              script.onload = () => {
-                  setAdSenseLoaded(true);
-              };
-              document.head.appendChild(script);
-          } else if ((window as any).adsbygoogle) {
+          // Le script AdSense est déjà chargé dans index.html, on attend juste qu'il soit prêt
+          // Vérifier si le script est déjà chargé (depuis index.html)
+          if ((window as any).adsbygoogle) {
               setAdSenseLoaded(true);
+          } else {
+              // Attendre que le script se charge (il est dans index.html)
+              const checkInterval = setInterval(() => {
+                  if ((window as any).adsbygoogle) {
+                      setAdSenseLoaded(true);
+                      clearInterval(checkInterval);
+                  }
+              }, 100);
+              
+              // Timeout après 5 secondes
+              setTimeout(() => {
+                  clearInterval(checkInterval);
+                  if ((window as any).adsbygoogle) {
+                      setAdSenseLoaded(true);
+                  }
+              }, 5000);
           }
       }
   }, []);

@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tools } from '../tools-config';
 import { useUserStore } from '../store/userStore';
 import { generateToolContent, isApiReady } from '../services/geminiService';
-import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code } from 'lucide-react';
+import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn } from 'lucide-react';
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
@@ -12,9 +12,9 @@ import ReactMarkdown from 'react-markdown';
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const tool = tools.find(t => t.id === slug);
+  const tool = tools.find(t => (t.slug || t.id) === slug);
   
-  const { credits, deductCredits, isPro } = useUserStore();
+  const { user, credits, deductCredits, isPro } = useUserStore();
   
   // Form State
   const [inputs, setInputs] = useState<Record<string, any>>({});
@@ -29,7 +29,7 @@ export const ToolPage: React.FC = () => {
   // Preview Toggle for Website Generator
   const [showPreview, setShowPreview] = useState(true);
 
-  const MAX_CHARS = 3000; // Limite de caractères pour éviter les abus
+  const MAX_CHARS = 3500; // Limite de caractères pour éviter les abus
 
   // ----------------------------------------------------
   // PERFECT SEO INJECTION LOGIC
@@ -163,6 +163,11 @@ export const ToolPage: React.FC = () => {
     e.preventDefault();
     setError(null);
 
+    if (!isLoggedIn) {
+      navigate('/signup');
+      return;
+    }
+
     if (isLocked) {
       alert("Cet outil nécessite un plan PRO.");
       return;
@@ -173,10 +178,21 @@ export const ToolPage: React.FC = () => {
       return;
     }
 
-    const missing = tool.inputs.filter(i => i.required && !inputs[i.name]);
-    if (missing.length > 0) {
-      setError(`Veuillez remplir : ${missing.map(m => m.label).join(', ')}`);
-      return;
+    // Validation spéciale pour l'aide aux devoirs (au moins image OU question)
+    if (tool.id === 'homework-helper') {
+      const hasImage = fileInput !== undefined;
+      const hasQuestion = inputs.question && inputs.question.trim();
+      if (!hasImage && !hasQuestion) {
+        setError('Veuillez fournir au moins une photo de l\'exercice OU une question écrite.');
+        return;
+      }
+    } else {
+      // Validation standard pour les autres outils
+      const missing = tool.inputs.filter(i => i.required && !inputs[i.name]);
+      if (missing.length > 0) {
+        setError(`Veuillez remplir : ${missing.map(m => m.label).join(', ')}`);
+        return;
+      }
     }
 
     setLoading(true);
@@ -185,7 +201,18 @@ export const ToolPage: React.FC = () => {
     try {
       if (!tool.promptGenerator) throw new Error("Config invalide");
       
-      const prompt = tool.promptGenerator(inputs);
+      // Pour l'aide aux devoirs, on doit passer l'info de l'image dans les inputs
+      const inputsWithFile = tool.id === 'homework-helper' && fileInput 
+        ? { ...inputs, image: 'FILE_UPLOADED' }
+        : inputs;
+      
+      const prompt = tool.promptGenerator(inputsWithFile);
+      
+      // Vérifier si le prompt contient une erreur
+      if (prompt.startsWith('ERROR:')) {
+        setError(prompt.replace('ERROR:', '').trim());
+        return;
+      }
       
       // Les outils locaux ne nécessitent pas de clé API Google, mais ils passent par generateToolContent qui gère le switch
       // Pour les outils IA, on vérifie la clé
@@ -228,6 +255,8 @@ export const ToolPage: React.FC = () => {
       return markdown.replace(/```html|```/g, '').trim();
   };
 
+  const isLoggedIn = !!user;
+
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
@@ -240,6 +269,25 @@ export const ToolPage: React.FC = () => {
         </div>
         <p className="text-gray-600 dark:text-gray-300 mt-2">{tool.description}</p>
       </div>
+
+      {/* Message doux si non connecté */}
+      {!isLoggedIn && (
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">
+              Pour utiliser cet outil, vous devez créer un compte. C'est gratuit et rapide ! 🚀
+            </p>
+            <button
+              onClick={() => navigate('/signup')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors text-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              Créer un compte
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* AD BANNER (HEADER) FOR FREE USERS */}
       <AdBanner location="header" />
@@ -268,14 +316,14 @@ export const ToolPage: React.FC = () => {
                       placeholder={input.placeholder}
                       rows={input.rows || 4}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked}
+                      disabled={loading || isLocked || !isLoggedIn}
                       maxLength={MAX_CHARS}
                     />
                   ) : input.type === 'select' ? (
                     <select
                        className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                        onChange={(e) => handleInputChange(input.name, e.target.value)}
-                       disabled={loading || isLocked}
+                       disabled={loading || isLocked || !isLoggedIn}
                     >
                       <option value="">Sélectionnez une option</option>
                       {input.options?.map(opt => (
@@ -309,7 +357,7 @@ export const ToolPage: React.FC = () => {
                                 className="hidden" 
                                 accept={input.accept}
                                 onChange={(e) => handleFileChange(e, input.name)}
-                                disabled={loading || isLocked}
+                                disabled={loading || isLocked || !isLoggedIn}
                             />
                         </label>
                     </div>
@@ -319,7 +367,7 @@ export const ToolPage: React.FC = () => {
                       className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                       placeholder={input.placeholder}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked}
+                      disabled={loading || isLocked || !isLoggedIn}
                       maxLength={MAX_CHARS}
                     />
                   )}
@@ -337,19 +385,25 @@ export const ToolPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={loading || isLocked || !hasCredits}
+                disabled={loading || (isLoggedIn && (isLocked || !hasCredits))}
                 className={`
                   w-full py-4 font-bold text-lg border-2 border-black dark:border-gray-500 rounded-md flex items-center justify-center gap-2 transition-all
-                  ${isLocked 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed' 
-                    : loading 
-                      ? 'bg-neo-yellow text-black cursor-wait'
-                      : !hasCredits 
-                        ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                        : 'bg-neo-black dark:bg-white text-white dark:text-black shadow-[4px_4px_0px_0px_#86efac] dark:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#86efac]'}
+                  ${!isLoggedIn
+                    ? 'bg-neo-yellow text-black hover:bg-yellow-400 cursor-pointer shadow-[4px_4px_0px_0px_#000] dark:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000]'
+                    : isLocked 
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed' 
+                      : loading 
+                        ? 'bg-neo-yellow text-black cursor-wait'
+                        : !hasCredits 
+                          ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                          : 'bg-neo-black dark:bg-white text-white dark:text-black shadow-[4px_4px_0px_0px_#86efac] dark:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#86efac]'}
                 `}
               >
-                {loading ? (
+                {!isLoggedIn ? (
+                  <>
+                    <LogIn className="w-5 h-5" /> Créer un compte pour utiliser
+                  </>
+                ) : loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" /> 
                     Génération...
@@ -426,7 +480,7 @@ export const ToolPage: React.FC = () => {
              {result && (
                tool.outputType === 'image' ? (
                  <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500">
-                    <img src={result} alt="Generated output" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" />
+                    <img src={result} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" />
                     <div className="mt-4 text-center">
                       <a href={result} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
                         Télécharger l'image
@@ -444,7 +498,7 @@ export const ToolPage: React.FC = () => {
                             <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
                                 <iframe 
                                     srcDoc={getCleanHtml(result)} 
-                                    title="Website Preview"
+                                    title="Aperçu du site"
                                     className="w-full h-full absolute inset-0"
                                     sandbox="allow-scripts"
                                 />

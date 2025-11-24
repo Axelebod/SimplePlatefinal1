@@ -10,36 +10,49 @@ export const useUserStore = create<UserState>()(
     (set, get) => ({
       user: null, 
       credits: 0,
+      creditsFree: 0,
+      creditsPaid: 0,
       isPro: false,
       isDarkMode: false,
 
       login: async (user: User) => {
         set({ user });
         
-        // Vérifier et recharger les crédits mensuels si nécessaire (pour utilisateurs non-PRO)
+        // Vérifier et recharger les crédits gratuits hebdomadaires (pour TOUS les utilisateurs, y compris PRO)
         try {
-          await supabase.rpc('reset_monthly_credits', { p_user_id: user.id });
+          await supabase.rpc('reset_weekly_free_credits', { p_user_id: user.id });
         } catch (err) {
-          console.warn("Erreur lors de la vérification du reset mensuel:", err);
+          console.warn("Erreur lors de la vérification du reset hebdomadaire:", err);
+        }
+        
+        // Vérifier et recharger les crédits PRO mensuels si nécessaire (seulement pour PRO)
+        try {
+          await supabase.rpc('reset_pro_monthly_credits', { p_user_id: user.id });
+        } catch (err) {
+          console.warn("Erreur lors de la vérification du reset mensuel PRO:", err);
         }
         
         // FORCER la synchronisation depuis Supabase (ignore localStorage)
         const { data, error } = await supabase
           .from('profiles')
-          .select('credits, is_pro, last_credit_reset, created_at')
+          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at')
           .eq('id', user.id)
           .single();
 
         if (error) {
           console.error("Erreur fetch profil:", error);
-          set({ credits: 0, isPro: false });
+          set({ credits: 0, creditsFree: 0, creditsPaid: 0, isPro: false });
         } else {
           // Forcer la mise à jour même si localStorage a une autre valeur
           const creditsFromDB = data?.credits ?? 0;
+          const creditsFreeFromDB = data?.credits_free ?? 0;
+          const creditsPaidFromDB = data?.credits_paid ?? 0;
           const isProFromDB = data?.is_pro ?? false;
           
           set({ 
             credits: creditsFromDB,
+            creditsFree: creditsFreeFromDB,
+            creditsPaid: creditsPaidFromDB,
             isPro: isProFromDB
           });
           
@@ -59,26 +72,37 @@ export const useUserStore = create<UserState>()(
         const { user } = get();
         if (!user) return;
         
-        // Vérifier et recharger les crédits mensuels si nécessaire (pour utilisateurs non-PRO)
+        // Vérifier et recharger les crédits gratuits hebdomadaires (pour TOUS les utilisateurs, y compris PRO)
         try {
-          await supabase.rpc('reset_monthly_credits', { p_user_id: user.id });
+          await supabase.rpc('reset_weekly_free_credits', { p_user_id: user.id });
         } catch (err) {
-          console.warn("Erreur lors de la vérification du reset mensuel:", err);
+          console.warn("Erreur lors de la vérification du reset hebdomadaire:", err);
         }
         
-        // Rafraîchir les crédits depuis Supabase (avec last_credit_reset et created_at pour le timer)
+        // Vérifier et recharger les crédits PRO mensuels si nécessaire (seulement pour PRO)
+        try {
+          await supabase.rpc('reset_pro_monthly_credits', { p_user_id: user.id });
+        } catch (err) {
+          console.warn("Erreur lors de la vérification du reset mensuel PRO:", err);
+        }
+        
+        // Rafraîchir les crédits depuis Supabase
         const { data, error } = await supabase
           .from('profiles')
-          .select('credits, is_pro, last_credit_reset, created_at')
+          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at')
           .eq('id', user.id)
           .single();
 
         if (!error && data) {
           const creditsFromDB = data.credits ?? 0;
+          const creditsFreeFromDB = data.credits_free ?? 0;
+          const creditsPaidFromDB = data.credits_paid ?? 0;
           const isProFromDB = data.is_pro ?? false;
           
           set({ 
             credits: creditsFromDB,
+            creditsFree: creditsFreeFromDB,
+            creditsPaid: creditsPaidFromDB,
             isPro: isProFromDB
           });
           
@@ -87,6 +111,8 @@ export const useUserStore = create<UserState>()(
           currentStorage.state = {
             ...currentStorage.state,
             credits: creditsFromDB,
+            creditsFree: creditsFreeFromDB,
+            creditsPaid: creditsPaidFromDB,
             isPro: isProFromDB,
             user: user
           };
@@ -95,7 +121,7 @@ export const useUserStore = create<UserState>()(
       },
 
       logout: async () => {
-        set({ user: null, credits: 0, isPro: false });
+        set({ user: null, credits: 0, creditsFree: 0, creditsPaid: 0, isPro: false });
         await supabase.auth.signOut();
         localStorage.removeItem('simpleplate-storage'); // Nettoyage complet
       },
@@ -131,8 +157,12 @@ export const useUserStore = create<UserState>()(
           }
           
           if (data && data.success) {
-            // Mise à jour avec la vraie valeur depuis la DB
-            set({ credits: data.credits });
+            // Mise à jour avec les vraies valeurs depuis la DB
+            set({ 
+              credits: data.credits_total || (data.credits_free + data.credits_paid),
+              creditsFree: data.credits_free || 0,
+              creditsPaid: data.credits_paid || 0
+            });
             return true;
           } else {
             // Pas assez de crédits côté serveur

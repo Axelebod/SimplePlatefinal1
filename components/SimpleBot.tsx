@@ -29,7 +29,8 @@ export const SimpleBot: React.FC = () => {
     ];
   });
 
-  // Gestion du quota
+  // Gestion du quota (INDÉPENDANT de l'état utilisateur - utilise uniquement localStorage)
+  // La limite de 5 messages/jour est appliquée à tous les utilisateurs, connectés ou non
   const [usage, setUsage] = useState<BotUsage>(() => {
       const savedUsage = localStorage.getItem('simplebot_usage');
       const today = new Date().toDateString();
@@ -47,6 +48,14 @@ export const SimpleBot: React.FC = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Vérification de la date au montage et après chaque refresh
+  useEffect(() => {
+    const today = new Date().toDateString();
+    if (usage.date !== today) {
+      setUsage({ date: today, count: 0 });
+    }
+  }, []); // Exécuté une seule fois au montage
 
   // Sauvegarde automatique
   useEffect(() => {
@@ -139,7 +148,7 @@ export const SimpleBot: React.FC = () => {
       
       {/* CHAT WINDOW */}
       {isOpen && (
-        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg shadow-[8px_8px_0px_0px_#000] dark:shadow-[8px_8px_0px_0px_#fff] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
+        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
           {/* Header */}
           <div className="bg-neo-black dark:bg-white text-white dark:text-black p-3 flex justify-between items-center border-b-2 border-black dark:border-gray-300">
             <div className="flex flex-col">
@@ -166,7 +175,7 @@ export const SimpleBot: React.FC = () => {
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`
-                  max-w-[85%] p-3 text-sm rounded-md border border-black dark:border-gray-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-none
+                  max-w-[85%] p-3 text-sm rounded-md border border-black dark:border-gray-500
                   ${msg.role === 'user' 
                     ? 'bg-white text-black rounded-br-none' 
                     : 'bg-neo-yellow text-black rounded-bl-none'}
@@ -242,7 +251,7 @@ export const SimpleBot: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative w-14 h-14 bg-neo-black dark:bg-white text-white dark:text-black rounded-full border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] flex items-center justify-center hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] dark:hover:shadow-[6px_6px_0px_0px_#fff] transition-all"
+          className="group relative w-14 h-14 bg-neo-black dark:bg-white text-white dark:text-black rounded-full border-2 border-black dark:border-white flex items-center justify-center hover:-translate-y-1 transition-all"
         >
           <Bot className="w-7 h-7 group-hover:text-neo-yellow dark:group-hover:text-neo-violet transition-colors" />
           

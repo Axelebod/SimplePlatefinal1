@@ -1,6 +1,18 @@
 
 import { ToolConfig } from './types';
 
+// Fonction pour générer un slug français SEO-friendly
+const createFrenchSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
+    .replace(/[^a-z0-9\s-]/g, '') // Supprime les caractères spéciaux
+    .replace(/\s+/g, '-') // Remplace les espaces par des tirets
+    .replace(/-+/g, '-') // Remplace les tirets multiples par un seul
+    .replace(/^-|-$/g, ''); // Supprime les tirets en début/fin
+};
+
 // Directive stricte pour l'IA
 const SYSTEM_PROMPT = `
 RÔLE: Tu es un expert francophone précis et efficace.
@@ -24,6 +36,7 @@ const createSimpleTool = (
   costOverride: number = 1
 ): ToolConfig => ({
   id,
+  slug: createFrenchSlug(title),
   title,
   description,
   category,
@@ -54,6 +67,7 @@ export const tools: ToolConfig[] = [
   // --- HIGH TICKET TOOLS (3 CREDITS) ---
   {
     id: 'ecom-product-scanner',
+    slug: 'scanner-produit-ecommerce',
     title: 'Scanner Produit E-com',
     description: 'Uploadez une photo, obtenez la fiche produit Shopify complète.',
     category: 'Business',
@@ -83,6 +97,7 @@ SORTIE ATTENDUE (Format Markdown) :
   },
   {
     id: 'website-generator',
+    slug: 'generateur-site-web',
     title: 'Générateur Site Web',
     description: 'Créez une Landing Page complète (HTML/CSS/JS) en une requête.',
     category: 'Dev',
@@ -95,18 +110,95 @@ SORTIE ATTENDUE (Format Markdown) :
       description: 'Générez le code complet d\'une page web moderne, responsive et stylisée (Tailwind CSS) à partir d\'une simple description. Code propre et prêt à l\'emploi.', 
       keywords: ['générateur site web', 'créer site ia', 'code html css', 'landing page generator', 'webdesign ia', 'nocode'] 
     },
-    inputs: [{ name: 'desc', label: 'Décrivez le site web à créer', type: 'textarea', rows: 6, placeholder: 'Ex: Une landing page pour une application de fitness sombre avec des boutons verts néons, une section témoignages et un formulaire de contact.', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Agis comme un Développeur Frontend Senior. Code une page web complète (Single File HTML) pour : "${data.desc}".
-INSTRUCTIONS STRICTES:
-1. Structure HTML5 complète (<!DOCTYPE html>...).
-2. Utilise Tailwind CSS via CDN (<script src="https://cdn.tailwindcss.com"></script>).
-3. Utilise des images placeholder (https://placehold.co/600x400) si besoin.
-4. Inclus tout (CSS/JS) dans le même fichier.
-5. NE DONNE QUE LE CODE DANS UN BLOC MARKDOWN. Pas de texte avant ni après. Pas d'explications.`
+    inputs: [
+      { 
+        name: 'desc', 
+        label: 'Description du site web', 
+        type: 'textarea', 
+        rows: 6, 
+        placeholder: 'Ex: Une landing page moderne pour une app de fitness avec hero section, fonctionnalités, témoignages et CTA.', 
+        required: true,
+        helpText: 'Décrivez le type de site, le style, les sections souhaitées, les couleurs, etc.'
+      },
+      { 
+        name: 'style', 
+        label: 'Style visuel (Optionnel)', 
+        type: 'select', 
+        options: ['Moderne & Minimaliste', 'Bold & Coloré', 'Élégant & Professionnel', 'Créatif & Artistique', 'Tech & Futuriste', 'Classique & Corporate'],
+        required: false,
+        helpText: 'Choisissez le style général du design'
+      },
+      { 
+        name: 'sections', 
+        label: 'Sections à inclure (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Hero, Features, Testimonials, Pricing, Contact',
+        required: false,
+        helpText: 'Listez les sections souhaitées (séparées par des virgules)'
+      }
+    ],
+    promptGenerator: (data) => {
+      const styleGuide = data.style ? `\nSTYLE VISUEL: ${data.style}` : '';
+      const sectionsList = data.sections ? `\nSECTIONS À INCLURE: ${data.sections}` : '';
+      
+      return `${SYSTEM_PROMPT}
+TÂCHE: Agis comme un Développeur Frontend Senior Expert. Code une page web complète, moderne et professionnelle (Single File HTML) pour : "${data.desc}".${styleGuide}${sectionsList}
+
+INSTRUCTIONS STRICTES ET DÉTAILLÉES:
+
+1. **STRUCTURE HTML5 COMPLÈTE** :
+   - <!DOCTYPE html>
+   - <html lang="fr">
+   - <head> avec meta tags (viewport, charset, title, description)
+   - <body> avec tout le contenu
+
+2. **DESIGN & STYLING** :
+   - Utilise Tailwind CSS via CDN : <script src="https://cdn.tailwindcss.com"></script>
+   - Design RESPONSIVE (mobile-first) avec breakpoints md: et lg:
+   - Utilise des dégradés modernes, des ombres subtiles, des animations douces
+   - Typographie soignée avec hiérarchie claire (h1, h2, h3)
+   - Espacement généreux et aéré (padding, margin)
+
+3. **SECTIONS STANDARD À INCLURE** :
+   - **Hero Section** : Titre accrocheur, sous-titre, CTA principal, image/illustration
+   - **Features/Benefits** : 3-4 fonctionnalités avec icônes ou images
+   - **Testimonials** : 2-3 témoignages clients avec avatars
+   - **CTA Section** : Appel à l'action final
+   - **Footer** : Liens, copyright, réseaux sociaux
+
+4. **INTERACTIVITÉ** :
+   - Ajoute des animations au scroll (fade-in, slide-up)
+   - Hover effects sur les boutons et cartes
+   - Smooth scroll pour les ancres
+   - Menu de navigation sticky si plusieurs sections
+
+5. **IMAGES & ASSETS** :
+   - Utilise https://placehold.co/ pour les images placeholder
+   - Format: https://placehold.co/600x400/COLOR/TEXT (ex: https://placehold.co/600x400/6366f1/white)
+   - Utilise des icônes SVG inline ou Heroicons si besoin
+
+6. **CODE QUALITÉ** :
+   - Code propre, indenté, commenté pour les sections importantes
+   - Utilise des classes Tailwind sémantiques
+   - Pas de CSS inline sauf si absolument nécessaire
+   - JavaScript vanilla pour les interactions (pas de dépendances)
+
+7. **FORMAT DE SORTIE** :
+   - NE DONNE QUE LE CODE HTML COMPLET dans un bloc markdown \`\`\`html
+   - Pas de texte avant ni après le code
+   - Pas d'explications, juste le code prêt à copier-coller
+
+8. **BONUS** :
+   - Ajoute un favicon simple (data URI SVG)
+   - Dark mode optionnel si le style le permet
+   - Micro-interactions et transitions fluides
+
+GÉNÈRE MAINTENANT LE CODE COMPLET :`;
+    }
   },
   {
     id: 'python-pro-gen',
+    slug: 'generateur-python-pro',
     title: 'Générateur Python Pro',
     description: 'Scripts Python complexes, robustes et documentés.',
     category: 'Dev',
@@ -133,6 +225,7 @@ INSTRUCTIONS:
   // --- PRO TOOLS (HIGH VALUE) ---
   {
     id: 'ai-image-analysis',
+    slug: 'analyseur-image-ia',
     title: 'Analyseur d\'Image IA',
     description: 'Détectez les incohérences ou faites du Reverse Engineering.',
     category: 'Image',
@@ -159,6 +252,7 @@ DIRECTIVES:
   },
   {
     id: 'business-plan-pro',
+    slug: 'business-plan-pro',
     title: 'Business Plan Pro',
     description: 'Générez un plan stratégique complet pour investisseurs.',
     category: 'Business',
@@ -176,6 +270,7 @@ DIRECTIVES:
   },
   {
     id: 'smart-contract-audit',
+    slug: 'audit-smart-contract',
     title: 'Audit Smart Contract',
     description: 'Analysez la sécurité de votre code Solidity.',
     category: 'Security',
@@ -227,6 +322,7 @@ DIRECTIVES:
   // --- NEW AI TOOLS ---
   {
     id: 'ai-detector',
+    slug: 'detecteur-texte-ia',
     title: 'Détecteur Texte IA',
     description: 'Vérifiez si un texte est écrit par ChatGPT, Gemini ou un humain.',
     category: 'Text',
@@ -244,6 +340,7 @@ DIRECTIVES:
   },
   {
     id: 'ai-humanizer',
+    slug: 'humaniseur-texte',
     title: 'Humaniseur de Texte',
     description: 'Rendez vos textes IA indétectables et naturels.',
     category: 'Text',
@@ -261,6 +358,7 @@ DIRECTIVES:
   },
   {
     id: 'pro-prompt-gen',
+    slug: 'generateur-prompt-pro',
     title: 'Générateur Prompt Pro',
     description: 'Transformez une idée simple en Super-Prompt structuré.',
     category: 'Business',
@@ -280,6 +378,7 @@ DIRECTIVES:
   // --- MANDATORY / FLAGSHIP TOOLS (IA) ---
   {
     id: 'scam-detector',
+    slug: 'detecteur-arnaques',
     title: 'Détecteur d\'Arnaques',
     description: 'Analysez si un SMS ou un numéro est une arnaque.',
     category: 'Security',
@@ -297,6 +396,7 @@ DIRECTIVES:
   },
   {
     id: 'legal-translator',
+    slug: 'traducteur-juridique',
     title: 'Traducteur Juridique',
     description: 'Comprenez enfin vos contrats et documents légaux.',
     category: 'Business',
@@ -314,6 +414,7 @@ DIRECTIVES:
   },
   {
     id: 'dream-interpreter',
+    slug: 'interprete-reves',
     title: 'Interprète de Rêves',
     description: 'Découvrez la signification cachée de vos rêves.',
     category: 'Life',
@@ -331,6 +432,7 @@ DIRECTIVES:
   },
   {
     id: 'roast-my-code',
+    slug: 'explose-mon-code',
     title: 'Explose mon Code',
     description: 'L\'IA critique votre code avec humour et méchanceté.',
     category: 'Dev',
@@ -347,13 +449,14 @@ DIRECTIVES:
     promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un développeur Senior aigri et très drôle. "Roast" (critique violemment) ce code : "${data.code}". \n1. Une insulte créative sur le niveau du dev.\n2. Les vrais problèmes techniques.\n3. La version corrigée.`
   },
 
-  // --- LOCAL TOOLS (Passage à 1 Crédit pour rentabiliser) ---
+  // --- LOCAL TOOLS (Gratuits - 0 Crédit) ---
   {
     id: 'csv-to-json',
+    slug: 'csv-vers-json',
     title: 'CSV vers JSON',
     description: 'Convertisseur instantané sécurisé (local).',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'FileJson',
     outputType: 'text',
@@ -367,10 +470,11 @@ DIRECTIVES:
   },
   {
     id: 'hex-to-rgb',
+    slug: 'couleur-hex-rgb',
     title: 'Couleur Hex ↔ RGB',
     description: 'Convertisseur de couleurs pour Webdesigners.',
     category: 'Image',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Palette',
     outputType: 'text',
@@ -384,10 +488,11 @@ DIRECTIVES:
   },
   {
     id: 'percent-calc',
+    slug: 'calcul-pourcentage',
     title: 'Calcul Pourcentage',
     description: 'Calculez rapidement remises et évolutions.',
     category: 'Life',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Percent',
     outputType: 'text',
@@ -404,10 +509,11 @@ DIRECTIVES:
   },
   {
     id: 'meta-tag-gen',
+    slug: 'generateur-seo-meta',
     title: 'Générateur SEO Meta',
     description: 'Créez vos balises HTML pour Google.',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Tag',
     outputType: 'text',
@@ -425,10 +531,11 @@ DIRECTIVES:
   },
   {
     id: 'morse-trans',
+    slug: 'traducteur-morse',
     title: 'Traducteur Morse',
     description: 'Encodez ou décodez des messages secrets.',
     category: 'Life',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Radio',
     outputType: 'text',
@@ -442,10 +549,11 @@ DIRECTIVES:
   },
   {
     id: 'password-gen',
+    slug: 'generateur-mots-de-passe',
     title: 'Générateur Mots de Passe',
     description: 'Créez des mots de passe incassables.',
     category: 'Security',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Key',
     outputType: 'text',
@@ -459,10 +567,11 @@ DIRECTIVES:
   },
   {
     id: 'json-formatter',
+    slug: 'formateur-json',
     title: 'Formateur JSON',
     description: 'Validez et embellissez votre code JSON.',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Braces',
     outputType: 'text',
@@ -476,10 +585,11 @@ DIRECTIVES:
   },
   {
     id: 'uuid-gen',
+    slug: 'generateur-uuid',
     title: 'Générateur UUID',
     description: 'Créez des identifiants uniques (v4).',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Fingerprint',
     outputType: 'text',
@@ -493,10 +603,11 @@ DIRECTIVES:
   },
   {
     id: 'slug-gen',
+    slug: 'generateur-slug',
     title: 'Générateur de Slug',
     description: 'Optimisez vos URLs pour le SEO.',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Link',
     outputType: 'text',
@@ -510,10 +621,11 @@ DIRECTIVES:
   },
   {
     id: 'px-to-rem',
+    slug: 'pixel-vers-rem',
     title: 'Pixel vers REM',
     description: 'Convertisseur d\'unités CSS.',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Ruler',
     outputType: 'text',
@@ -527,10 +639,11 @@ DIRECTIVES:
   },
   {
     id: 'roi-calc',
+    slug: 'calculatrice-roi',
     title: 'Calculatrice ROI',
     description: 'Estimez la rentabilité de vos projets.',
     category: 'Business',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'TrendingUp',
     outputType: 'text',
@@ -547,10 +660,11 @@ DIRECTIVES:
   },
   {
     id: 'freelance-calc',
+    slug: 'simulateur-tjm-freelance',
     title: 'Simulateur TJM Freelance',
     description: 'Convertissez votre TJM en salaire net.',
     category: 'Business',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Briefcase',
     outputType: 'text',
@@ -564,10 +678,11 @@ DIRECTIVES:
   },
   {
     id: 'base64-tool',
+    slug: 'encodeur-base64',
     title: 'Encodeur Base64',
     description: 'Encodez et décodez du texte instantanément.',
     category: 'Dev',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Binary',
     outputType: 'text',
@@ -581,10 +696,11 @@ DIRECTIVES:
   },
   {
     id: 'text-analyzer',
+    slug: 'analyseur-texte',
     title: 'Analyseur de Texte',
     description: 'Compteur de mots, caractères et temps de lecture.',
     category: 'Text',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'AlignLeft',
     outputType: 'text',
@@ -598,10 +714,11 @@ DIRECTIVES:
   },
   {
     id: 'decision-maker',
+    slug: 'decideur',
     title: 'Le Décideur',
     description: 'Laissez le hasard choisir pour vous.',
     category: 'Life',
-    cost: 1,
+    cost: 0,
     isPremium: false,
     iconName: 'Dices',
     outputType: 'text',
@@ -612,6 +729,94 @@ DIRECTIVES:
     },
     inputs: [{ name: 'choices', label: 'Choix (séparés par des virgules)', type: 'text', placeholder: 'Pizza, Sushi, Burger', required: true }],
     promptGenerator: (data) => `LOCAL:DECISION_MAKER;;;${data.choices}`
+  },
+  {
+    id: 'homework-helper',
+    slug: 'aide-aux-devoirs',
+    title: 'Aide aux Devoirs IA',
+    description: 'Uploadez une photo ou posez une question, obtenez une explication détaillée.',
+    category: 'Life',
+    cost: 2,
+    isPremium: false,
+    iconName: 'GraduationCap',
+    outputType: 'text',
+    seo: { 
+      title: 'Aide aux Devoirs IA - Explications Détaillées par Intelligence Artificielle', 
+      description: 'Besoin d\'aide pour vos devoirs ? Uploadez une photo de votre exercice ou posez votre question. L\'IA vous explique tout en détail avec des exemples.', 
+      keywords: ['aide aux devoirs', 'aide devoir ia', 'explication exercice', 'résoudre exercice', 'aide scolaire ia', 'devoir maison'] 
+    },
+    inputs: [
+      { 
+        name: 'image', 
+        label: 'Photo de l\'exercice (Optionnel)', 
+        type: 'file', 
+        accept: 'image/*', 
+        required: false,
+        helpText: 'Uploadez une photo claire de votre exercice, problème ou question.'
+      },
+      { 
+        name: 'question', 
+        label: 'Votre question ou exercice (Optionnel)', 
+        type: 'textarea', 
+        rows: 6, 
+        required: false,
+        placeholder: 'Ex: Explique-moi comment résoudre une équation du second degré...',
+        helpText: 'Décrivez votre question ou copiez l\'énoncé de l\'exercice. Au moins une photo OU une question est requise.'
+      }
+    ],
+    promptGenerator: (data) => {
+      const hasImage = data.image === 'FILE_UPLOADED';
+      const hasText = data.question && data.question.trim();
+      
+      if (!hasImage && !hasText) {
+        return 'ERROR: Veuillez fournir au moins une photo ou une question.';
+      }
+      
+      const questionText = hasText ? data.question : 'Analyse cette image et explique-moi tout en détail.';
+      
+      return `${SYSTEM_PROMPT}
+RÔLE: Tu es un professeur patient et pédagogue, expert dans toutes les matières scolaires (Mathématiques, Français, Histoire, Sciences, Langues, etc.).
+
+MISSION: Aider l'élève à comprendre et résoudre son exercice ou sa question en donnant des explications DÉTAILLÉES et PÉDAGOGIQUES.
+
+${hasImage ? 'L\'élève a fourni une photo de son exercice. Analyse-la attentivement.' : ''}
+${hasText ? `QUESTION DE L'ÉLÈVE : "${questionText}"` : ''}
+
+INSTRUCTIONS STRICTES:
+1. Si c'est un exercice, explique chaque étape de la résolution de manière claire.
+2. Donne des exemples concrets pour illustrer les concepts.
+3. Utilise un langage adapté au niveau scolaire (collège/lycée).
+4. Si l'élève a fait une erreur, explique pourquoi et comment corriger.
+5. Fournis la réponse finale mais surtout EXPLIQUE le raisonnement.
+6. Sois encourageant et pédagogique.
+
+FORMAT DE RÉPONSE:
+- **Analyse** : Ce que je vois/comprends
+- **Explication étape par étape** : Comment résoudre
+- **Exemple concret** : Pour illustrer
+- **Réponse finale** : La solution
+- **Conseils** : Pour retenir et progresser
+
+${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' : 'Réponds maintenant à la question de manière détaillée et pédagogique.'}`;
+    }
+  },
+  {
+    id: 'qr-code-generator',
+    slug: 'generateur-qr-code',
+    title: 'Générateur QR Code',
+    description: 'Créez un QR code instantanément pour URL, texte ou contact.',
+    category: 'Dev',
+    cost: 0,
+    isPremium: false,
+    iconName: 'QrCode',
+    outputType: 'text',
+    seo: { 
+      title: 'Générateur QR Code Gratuit - Créer QR Code En Ligne', 
+      description: 'Générez des QR codes instantanément pour URLs, textes, contacts ou WiFi. Gratuit, rapide et sans inscription.', 
+      keywords: ['générateur qr code', 'créer qr code', 'qr code gratuit', 'qr code url', 'qr code wifi'] 
+    },
+    inputs: [{ name: 'data', label: 'Texte ou URL à encoder', type: 'text', placeholder: 'https://example.com ou Texte libre', required: true, helpText: 'Entrez une URL, un texte, un numéro de téléphone, etc.' }],
+    promptGenerator: (data) => `LOCAL:QR_CODE;;;${data.data}`
   },
 
   // --- AI TOOLS (Restants utiles/Fun - Passés à 1 Crédit) ---

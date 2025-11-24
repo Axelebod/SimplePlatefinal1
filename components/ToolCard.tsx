@@ -16,7 +16,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
 
   return (
     <Link 
-      to={`/tool/${tool.id}`}
+      to={`/tool/${tool.slug || tool.id}`}
       className="group relative block h-full"
     >
       <div className={`

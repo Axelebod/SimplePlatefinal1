@@ -41,8 +41,8 @@ export const generateToolContent = async (
   // LOGIQUE LOCALE (Redirection vers JS pur)
   if (prompt.startsWith('LOCAL:')) {
     // On simule un délai réseau pour l'expérience utilisateur (optionnel)
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return handleLocalTool(prompt);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return await handleLocalTool(prompt);
   }
 
   if (!API_KEY) {

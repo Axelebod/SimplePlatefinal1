@@ -8,7 +8,8 @@ export const Pricing: React.FC = () => {
 
   const features = [
     { name: "Accès à tous les outils", free: true, pro: true },
-    { name: "Crédits mensuels", free: "5 Crédits / mois", pro: "100 Crédits / mois" },
+    { name: "Crédits gratuits", free: "5 / semaine (non cumulable)", pro: "5 / semaine (non cumulable)" },
+    { name: "Crédits payants", free: "0", pro: "100 / mois" },
     { name: "Génération d'Images IA", free: false, pro: true },
     { name: "Support Prioritaire", free: false, pro: true },
     { name: "Sans Publicité", free: false, pro: true },
@@ -54,9 +55,14 @@ export const Pricing: React.FC = () => {
       {/* ALERT INFO RECHARGE */}
       <div className="max-w-2xl mx-auto mb-12 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800 p-4 rounded-md flex items-start gap-3 text-blue-800 dark:text-blue-200 text-sm">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-          <p>
-              <strong>Note importante :</strong> Les crédits inclus dans les abonnements sont réinitialisés chaque mois (remise à niveau). Ils ne sont pas cumulables d'un mois à l'autre. Utilisez-les !
-          </p>
+          <div>
+              <p className="mb-2">
+                  <strong>Crédits gratuits :</strong> 5 crédits par semaine (non cumulables - maximum 5). Si vous ne les utilisez pas, ils ne s'accumulent pas.
+              </p>
+              <p>
+                  <strong>Crédits PRO :</strong> 100 crédits payants par mois qui s'ajoutent à vos crédits payants existants. Les crédits payants ne s'expirent jamais.
+              </p>
+          </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">

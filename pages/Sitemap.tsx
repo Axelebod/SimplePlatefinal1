@@ -81,7 +81,7 @@ export const Sitemap: React.FC = () => {
                         {catTools.map(tool => (
                             <Link 
                                 key={tool.id}
-                                to={`/tool/${tool.id}`} 
+                                to={`/tool/${tool.slug || tool.id}`} 
                                 className="block p-4 hover:bg-gray-50 transition-colors group"
                             >
                                 <div className="flex justify-between items-start">
