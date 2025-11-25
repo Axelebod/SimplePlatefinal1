@@ -138,62 +138,35 @@ SORTIE ATTENDUE (Format Markdown) :
       }
     ],
     promptGenerator: (data) => {
-      const styleGuide = data.style ? `\nSTYLE VISUEL: ${data.style}` : '';
-      const sectionsList = data.sections ? `\nSECTIONS À INCLURE: ${data.sections}` : '';
+      const styleGuide = data.style ? `\nSTYLE: ${data.style}` : '';
+      const sectionsList = data.sections ? `\nSECTIONS: ${data.sections}` : '';
       
       return `${SYSTEM_PROMPT}
-TÂCHE: Agis comme un Développeur Frontend Senior Expert. Code une page web complète, moderne et professionnelle (Single File HTML) pour : "${data.desc}".${styleGuide}${sectionsList}
+TÂCHE: Code une landing page HTML complète et fonctionnelle pour : "${data.desc}".${styleGuide}${sectionsList}
 
-INSTRUCTIONS STRICTES ET DÉTAILLÉES:
+RÈGLES STRICTES (RESPECTE-LES) :
 
-1. **STRUCTURE HTML5 COMPLÈTE** :
-   - <!DOCTYPE html>
-   - <html lang="fr">
-   - <head> avec meta tags (viewport, charset, title, description)
-   - <body> avec tout le contenu
+1. **HTML5 COMPLET** : <!DOCTYPE html>, <html lang="fr">, <head> avec meta (viewport, charset, title), <body>
 
-2. **DESIGN & STYLING** :
-   - Utilise Tailwind CSS via CDN : <script src="https://cdn.tailwindcss.com"></script>
-   - Design RESPONSIVE (mobile-first) avec breakpoints md: et lg:
-   - Utilise des dégradés modernes, des ombres subtiles, des animations douces
-   - Typographie soignée avec hiérarchie claire (h1, h2, h3)
-   - Espacement généreux et aéré (padding, margin)
+2. **TAILWIND CSS** : <script src="https://cdn.tailwindcss.com"></script> dans <head>
 
-3. **SECTIONS STANDARD À INCLURE** :
-   - **Hero Section** : Titre accrocheur, sous-titre, CTA principal, image/illustration
-   - **Features/Benefits** : 3-4 fonctionnalités avec icônes ou images
-   - **Testimonials** : 2-3 témoignages clients avec avatars
-   - **CTA Section** : Appel à l'action final
-   - **Footer** : Liens, copyright, réseaux sociaux
+3. **RESPONSIVE** : Mobile-first avec md: et lg: breakpoints
 
-4. **INTERACTIVITÉ** :
-   - Ajoute des animations au scroll (fade-in, slide-up)
-   - Hover effects sur les boutons et cartes
-   - Smooth scroll pour les ancres
-   - Menu de navigation sticky si plusieurs sections
+4. **SECTIONS MAX 4** :
+   - Hero (titre + sous-titre + CTA + image)
+   - Features (3 items max)
+   - CTA final
+   - Footer simple
 
-5. **IMAGES & ASSETS** :
-   - Utilise https://placehold.co/ pour les images placeholder
-   - Format: https://placehold.co/600x400/COLOR/TEXT (ex: https://placehold.co/600x400/6366f1/white)
-   - Utilise des icônes SVG inline ou Heroicons si besoin
+5. **IMAGES** : https://placehold.co/600x400/6366f1/white (remplace COLOR par une couleur appropriée)
 
-6. **CODE QUALITÉ** :
-   - Code propre, indenté, commenté pour les sections importantes
-   - Utilise des classes Tailwind sémantiques
-   - Pas de CSS inline sauf si absolument nécessaire
-   - JavaScript vanilla pour les interactions (pas de dépendances)
+6. **JAVASCRIPT MINIMAL** : Seulement pour smooth scroll et animations simples (fade-in au scroll)
 
-7. **FORMAT DE SORTIE** :
-   - NE DONNE QUE LE CODE HTML COMPLET dans un bloc markdown \`\`\`html
-   - Pas de texte avant ni après le code
-   - Pas d'explications, juste le code prêt à copier-coller
+7. **CODE COURT** : Maximum 200 lignes HTML. Pas de sections inutiles. Code propre et indenté.
 
-8. **BONUS** :
-   - Ajoute un favicon simple (data URI SVG)
-   - Dark mode optionnel si le style le permet
-   - Micro-interactions et transitions fluides
+8. **SORTIE** : UNIQUEMENT le code HTML dans \`\`\`html. Pas de texte avant/après.
 
-GÉNÈRE MAINTENANT LE CODE COMPLET :`;
+GÉNÈRE LE CODE MAINTENANT :`;
     }
   },
   {

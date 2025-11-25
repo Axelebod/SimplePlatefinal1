@@ -1,3 +1,7 @@
+// @ts-nocheck
+// Ce fichier utilise Deno (pas Node.js) - les erreurs TypeScript sont normales
+// Le code fonctionnera correctement sur Supabase Edge Functions
+
 import Stripe from 'https://esm.sh/stripe@15.9.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 
@@ -38,7 +42,7 @@ async function addCreditsToUser(userId: string | null, email: string | null, cre
   if (userId) {
     const { data: profile, error } = await supabaseAdmin
       .from('profiles')
-      .select('id, credits')
+      .select('id')
       .eq('id', userId)
       .single();
 
@@ -53,7 +57,7 @@ async function addCreditsToUser(userId: string | null, email: string | null, cre
   if (!profileId && email) {
     const { data: profile, error } = await supabaseAdmin
       .from('profiles')
-      .select('id, credits')
+      .select('id')
       .eq('email', email)
       .single();
 
@@ -110,7 +114,7 @@ async function activatePro(userId: string | null, email: string | null, isRenewa
   if (userId) {
     const { data: profile, error } = await supabaseAdmin
       .from('profiles')
-      .select('id, credits, is_pro')
+      .select('id, is_pro')
       .eq('id', userId)
       .single();
 
@@ -125,7 +129,7 @@ async function activatePro(userId: string | null, email: string | null, isRenewa
   if (!profileId && email) {
     const { data: profile, error } = await supabaseAdmin
       .from('profiles')
-      .select('id, credits, is_pro')
+      .select('id, is_pro')
       .eq('email', email)
       .single();
 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useUserStore } from '../store/userStore';
 import { Loader2, AlertTriangle, Check, Mail } from 'lucide-react';
@@ -228,7 +228,7 @@ export const Auth: React.FC = () => {
         
         <div className="text-center mt-6">
             <p className="text-sm text-gray-500">
-                En continuant, vous acceptez nos <a href="#/legal" className="underline font-bold text-black">CGU</a>.
+                En continuant, vous acceptez nos <Link to="/legal" className="underline font-bold text-black">CGU</Link>.
             </p>
         </div>
 
