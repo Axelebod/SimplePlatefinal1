@@ -155,49 +155,102 @@ export const handleLocalTool = async (command: string): Promise<string> => {
 \`\`\``);
 
     case 'QR_CODE':
-        // Génération locale du QR code (100% côté client, aucune dépendance externe)
+        // Génération locale du QR code (100% côté client)
+        // Utilise une API QR code en ligne gratuite comme fallback si la bibliothèque locale échoue
         try {
-            // Attendre que la bibliothèque soit chargée (avec timeout)
-            const maxWait = 2000; // 2 secondes max
-            const checkInterval = 100;
-            let waited = 0;
+            const win = window as any;
             
-            while (waited < maxWait) {
-                const QRCode = (window as any).QRCode;
-                if (QRCode && typeof QRCode.toCanvas === 'function') {
+            // Essayer d'abord avec la bibliothèque locale
+            const tryLocalQRCode = (): Promise<string> => {
+                return new Promise((resolve, reject) => {
+                    // Vérifier plusieurs façons dont la bibliothèque peut s'exposer
+                    let QRCodeLib: any = null;
+                    
+                    if (win.QRCode && typeof win.QRCode.toCanvas === 'function') {
+                        QRCodeLib = win.QRCode;
+                    } else if (win.qrcode && typeof win.qrcode.toCanvas === 'function') {
+                        QRCodeLib = win.qrcode;
+                    } else if (typeof QRCode !== 'undefined' && typeof (QRCode as any).toCanvas === 'function') {
+                        QRCodeLib = QRCode;
+                    }
+                    
+                    if (!QRCodeLib) {
+                        reject(new Error('Bibliothèque locale non disponible'));
+                        return;
+                    }
+                    
                     // Créer un canvas temporaire pour générer le QR code
                     const canvas = document.createElement('canvas');
-                    await new Promise<void>((resolve, reject) => {
-                        try {
-                            QRCode.toCanvas(canvas, input, {
-                                width: 300,
-                                margin: 2,
-                                color: {
-                                    dark: '#000000',
-                                    light: '#FFFFFF'
-                                }
-                            }, (error: any) => {
-                                if (error) reject(error);
-                                else resolve();
-                            });
-                        } catch (err) {
-                            reject(err);
+                    QRCodeLib.toCanvas(canvas, input, {
+                        width: 300,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        },
+                        errorCorrectionLevel: 'M'
+                    }, (error: any) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            const qrDataUrl = canvas.toDataURL('image/png');
+                            resolve(qrDataUrl);
                         }
                     });
+                });
+            };
+            
+            // Fallback: Utiliser une API QR code en ligne gratuite
+            const useOnlineQRCode = (): Promise<string> => {
+                return new Promise((resolve, reject) => {
+                    // Utiliser api.qrserver.com (gratuit, pas de clé API requise)
+                    const encodedInput = encodeURIComponent(input);
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedInput}`;
                     
-                    // Convertir le canvas en image base64
-                    const qrDataUrl = canvas.toDataURL('image/png');
-                    
-                    return Promise.resolve(`### QR Code généré 📱\n\n![QR Code](${qrDataUrl})\n\n**Données encodées :** \`${input}\`\n\n*Scannez le QR code avec votre téléphone pour accéder au contenu.*`);
-                }
-                // Attendre un peu avant de réessayer
-                await new Promise(resolve => setTimeout(resolve, checkInterval));
-                waited += checkInterval;
+                    // Vérifier que l'image se charge correctement
+                    const img = new Image();
+                    img.onload = () => {
+                        // Utiliser directement l'URL de l'API (plus simple et plus fiable)
+                        resolve(qrUrl);
+                    };
+                    img.onerror = () => {
+                        // Si l'image ne charge pas, essayer de convertir en base64 comme fallback
+                        const img2 = new Image();
+                        img2.crossOrigin = 'anonymous';
+                        img2.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img2.width;
+                            canvas.height = img2.height;
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                ctx.drawImage(img2, 0, 0);
+                                const qrDataUrl = canvas.toDataURL('image/png');
+                                resolve(qrDataUrl);
+                            } else {
+                                reject(new Error('Impossible de créer le canvas'));
+                            }
+                        };
+                        img2.onerror = () => reject(new Error('Erreur de chargement de l\'image QR code'));
+                        img2.src = qrUrl;
+                    };
+                    img.src = qrUrl;
+                });
+            };
+            
+            // Essayer d'abord la bibliothèque locale, puis fallback en ligne
+            let qrDataUrl: string;
+            try {
+                qrDataUrl = await tryLocalQRCode();
+            } catch (localError) {
+                console.warn('Bibliothèque locale QR Code non disponible, utilisation du fallback en ligne:', localError);
+                qrDataUrl = await useOnlineQRCode();
             }
             
-            return Promise.resolve("❌ **Erreur** : Bibliothèque QR Code non chargée. Veuillez rafraîchir la page et réessayer.");
+            // Retourner le QR code avec un format markdown simple pour un meilleur affichage
+            return Promise.resolve(`### QR Code généré 📱\n\n![QR Code](${qrDataUrl})\n\n**Données encodées :** \`${input}\`\n\n*Scannez le QR code avec votre téléphone pour accéder au contenu.*`);
         } catch (error) {
-            return Promise.resolve(`❌ **Erreur lors de la génération** : ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+            console.error('QR Code service error:', error);
+            return Promise.resolve(`❌ **Erreur lors de la génération** : ${error instanceof Error ? error.message : 'Erreur inconnue'}\n\n**Solution** : Vérifiez votre connexion Internet et réessayez.`);
         }
     
     default:

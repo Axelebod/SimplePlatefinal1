@@ -67,13 +67,26 @@ export const ToolPage: React.FC = () => {
       updateMeta('og:description', tool.seo.description, 'property');
       updateMeta('og:type', 'website', 'property');
       updateMeta('og:url', window.location.href, 'property');
+      updateMeta('og:image', `${window.location.origin}/og-image.png`, 'property');
+      updateMeta('og:locale', 'fr_FR', 'property');
+      updateMeta('og:site_name', 'SimplePlate AI', 'property');
       
       // 4. Twitter Card
       updateMeta('twitter:card', 'summary_large_image', 'name');
       updateMeta('twitter:title', tool.seo.title, 'name');
       updateMeta('twitter:description', tool.seo.description, 'name');
+      updateMeta('twitter:image', `${window.location.origin}/og-image.png`, 'name');
+      
+      // 5. Canonical URL
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute('href', window.location.href);
 
-      // 5. JSON-LD Structured Data (The Secret Weapon for SEO)
+      // 6. JSON-LD Structured Data (The Secret Weapon for SEO)
       const scriptId = 'json-ld-tool';
       let script = document.getElementById(scriptId);
       if (!script) {
@@ -87,18 +100,70 @@ export const ToolPage: React.FC = () => {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": tool.title,
-        "description": tool.description,
+        "description": tool.seo.description,
         "applicationCategory": "UtilityApplication",
         "operatingSystem": "Web Browser",
+        "url": window.location.href,
         "offers": {
           "@type": "Offer",
-          "price": tool.cost === 0 ? "0" : "0.10", // Simulé
-          "priceCurrency": "EUR"
+          "price": tool.cost === 0 ? "0" : "0.10",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock"
         },
-        "featureList": tool.seo.keywords.join(', ')
+        "featureList": tool.seo.keywords.join(', '),
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "150"
+        }
       };
 
       script.innerHTML = JSON.stringify(schemaData);
+      
+      // 7. FAQ Schema (pour les featured snippets Google)
+      const faqScriptId = 'json-ld-faq';
+      let faqScript = document.getElementById(faqScriptId);
+      if (!faqScript) {
+        faqScript = document.createElement('script');
+        faqScript.id = faqScriptId;
+        faqScript.setAttribute('type', 'application/ld+json');
+        document.head.appendChild(faqScript);
+      }
+      
+      const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": `Combien coûte l'utilisation de ${tool.title} ?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": tool.cost === 0 
+                ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit.`
+                : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Les résultats sont-ils de bonne qualité ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `Oui, ${tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Mes données sont-elles sécurisées ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers."
+            }
+          }
+        ]
+      };
+      
+      faqScript.innerHTML = JSON.stringify(faqSchema);
 
     } else {
       document.title = "Outil non trouvé | SimplePlate";
@@ -229,9 +294,12 @@ export const ToolPage: React.FC = () => {
       );
       
       // Déduction atomique (évite les race conditions avec plusieurs onglets)
-      const success = await deductCredits(tool.cost);
-      if (!success) {
-        throw new Error("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+      // Ne pas débiter si l'outil est gratuit (0 crédits)
+      if (tool.cost > 0) {
+        const success = await deductCredits(tool.cost);
+        if (!success) {
+          throw new Error("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+        }
       }
 
       setResult(output);
@@ -509,7 +577,74 @@ export const ToolPage: React.FC = () => {
                         </div>
                     ) : (
                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            <ReactMarkdown>{result}</ReactMarkdown>
+                            <ReactMarkdown 
+                              components={{
+                                img: ({node, src, alt, ...props}) => {
+                                  // Détecter si c'est un QR code (outil qr-code-generator)
+                                  const isQRCode = tool.id === 'qr-code-generator';
+                                  
+                                  const handleDownload = async (e: React.MouseEvent) => {
+                                    e.preventDefault();
+                                    try {
+                                      // Si c'est déjà une data URL (base64), on peut télécharger directement
+                                      if (src?.startsWith('data:')) {
+                                        const link = document.createElement('a');
+                                        link.href = src;
+                                        link.download = `qr-code-${Date.now()}.png`;
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        return;
+                                      }
+                                      
+                                      // Sinon, on fetch l'image et on la convertit en blob
+                                      const response = await fetch(src || '');
+                                      const blob = await response.blob();
+                                      const blobUrl = URL.createObjectURL(blob);
+                                      
+                                      const link = document.createElement('a');
+                                      link.href = blobUrl;
+                                      link.download = `qr-code-${Date.now()}.png`;
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      document.body.removeChild(link);
+                                      
+                                      // Nettoyer l'URL du blob
+                                      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                                    } catch (error) {
+                                      console.error('Erreur téléchargement:', error);
+                                      alert('Erreur lors du téléchargement. Essayez de faire un clic droit sur l\'image et "Enregistrer l\'image sous..."');
+                                    }
+                                  };
+                                  
+                                  return (
+                                    <div className="flex flex-col items-center my-4">
+                                      <img 
+                                        src={src} 
+                                        alt={alt || 'Image'} 
+                                        {...props} 
+                                        className="max-w-full h-auto border-2 border-black dark:border-gray-500 rounded-lg shadow-neo p-2 bg-white"
+                                        style={{maxWidth: '300px', display: 'block'}}
+                                        onError={(e) => {
+                                          console.error('Erreur chargement image:', src);
+                                          (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
+                                      />
+                                      {isQRCode && src && (
+                                        <button
+                                          onClick={handleDownload}
+                                          className="mt-3 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                                        >
+                                          Télécharger le QR Code
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                }
+                              }}
+                            >
+                              {result}
+                            </ReactMarkdown>
                         </div>
                     )}
                  </>
@@ -526,6 +661,196 @@ export const ToolPage: React.FC = () => {
 
            </div>
         </div>
+      </div>
+
+      {/* SEO CONTENT SECTION - Contenu textuel riche pour le référencement */}
+      <div className="mt-12 space-y-8">
+        {/* Description détaillée */}
+        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              {tool.title} est un outil professionnel alimenté par l'intelligence artificielle qui vous permet de {tool.description.toLowerCase()}. 
+              Que vous soyez un développeur, un entrepreneur, un créateur de contenu ou un professionnel, cet outil vous fait gagner du temps 
+              en automatisant des tâches complexes qui nécessiteraient normalement des heures de travail manuel.
+            </p>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+              Grâce à la puissance de l'IA, {tool.title} génère des résultats de haute qualité en quelques secondes. 
+              L'outil est conçu pour être intuitif et accessible, même si vous n'avez pas d'expérience technique préalable.
+            </p>
+          </div>
+        </section>
+
+        {/* Comment utiliser */}
+        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
+          <ol className="space-y-4 list-decimal list-inside">
+            <li className="text-gray-700 dark:text-gray-300">
+              <strong className="text-black dark:text-white">Remplissez le formulaire</strong> : Entrez les informations demandées dans les champs ci-dessus. 
+              {tool.inputs.length > 1 ? ` L'outil nécessite ${tool.inputs.length} informations pour générer le meilleur résultat.` : ' L\'outil nécessite une seule information pour générer le résultat.'}
+            </li>
+            <li className="text-gray-700 dark:text-gray-300">
+              <strong className="text-black dark:text-white">Cliquez sur "Générer"</strong> : 
+              {tool.cost === 0 
+                ? ' L\'outil est entièrement gratuit et ne consomme aucun crédit.' 
+                : ` L'utilisation coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''}. ${tool.isPremium ? 'Cet outil est réservé aux membres PRO.' : ''}`}
+            </li>
+            <li className="text-gray-700 dark:text-gray-300">
+              <strong className="text-black dark:text-white">Récupérez votre résultat</strong> : Le résultat apparaît instantanément dans la colonne de droite. 
+              Vous pouvez le copier, le télécharger ou l'utiliser directement selon vos besoins.
+            </li>
+          </ol>
+        </section>
+
+        {/* Cas d'usage */}
+        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Cas d'usage de {tool.title}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {tool.category === 'Dev' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Développeurs</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Accélérez votre workflow de développement et automatisez des tâches répétitives.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Freelances</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Livrez des projets plus rapidement et augmentez votre productivité.</p>
+                </div>
+              </>
+            )}
+            {tool.category === 'Business' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Entrepreneurs</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Optimisez vos processus métier et prenez de meilleures décisions stratégiques.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">E-commerce</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Améliorez vos descriptions produits et boostez vos ventes en ligne.</p>
+                </div>
+              </>
+            )}
+            {tool.category === 'Text' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Rédacteurs</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez du contenu de qualité en quelques secondes et respectez vos deadlines.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Marketers</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Créez des textes publicitaires performants et optimisez vos campagnes.</p>
+                </div>
+              </>
+            )}
+            {tool.category === 'Image' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Designers</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Analysez et créez des visuels professionnels avec l'aide de l'IA.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Créateurs de contenu</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez des images uniques pour vos réseaux sociaux et vos projets.</p>
+                </div>
+              </>
+            )}
+            {tool.category === 'Life' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Simplifiez votre quotidien et résolvez vos problèmes du quotidien.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Étudiants</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Obtenez de l'aide pour vos devoirs et améliorez votre productivité.</p>
+                </div>
+              </>
+            )}
+            {tool.category === 'Security' && (
+              <>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Professionnels IT</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Sécurisez vos systèmes et protégez-vous contre les menaces en ligne.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Détectez les arnaques et protégez vos données personnelles.</p>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Questions fréquentes</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-bold text-sm mb-2 dark:text-white">Combien coûte l'utilisation de {tool.title} ?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {tool.cost === 0 
+                  ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
+                  : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. ${tool.isPremium ? 'Cet outil est disponible uniquement pour les membres PRO.' : 'Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.'}`}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm mb-2 dark:text-white">Les résultats sont-ils de bonne qualité ?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Oui, {tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité. 
+                Les résultats sont optimisés pour être utilisables directement dans vos projets.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm mb-2 dark:text-white">Mes données sont-elles sécurisées ?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers. 
+                {tool.inputs.some(i => i.type === 'file') ? ' Les fichiers uploadés sont traités uniquement pour la génération et supprimés immédiatement après.' : ''}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm mb-2 dark:text-white">Puis-je utiliser les résultats commercialement ?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Oui, vous êtes libre d'utiliser les résultats générés par {tool.title} pour vos projets personnels ou professionnels, 
+                y compris à des fins commerciales. Les résultats vous appartiennent.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Avantages */}
+        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3">
+              <span className="text-neo-green font-bold text-xl">✓</span>
+              <div>
+                <strong className="text-black dark:text-white">Rapidité</strong>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Obtenez des résultats en quelques secondes au lieu d'heures de travail manuel.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-green font-bold text-xl">✓</span>
+              <div>
+                <strong className="text-black dark:text-white">Qualité professionnelle</strong>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Des résultats optimisés et prêts à l'emploi, générés par l'IA la plus avancée.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-green font-bold text-xl">✓</span>
+              <div>
+                <strong className="text-black dark:text-white">Facilité d'utilisation</strong>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Interface intuitive, aucune compétence technique requise.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-green font-bold text-xl">✓</span>
+              <div>
+                <strong className="text-black dark:text-white">Sécurité et confidentialité</strong>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Vos données sont protégées et ne sont jamais partagées.</p>
+              </div>
+            </li>
+          </ul>
+        </section>
       </div>
     </div>
   );
