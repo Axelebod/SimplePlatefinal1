@@ -369,7 +369,7 @@ export const ToolPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column: Input */}
         <div className="space-y-6">
-          <div className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+          <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
             <form onSubmit={handleSubmit} className="space-y-6">
               {tool.inputs.map((input) => (
                 <div key={input.name}>
@@ -512,7 +512,7 @@ export const ToolPage: React.FC = () => {
         </div>
 
         {/* Right Column: Output */}
-        <div className="relative bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] min-h-[400px] flex flex-col">
+        <div className="relative bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] min-h-[400px] flex flex-col">
            
            {/* HEADER */}
            <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-white pb-2">
@@ -704,7 +704,7 @@ export const ToolPage: React.FC = () => {
         return (
           <div className="mt-12 space-y-8">
             {/* Description détaillée personnalisée */}
-            <section className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -714,7 +714,7 @@ export const ToolPage: React.FC = () => {
             </section>
 
             {/* Comment utiliser personnalisé */}
-            <section className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
               <ol className="space-y-4">
                 {content.howTo.map((step, index) => (
@@ -727,7 +727,7 @@ export const ToolPage: React.FC = () => {
             </section>
 
             {/* Cas d'usage personnalisés */}
-            <section className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qui utilise {tool.title} ?</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {content.useCases.map((useCase, index) => (
@@ -776,7 +776,7 @@ export const ToolPage: React.FC = () => {
         </section>
 
             {/* Avantages personnalisés */}
-            <section className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
               <ul className="space-y-3">
                 {content.benefits.map((benefit, index) => (

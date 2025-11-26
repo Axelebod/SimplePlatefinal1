@@ -26,7 +26,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
         transition-all duration-200
         shadow-neo hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]
         dark:shadow-[2px_2px_0px_0px_#fff] dark:hover:shadow-none dark:hover:translate-x-[2px] dark:hover:translate-y-[2px]
-        bg-neo-white dark:bg-gray-600
+        bg-white dark:bg-gray-600
       `}>
         
         <div>

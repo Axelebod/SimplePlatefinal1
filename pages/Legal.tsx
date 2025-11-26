@@ -7,7 +7,7 @@ export const Legal: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white p-8 rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] my-8">
+    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-600 border-2 border-black dark:border-white p-8 rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] my-8">
       <h1 className="font-display text-3xl md:text-4xl font-bold mb-8 dark:text-white">Mentions Légales & Conditions Générales d'Utilisation</h1>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Dernière mise à jour : 25 novembre 2025</p>
 
