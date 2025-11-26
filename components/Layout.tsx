@@ -76,6 +76,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     }
   }, [isDarkMode]);
 
+  // Initialiser le dark mode au montage du composant
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDarkMode) {
+        root.classList.add('dark');
+    } else {
+        root.classList.remove('dark');
+    }
+  }, []);
+
   // Gestion du Scroll To Top
   useEffect(() => {
     const checkScroll = () => {

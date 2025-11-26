@@ -7,14 +7,33 @@ import { SITE_CONFIG } from '../constants';
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
-      user: null, 
-      credits: 0,
-      creditsFree: 0,
-      creditsPaid: 0,
-      isPro: false,
-      isDarkMode: false,
-      freeCreditsResetDate: null,
+    (set, get) => {
+      // Initialiser le dark mode avec la préférence stockée ou système
+      let initialDarkMode = false;
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('simpleplate-storage');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            initialDarkMode = parsed.state?.isDarkMode ?? false;
+          } catch (e) {
+            // Si erreur de parsing, utiliser la préférence système
+            initialDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          }
+        } else {
+          // Si pas de préférence stockée, utiliser la préférence système
+          initialDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+      }
+
+      return {
+        user: null, 
+        credits: 0,
+        creditsFree: 0,
+        creditsPaid: 0,
+        isPro: false,
+        isDarkMode: initialDarkMode,
+        freeCreditsResetDate: null,
 
       login: async (user: User) => {
         set({ user });
@@ -289,7 +308,8 @@ export const useUserStore = create<UserState>()(
       toggleDarkMode: () => {
           set((state) => ({ isDarkMode: !state.isDarkMode }));
       }
-    }),
+      };
+    },
     {
       name: 'simpleplate-storage',
       storage: createJSONStorage(() => localStorage),

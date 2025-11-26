@@ -167,6 +167,30 @@
 </head>
   <body>
     <div id="root"></div>
+  <script>
+    // Initialisation du dark mode avant le rendu React
+    (function() {
+      const stored = localStorage.getItem('simpleplate-storage');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.state?.isDarkMode) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {
+          // Si pas de préférence stockée, utiliser la préférence système
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+          }
+        }
+      } else {
+        // Si pas de préférence stockée, utiliser la préférence système
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.classList.add('dark');
+        }
+      }
+    })();
+  </script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
