@@ -148,7 +148,7 @@ export const SimpleBot: React.FC = () => {
       
       {/* CHAT WINDOW */}
       {isOpen && (
-        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
+        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
           {/* Header */}
           <div className="bg-neo-black dark:bg-white text-white dark:text-black p-3 flex justify-between items-center border-b-2 border-black dark:border-gray-300">
             <div className="flex flex-col">
@@ -225,7 +225,7 @@ export const SimpleBot: React.FC = () => {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={handleSend} className="p-2 border-t-2 border-black dark:border-white bg-white dark:bg-gray-600 flex gap-2">
+          <form onSubmit={handleSend} className="p-2 border-t-2 border-black dark:border-white bg-neo-white dark:bg-gray-600 flex gap-2">
             <input
               type="text"
               value={input}

@@ -80,7 +80,7 @@ export const Home: React.FC = () => {
       <header className="text-center space-y-4 py-8 animate-in fade-in slide-in-from-top-4 duration-700">
         <h1 className="font-display text-4xl md:text-6xl font-bold dark:text-white">
           Boostez votre <br className="hidden md:block" />
-          <span className="bg-neo-yellow px-2 border border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-none transform -rotate-1 inline-block mx-2 text-black">
+          <span className="bg-neo-yellow dark:bg-neo-yellow px-2 border border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] transform -rotate-1 inline-block mx-2 text-black dark:text-black">
             productivité
           </span>
         </h1>
@@ -111,7 +111,7 @@ export const Home: React.FC = () => {
             className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
               selectedCategory === 'All' 
                 ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
+                : 'bg-neo-white text-neo-black hover:bg-white dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
             }`}
           >
             Tous
@@ -123,7 +123,7 @@ export const Home: React.FC = () => {
               className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
                 selectedCategory === cat 
                   ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
+                  : 'bg-neo-white text-neo-black hover:bg-white dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
               }`}
             >
               {CATEGORY_LABELS[cat]}
@@ -149,7 +149,7 @@ export const Home: React.FC = () => {
           className="group relative block h-full opacity-60 hover:opacity-100 transition-opacity"
         >
           <div className="h-full flex flex-col items-center justify-center text-center border-2 border-black dark:border-white border-dashed rounded-lg p-8 bg-transparent hover:bg-white dark:hover:bg-gray-600 transition-all cursor-pointer min-h-[200px]">
-             <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 border-2 border-black dark:border-gray-500 border-dashed rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+             <div className="w-12 h-12 bg-neo-white dark:bg-gray-700 border-2 border-black dark:border-white border-dashed rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Plus className="w-6 h-6 text-gray-400 dark:text-gray-400" />
              </div>
              <h3 className="font-display font-bold text-lg text-gray-600 dark:text-gray-400 mb-1">
@@ -178,7 +178,7 @@ export const Home: React.FC = () => {
                  { name: "Sarah", role: "Entrepreneuse", text: "J'ai fait mon Business Plan en 10 minutes avec l'IA. C'est bluffant." },
                  { name: "Kevin", role: "Étudiant", text: "L'outil pour humaniser les textes est parfait pour mes devoirs. Merci !" }
              ].map((avis, i) => (
-                 <div key={i} className="bg-white dark:bg-gray-600 p-6 border-2 border-black dark:border-white rounded-lg shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
+                 <div key={i} className="bg-neo-white dark:bg-gray-600 p-6 border-2 border-black dark:border-white rounded-lg shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
                      <p className="italic text-gray-600 dark:text-gray-300 mb-4">"{avis.text}"</p>
                      <div className="flex items-center gap-2">
                          <div className="w-8 h-8 bg-neo-violet rounded-full border border-black flex items-center justify-center font-bold text-xs">{avis.name[0]}</div>
@@ -196,14 +196,14 @@ export const Home: React.FC = () => {
       <section className="max-w-3xl mx-auto pb-12">
          <h2 className="text-center font-display text-3xl font-bold mb-8 dark:text-white">Questions Fréquentes</h2>
          <div className="space-y-4">
-             <details className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
+             <details className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
                  <summary className="font-bold flex justify-between items-center list-none dark:text-white">
                      Comment fonctionnent les crédits ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>
                  </summary>
                  <p className="mt-2 text-gray-600 dark:text-gray-300">Chaque utilisateur reçoit 5 crédits par mois. Les outils coûtent entre 1 et 3 crédits selon leur complexité. Pour un usage intensif, l'abonnement PRO (9.99€/mois) offre 100 crédits mensuels.</p>
              </details>
-             <details className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
+             <details className="bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
                  <summary className="font-bold flex justify-between items-center list-none dark:text-white">
                      Mes données sont-elles privées ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>

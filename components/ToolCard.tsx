@@ -26,7 +26,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
         transition-all duration-200
         shadow-neo hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]
         dark:shadow-[2px_2px_0px_0px_#fff] dark:hover:shadow-none dark:hover:translate-x-[2px] dark:hover:translate-y-[2px]
-        bg-white dark:bg-gray-600
+        bg-neo-white dark:bg-gray-600
       `}>
         
         <div>
@@ -41,7 +41,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
             )}
             </div>
 
-            <h3 className="font-display font-bold text-lg leading-tight mb-2 group-hover:text-neo-violet transition-colors text-black dark:text-white">
+            <h3 className="font-display font-bold text-lg leading-tight mb-2 group-hover:text-neo-violet dark:group-hover:text-neo-violet transition-colors text-black dark:text-white">
             {tool.title}
             </h3>
             

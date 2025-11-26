@@ -8,7 +8,7 @@ export const Privacy: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-600 border-2 border-black dark:border-white p-8 rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] my-8">
+    <div className="max-w-4xl mx-auto bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white p-8 rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] my-8">
       <div className="flex items-center gap-3 mb-6">
         <Shield className="w-8 h-8 text-neo-violet dark:text-neo-blue" />
         <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white">

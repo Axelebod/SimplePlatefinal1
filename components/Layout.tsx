@@ -144,7 +144,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           >
             {/* LOGO */}
             <div className="relative w-10 h-10" aria-hidden="true">
-                <div className="absolute inset-0 bg-neo-yellow border-2 border-black dark:border-gray-500 rounded-sm translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform"></div>
+                <div className="absolute inset-0 bg-neo-yellow border-2 border-black dark:border-white rounded-sm translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform"></div>
                 <div className="absolute inset-0 bg-neo-black dark:bg-white border-2 border-black dark:border-white rounded-sm flex items-center justify-center z-10">
                     <span className="font-display font-bold text-white dark:text-black text-xl tracking-tighter">SP</span>
                 </div>
@@ -179,7 +179,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                  <>
                     <Link 
                         to="/pricing"
-                        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-600 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-neo-white dark:bg-gray-600 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         title="Acheter des crédits"
                     >
                         <Zap className="w-4 h-4 text-neo-orange fill-current" />
@@ -199,7 +199,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
                     <Link 
                         to="/pricing"
-                        className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-gray-100 dark:bg-gray-600'}`}
+                        className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-neo-white dark:bg-gray-600'}`}
                     >
                         <Crown className={`w-4 h-4 ${isPro ? 'fill-white text-white' : 'text-gray-500 dark:text-gray-400'}`} />
                         <span className="font-bold dark:text-white">{isPro ? 'PRO' : 'Passer PRO'}</span>
@@ -219,7 +219,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
              ) : (
                  <Link 
                     to="/login"
-                    className="flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold border-2 border-black dark:border-white rounded-md hover:shadow-[4px_4px_0px_0px_#fde047] dark:hover:shadow-[4px_4px_0px_0px_#fde047] hover:text-neo-yellow dark:hover:text-neo-violet transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold border-2 border-black dark:border-white rounded-md hover:shadow-[4px_4px_0px_0px_#fde047] dark:hover:shadow-[4px_4px_0px_0px_#d8b4fe] hover:text-neo-yellow dark:hover:text-neo-violet transition-all"
                  >
                     <LogIn className="w-4 h-4" />
                     Connexion
@@ -260,7 +260,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-white rounded-md bg-neo-yellow text-black font-bold">
                         <LayoutDashboard className="w-4 h-4" /> Mon Tableau de Bord
                     </Link>
-                    <div className="p-3 border border-black dark:border-white rounded-md bg-white dark:bg-gray-600">
+                    <div className="p-3 border border-black dark:border-white rounded-md bg-neo-white dark:bg-gray-600">
                         <div className="flex justify-between items-center mb-1">
                             <span className="font-bold dark:text-white">Crédits: {credits}</span>
                             <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="text-sm underline text-neo-blue font-bold">Recharger</Link>
@@ -278,7 +278,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
                         Voir les Outils
                     </Link>
-                    <button onClick={handleLogout} className="block w-full p-3 text-center font-bold border-2 border-neo-red text-neo-red rounded-md bg-white dark:bg-gray-600 mt-2">
+                    <button onClick={handleLogout} className="block w-full p-3 text-center font-bold border-2 border-neo-red text-neo-red rounded-md bg-neo-white dark:bg-gray-600 mt-2">
                         Se déconnecter
                     </button>
                  </>
@@ -287,7 +287,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none">
                         Se connecter / S'inscrire
                     </Link>
-                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-white rounded-md bg-white dark:bg-gray-600 text-center dark:text-white">
+                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-white rounded-md bg-neo-white dark:bg-gray-600 text-center dark:text-white">
                         Voir les Tarifs
                     </Link>
                  </>
@@ -302,7 +302,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </main>
 
       {/* Footer */}
-      <footer className="border-t-2 border-black dark:border-white py-8 bg-white dark:bg-gray-700 mt-12 transition-colors duration-300">
+      <footer className="border-t-2 border-black dark:border-white py-8 bg-neo-white dark:bg-gray-700 mt-12 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
           <div>
              <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
@@ -329,7 +329,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {showScrollTop && (
         <button 
             onClick={scrollToTop}
-            className="fixed bottom-6 left-6 z-[90] p-3 bg-white dark:bg-gray-600 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] rounded-md hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] dark:hover:shadow-[6px_6px_0px_0px_#fff] transition-all animate-in fade-in zoom-in duration-300"
+            className="fixed bottom-6 left-6 z-[90] p-3 bg-neo-white dark:bg-gray-600 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] rounded-md hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] dark:hover:shadow-[6px_6px_0px_0px_#fff] transition-all animate-in fade-in zoom-in duration-300"
             title="Remonter en haut"
         >
             <ArrowUp className="w-6 h-6 text-black dark:text-white" />
