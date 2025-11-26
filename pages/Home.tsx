@@ -91,7 +91,7 @@ export const Home: React.FC = () => {
       </header>
 
       {/* Controls */}
-      <div className="sticky top-20 z-40 bg-neo-white/90 dark:bg-gray-900/90 backdrop-blur-sm py-4 space-y-4 transition-colors">
+      <div className="sticky top-20 z-40 bg-neo-white/90 dark:bg-gray-700/90 backdrop-blur-sm py-4 space-y-4 transition-colors">
         {/* Search */}
         <div className="relative max-w-md mx-auto">
           <input
@@ -99,19 +99,19 @@ export const Home: React.FC = () => {
             placeholder="Rechercher un outil (ex: 'Juridique', 'Image')..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-black dark:border-gray-600 rounded-md shadow-neo dark:shadow-none focus:outline-none focus:ring-2 focus:ring-neo-violet bg-white dark:bg-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            className="w-full pl-10 pr-4 py-3 border-2 border-black dark:border-white rounded-md shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] focus:outline-none focus:ring-2 focus:ring-neo-violet bg-white dark:bg-gray-600 dark:text-white placeholder-gray-500 dark:placeholder-gray-300"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white w-5 h-5" />
         </div>
 
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-2">
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-gray-600 rounded-full transition-all ${
+            className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
               selectedCategory === 'All' 
-                ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-none' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]' 
+                : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
             }`}
           >
             Tous
@@ -120,10 +120,10 @@ export const Home: React.FC = () => {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-gray-600 rounded-full transition-all ${
-                selectedCategory === cat
-                  ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-none'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+              className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
+                selectedCategory === cat 
+                  ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
               }`}
             >
               {CATEGORY_LABELS[cat]}
@@ -148,7 +148,7 @@ export const Home: React.FC = () => {
           to="/contact?subject=suggestion"
           className="group relative block h-full opacity-60 hover:opacity-100 transition-opacity"
         >
-          <div className="h-full flex flex-col items-center justify-center text-center border-2 border-black dark:border-gray-500 border-dashed rounded-lg p-8 bg-transparent hover:bg-white dark:hover:bg-gray-800 transition-all cursor-pointer min-h-[200px]">
+          <div className="h-full flex flex-col items-center justify-center text-center border-2 border-black dark:border-white border-dashed rounded-lg p-8 bg-transparent hover:bg-white dark:hover:bg-gray-600 transition-all cursor-pointer min-h-[200px]">
              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 border-2 border-black dark:border-gray-500 border-dashed rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Plus className="w-6 h-6 text-gray-400 dark:text-gray-400" />
              </div>
@@ -170,7 +170,7 @@ export const Home: React.FC = () => {
       )}
 
       {/* SOCIAL PROOF */}
-      <section className="py-12 border-t-2 border-black dark:border-gray-700">
+      <section className="py-12 border-t-2 border-black dark:border-white">
          <h2 className="text-center font-display text-3xl font-bold mb-8 dark:text-white">Ils adorent SimplePlate</h2>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
              {[
@@ -178,7 +178,7 @@ export const Home: React.FC = () => {
                  { name: "Sarah", role: "Entrepreneuse", text: "J'ai fait mon Business Plan en 10 minutes avec l'IA. C'est bluffant." },
                  { name: "Kevin", role: "Étudiant", text: "L'outil pour humaniser les textes est parfait pour mes devoirs. Merci !" }
              ].map((avis, i) => (
-                 <div key={i} className="bg-white dark:bg-gray-800 p-6 border-2 border-black dark:border-gray-600 rounded-lg shadow-neo-sm dark:shadow-none">
+                 <div key={i} className="bg-white dark:bg-gray-600 p-6 border-2 border-black dark:border-white rounded-lg shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
                      <p className="italic text-gray-600 dark:text-gray-300 mb-4">"{avis.text}"</p>
                      <div className="flex items-center gap-2">
                          <div className="w-8 h-8 bg-neo-violet rounded-full border border-black flex items-center justify-center font-bold text-xs">{avis.name[0]}</div>
@@ -196,14 +196,14 @@ export const Home: React.FC = () => {
       <section className="max-w-3xl mx-auto pb-12">
          <h2 className="text-center font-display text-3xl font-bold mb-8 dark:text-white">Questions Fréquentes</h2>
          <div className="space-y-4">
-             <details className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-4 cursor-pointer group">
+             <details className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
                  <summary className="font-bold flex justify-between items-center list-none dark:text-white">
                      Comment fonctionnent les crédits ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>
                  </summary>
                  <p className="mt-2 text-gray-600 dark:text-gray-300">Chaque utilisateur reçoit 5 crédits par mois. Les outils coûtent entre 1 et 3 crédits selon leur complexité. Pour un usage intensif, l'abonnement PRO (9.99€/mois) offre 100 crédits mensuels.</p>
              </details>
-             <details className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-4 cursor-pointer group">
+             <details className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
                  <summary className="font-bold flex justify-between items-center list-none dark:text-white">
                      Mes données sont-elles privées ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>

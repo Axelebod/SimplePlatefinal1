@@ -133,9 +133,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   return (
-    <div className="min-h-screen bg-neo-white dark:bg-gray-900 dark:text-gray-100 font-sans text-neo-black flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-neo-white dark:bg-gray-800 dark:text-white font-sans text-neo-black flex flex-col transition-colors duration-300">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-neo-white dark:bg-gray-800 border-b-2 border-black dark:border-gray-600 px-4 py-3 shadow-neo-sm dark:shadow-none transition-all duration-300">
+      <nav className="sticky top-0 z-50 bg-neo-white dark:bg-gray-700 border-b-2 border-black dark:border-white px-4 py-3 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff] transition-all duration-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link 
             to="/" 
@@ -145,8 +145,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {/* LOGO */}
             <div className="relative w-10 h-10" aria-hidden="true">
                 <div className="absolute inset-0 bg-neo-yellow border-2 border-black dark:border-gray-500 rounded-sm translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform"></div>
-                <div className="absolute inset-0 bg-neo-black dark:bg-gray-700 border-2 border-black dark:border-gray-500 rounded-sm flex items-center justify-center z-10">
-                    <span className="font-display font-bold text-white dark:text-white text-xl tracking-tighter">SP</span>
+                <div className="absolute inset-0 bg-neo-black dark:bg-white border-2 border-black dark:border-white rounded-sm flex items-center justify-center z-10">
+                    <span className="font-display font-bold text-white dark:text-black text-xl tracking-tighter">SP</span>
                 </div>
             </div>
             <span className="font-display font-bold text-2xl tracking-tight group-hover:text-neo-violet transition-colors hidden sm:block dark:text-white">
@@ -161,7 +161,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 onClick={toggleDarkMode} 
                 aria-label={isDarkMode ? "Passer en mode clair" : "Passer en mode sombre"}
                 aria-pressed={isDarkMode}
-                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
+                className="p-2 border-2 border-black dark:border-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors mr-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
                 title={isDarkMode ? "Passer en mode clair" : "Passer en mode nuit"}
              >
                  {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
@@ -179,7 +179,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                  <>
                     <Link 
                         to="/pricing"
-                        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-700 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-600 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         title="Acheter des crédits"
                     >
                         <Zap className="w-4 h-4 text-neo-orange fill-current" />
@@ -199,14 +199,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
                     <Link 
                         to="/pricing"
-                        className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-gray-100 dark:bg-gray-900'}`}
+                        className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-white rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-gray-100 dark:bg-gray-600'}`}
                     >
                         <Crown className={`w-4 h-4 ${isPro ? 'fill-white text-white' : 'text-gray-500 dark:text-gray-400'}`} />
                         <span className="font-bold dark:text-white">{isPro ? 'PRO' : 'Passer PRO'}</span>
                     </Link>
                     
-                    <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700 flex items-center gap-3">
-                        <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors">
+                    <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-white flex items-center gap-3">
+                        <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-600 p-1 rounded transition-colors">
                             <div className="flex flex-col items-end leading-none">
                                 <span className="text-xs font-bold dark:text-gray-300 group-hover:text-neo-violet transition-colors">{user.email.split('@')[0]}</span>
                             </div>
@@ -248,19 +248,19 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-neo-white dark:bg-gray-900 border-b-2 border-black dark:border-gray-600 p-4 flex flex-col gap-4 shadow-neo dark:shadow-none z-50">
+          <div className="md:hidden absolute top-full left-0 w-full bg-neo-white dark:bg-gray-700 border-b-2 border-black dark:border-white p-4 flex flex-col gap-4 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] z-50">
              {user ? (
                  <>
-                    <div className="flex items-center gap-2 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-2 pb-4 border-b border-gray-200 dark:border-white">
                          <div className="w-8 h-8 bg-neo-blue rounded-full flex items-center justify-center border border-black">
                             <UserIcon className="w-4 h-4 text-black" />
                          </div>
                          <span className="font-bold dark:text-white">{user.email}</span>
                     </div>
-                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-gray-600 rounded-md bg-neo-yellow text-black font-bold">
+                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-white rounded-md bg-neo-yellow text-black font-bold">
                         <LayoutDashboard className="w-4 h-4" /> Mon Tableau de Bord
                     </Link>
-                    <div className="p-3 border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
+                    <div className="p-3 border border-black dark:border-white rounded-md bg-white dark:bg-gray-600">
                         <div className="flex justify-between items-center mb-1">
                             <span className="font-bold dark:text-white">Crédits: {credits}</span>
                             <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="text-sm underline text-neo-blue font-bold">Recharger</Link>
@@ -278,7 +278,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
                         Voir les Outils
                     </Link>
-                    <button onClick={handleLogout} className="block w-full p-3 text-center font-bold border-2 border-neo-red text-neo-red rounded-md bg-white dark:bg-gray-800 mt-2">
+                    <button onClick={handleLogout} className="block w-full p-3 text-center font-bold border-2 border-neo-red text-neo-red rounded-md bg-white dark:bg-gray-600 mt-2">
                         Se déconnecter
                     </button>
                  </>
@@ -287,7 +287,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none">
                         Se connecter / S'inscrire
                     </Link>
-                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white">
+                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-white rounded-md bg-white dark:bg-gray-600 text-center dark:text-white">
                         Voir les Tarifs
                     </Link>
                  </>
@@ -302,7 +302,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </main>
 
       {/* Footer */}
-      <footer className="border-t-2 border-black dark:border-gray-700 py-8 bg-white dark:bg-gray-800 mt-12 transition-colors duration-300">
+      <footer className="border-t-2 border-black dark:border-white py-8 bg-white dark:bg-gray-700 mt-12 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
           <div>
              <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
@@ -329,7 +329,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {showScrollTop && (
         <button 
             onClick={scrollToTop}
-            className="fixed bottom-6 left-6 z-[90] p-3 bg-white dark:bg-gray-800 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] rounded-md hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] transition-all animate-in fade-in zoom-in duration-300"
+            className="fixed bottom-6 left-6 z-[90] p-3 bg-white dark:bg-gray-600 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] rounded-md hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] dark:hover:shadow-[6px_6px_0px_0px_#fff] transition-all animate-in fade-in zoom-in duration-300"
             title="Remonter en haut"
         >
             <ArrowUp className="w-6 h-6 text-black dark:text-white" />

@@ -68,7 +68,7 @@ export const Pricing: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         
         {/* FREE PLAN */}
-        <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg shadow-neo dark:shadow-none p-8 flex flex-col relative">
+        <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] p-8 flex flex-col relative">
           <div className="mb-6">
             <h3 className="text-2xl font-display font-bold dark:text-white">Découverte</h3>
             <p className="text-gray-500 dark:text-gray-400 mt-2 h-12">Pour tester la plateforme.</p>
@@ -152,14 +152,14 @@ export const Pricing: React.FC = () => {
       </div>
 
       {/* ADD-ONS SECTION */}
-      <div className="mt-12 border-t-2 border-black dark:border-gray-600 pt-12">
+      <div className="mt-12 border-t-2 border-black dark:border-white pt-12">
           <h2 className="text-2xl font-bold mb-2 text-center dark:text-white">Recharges Ponctuelles (Sans abonnement)</h2>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-8">Besoin de crédits sans vous engager ?</p>
           
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {creditPacks.map((pack, idx) => (
-                  <div key={idx} className={`p-6 border-2 border-black dark:border-gray-600 rounded-md flex flex-col items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative overflow-hidden ${pack.alert ? 'bg-gray-50 dark:bg-gray-900 shadow-neo-sm dark:shadow-none' : 'bg-white dark:bg-gray-800'}`}>
+                  <div key={idx} className={`p-6 border-2 border-black dark:border-white rounded-md flex flex-col items-center hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors relative overflow-hidden ${pack.alert ? 'bg-gray-50 dark:bg-gray-500 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]' : 'bg-white dark:bg-gray-600'}`}>
                       
                       {pack.alert && (
                         <div className="absolute top-3 right-3 text-neo-red">

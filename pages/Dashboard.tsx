@@ -121,7 +121,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         
         {/* CARD 1 : CREDITS */}
-        <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-500 rounded-lg p-6 shadow-neo dark:shadow-none relative overflow-hidden">
+        <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Zap className="w-32 h-32 text-neo-orange" />
             </div>
@@ -147,7 +147,7 @@ export const Dashboard: React.FC = () => {
                         {isPro ? "Abonnement PRO actif." : "Passez PRO pour obtenir 100 crédits/mois."}
                     </p>
                     {nextResetDate && (
-                        <div className="flex items-center gap-2 text-xs bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600">
+                        <div className="flex items-center gap-2 text-xs bg-gray-100 dark:bg-gray-500 px-3 py-2 rounded-md border border-gray-300 dark:border-white">
                             <Clock className="w-3 h-3 text-neo-orange" />
                             <span className="text-gray-600 dark:text-gray-300">
                                 <span className="font-bold">Prochaine recharge :</span> {timeRemaining}
@@ -162,7 +162,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* CARD 2 : ABONNEMENT */}
-        <div className={`border-2 border-black dark:border-gray-500 rounded-lg p-6 shadow-neo dark:shadow-none relative overflow-hidden ${isPro ? 'bg-neo-violet text-black' : 'bg-white dark:bg-gray-800 dark:text-white'}`}>
+        <div className={`border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] relative overflow-hidden ${isPro ? 'bg-neo-violet text-black' : 'bg-white dark:bg-gray-600 dark:text-white'}`}>
             <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Crown className="w-32 h-32 text-white dark:text-gray-500" />
             </div>
@@ -204,7 +204,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* COLONNE GAUCHE : INFO COMPTE */}
-          <div className="bg-gray-50 dark:bg-gray-900 border-2 border-black dark:border-gray-600 rounded-lg p-6">
+          <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2 dark:text-white">
                   <Settings className="w-5 h-5" /> Détails du compte
               </h3>
@@ -215,13 +215,13 @@ export const Dashboard: React.FC = () => {
                   </li>
                   <li className="flex justify-between dark:text-gray-300">
                       <span className="text-gray-500">ID Membre</span>
-                      <span className="font-mono text-xs bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded">#{user.id.substring(0, 8)}</span>
+                      <span className="font-mono text-xs bg-gray-200 dark:bg-gray-500 px-2 py-0.5 rounded">#{user.id.substring(0, 8)}</span>
                   </li>
               </ul>
           </div>
 
           {/* COLONNE DROITE : STATS */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6">
+          <div className="lg:col-span-2 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6">
               <h3 className="font-bold text-lg mb-6 flex items-center gap-2 dark:text-white">
                   <TrendingUp className="w-5 h-5" /> Activité
               </h3>

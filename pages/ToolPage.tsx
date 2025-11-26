@@ -369,7 +369,7 @@ export const ToolPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column: Input */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+          <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
             <form onSubmit={handleSubmit} className="space-y-6">
               {tool.inputs.map((input) => (
                 <div key={input.name}>
@@ -386,7 +386,7 @@ export const ToolPage: React.FC = () => {
                   
                   {input.type === 'textarea' ? (
                     <textarea
-                      className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white text-sm ${input.className || ''}`}
+                      className={`w-full p-3 border-2 border-gray-200 dark:border-white rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-600 dark:text-white text-sm ${input.className || ''}`}
                       placeholder={input.placeholder}
                       rows={input.rows || 4}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
@@ -395,7 +395,7 @@ export const ToolPage: React.FC = () => {
                     />
                   ) : input.type === 'select' ? (
                     <select
-                       className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
+                       className={`w-full p-3 border-2 border-gray-200 dark:border-white rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-white dark:bg-gray-600 dark:text-white ${input.className || ''}`}
                        onChange={(e) => handleInputChange(input.name, e.target.value)}
                        disabled={loading || isLocked || !isLoggedIn}
                     >
@@ -408,7 +408,7 @@ export const ToolPage: React.FC = () => {
                     <div className="relative">
                          <label 
                             className={`
-                                flex flex-col items-center justify-center w-full h-32 border-2 border-black dark:border-gray-500 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all
+                                flex flex-col items-center justify-center w-full h-32 border-2 border-black dark:border-white border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 transition-all
                                 ${fileName ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : ''}
                             `}
                          >
@@ -438,7 +438,7 @@ export const ToolPage: React.FC = () => {
                   ) : (
                     <input
                       type={input.type}
-                      className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
+                      className={`w-full p-3 border-2 border-gray-200 dark:border-white rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-600 dark:text-white ${input.className || ''}`}
                       placeholder={input.placeholder}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
                       disabled={loading || isLocked || !isLoggedIn}
@@ -512,10 +512,10 @@ export const ToolPage: React.FC = () => {
         </div>
 
         {/* Right Column: Output */}
-        <div className="relative bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none min-h-[400px] flex flex-col">
+        <div className="relative bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] min-h-[400px] flex flex-col">
            
            {/* HEADER */}
-           <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+           <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-white pb-2">
              <div className="flex items-center gap-3">
                  <h3 className="font-bold text-lg dark:text-white">Résultat</h3>
                  {/* WEBSITE PREVIEW TOGGLE */}
@@ -595,7 +595,7 @@ export const ToolPage: React.FC = () => {
                     {/* WEBSITE GENERATOR IFRAME */}
                     {tool.id === 'website-generator' && showPreview ? (
                         <div className="flex flex-col h-full animate-in fade-in duration-500">
-                            <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
+                            <div className="flex-1 border-2 border-gray-200 dark:border-white rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white dark:bg-gray-600">
                                 <iframe 
                                     srcDoc={getCleanHtml(result)} 
                                     title="Aperçu du site"
@@ -704,7 +704,7 @@ export const ToolPage: React.FC = () => {
         return (
           <div className="mt-12 space-y-8">
             {/* Description détaillée personnalisée */}
-            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -714,7 +714,7 @@ export const ToolPage: React.FC = () => {
             </section>
 
             {/* Comment utiliser personnalisé */}
-            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
               <ol className="space-y-4">
                 {content.howTo.map((step, index) => (
@@ -727,11 +727,11 @@ export const ToolPage: React.FC = () => {
             </section>
 
             {/* Cas d'usage personnalisés */}
-            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qui utilise {tool.title} ?</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {content.useCases.map((useCase, index) => (
-                  <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div key={index} className="p-4 bg-gray-50 dark:bg-gray-500 rounded-lg border border-gray-200 dark:border-white">
                     <h3 className="font-bold text-sm mb-2 dark:text-white">{useCase.title}</h3>
                     <p className="text-xs text-gray-600 dark:text-gray-400">{useCase.description}</p>
                   </div>
@@ -776,7 +776,7 @@ export const ToolPage: React.FC = () => {
         </section>
 
             {/* Avantages personnalisés */}
-            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+            <section className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
               <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
               <ul className="space-y-3">
                 {content.benefits.map((benefit, index) => (

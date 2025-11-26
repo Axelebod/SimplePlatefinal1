@@ -8,7 +8,7 @@ export const Privacy: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 p-8 rounded-lg shadow-neo dark:shadow-none my-8">
+    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-600 border-2 border-black dark:border-white p-8 rounded-lg shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] my-8">
       <div className="flex items-center gap-3 mb-6">
         <Shield className="w-8 h-8 text-neo-violet dark:text-neo-blue" />
         <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white">
@@ -22,7 +22,7 @@ export const Privacy: React.FC = () => {
 
       <div className="prose max-w-none space-y-10 dark:prose-invert">
         {/* INTRODUCTION */}
-        <section className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <section className="bg-gray-50 dark:bg-gray-500 p-6 rounded-lg border border-gray-200 dark:border-white">
           <h2 className="text-2xl font-bold mb-4 dark:text-white flex items-center gap-2">
             <FileText className="w-6 h-6" />
             1. Introduction
@@ -451,7 +451,7 @@ export const Privacy: React.FC = () => {
             <p>
               Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits RGPD, contactez-nous :
             </p>
-            <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border-2 border-black dark:border-gray-600">
+            <div className="bg-gray-50 dark:bg-gray-500 p-6 rounded-lg border-2 border-black dark:border-white">
               <p className="font-bold mb-2 dark:text-white">SimplePlate</p>
               <p>
                 <strong>Email :</strong> <a href="mailto:contact@simpleplate.dev" className="text-blue-600 dark:text-blue-400 underline font-bold">contact@simpleplate.dev</a><br/>
