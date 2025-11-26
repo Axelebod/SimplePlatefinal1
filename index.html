@@ -14,12 +14,22 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23050505%22 rx=%2210%22/><text y=%22.9em%22 font-size=%2270%22 font-family=%22sans-serif%22 font-weight=%22bold%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%23fde047%22 dy=%2210%22>SP</text></svg>">
 
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- QR Code Library - Version UMD qui s'expose mieux -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+    
+    <!-- Tailwind CSS - Loaded asynchronously to prevent render blocking -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- QR Code Library - Deferred and loaded only when needed -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" defer></script>
+    
+    <!-- Fonts with font-display: swap for better performance -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
     <script>
       tailwind.config = {
         darkMode: 'class', // Activation manuelle via classe 'dark'
@@ -84,6 +94,46 @@
       .dark .markdown-body pre { background: #1f2937; border-color: #4b5563; color: #fff; } /* Gray 800 background */
       .dark .markdown-body code { background: #374151; color: #e5e7eb; }
       .dark .markdown-body a { color: #d8b4fe; }
+
+      /* Accessibility: Focus states for keyboard navigation */
+      *:focus-visible {
+        outline: 2px solid #d8b4fe;
+        outline-offset: 2px;
+      }
+
+      /* Skip to main content link for screen readers */
+      .skip-to-main {
+        position: absolute;
+        left: -9999px;
+        z-index: 999;
+      }
+      .skip-to-main:focus {
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 1rem 2rem;
+        background: #050505;
+        color: #fde047;
+        font-weight: bold;
+        border: 2px solid #fde047;
+        border-radius: 0.5rem;
+        text-decoration: none;
+      }
+
+      /* Improve contrast for better accessibility */
+      @media (prefers-contrast: high) {
+        .border-black { border-color: #000 !important; }
+        .text-gray-600 { color: #000 !important; }
+        .dark .text-gray-300 { color: #fff !important; }
+      }
+
+      /* Reduce motion for users who prefer it */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
   <script type="importmap">
 {
@@ -103,8 +153,8 @@
   </script>
  <link rel="stylesheet" href="/index.css">
  
- <!-- Google AdSense -->
- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3795795150757338"
+ <!-- Google AdSense - Deferred to improve initial page load -->
+ <script defer src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3795795150757338"
       crossorigin="anonymous"></script>
 </head>
   <body>

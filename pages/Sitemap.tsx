@@ -17,7 +17,8 @@ export const Sitemap: React.FC = () => {
       { to: "/pricing", label: "Tarifs & Pro", icon: CreditCard, color: "bg-neo-green" },
       { to: "/login", label: "Espace Membre", icon: LogIn, color: "bg-neo-yellow" },
       { to: "/contact", label: "Contact", icon: Mail, color: "bg-neo-blue" },
-      { to: "/legal", label: "Légal", icon: Shield, color: "bg-gray-200" },
+      { to: "/legal", label: "Mentions Légales", icon: Shield, color: "bg-gray-200" },
+      { to: "/privacy", label: "Confidentialité (RGPD)", icon: Shield, color: "bg-gray-300" },
   ];
 
   return (

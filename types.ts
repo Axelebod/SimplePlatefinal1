@@ -53,6 +53,7 @@ export interface UserState {
   creditsPaid: number; // Crédits achetés (ne s'expirent jamais)
   isPro: boolean;
   isDarkMode: boolean; // ÉTAT DU MODE NUIT
+  freeCreditsResetDate: Date | null; // Date de prochaine réinitialisation des crédits gratuits
   
   login: (user: User) => Promise<void>; // Async pour fetch DB
   logout: () => Promise<void>;

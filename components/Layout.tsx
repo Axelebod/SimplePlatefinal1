@@ -2,15 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
-import { Zap, Crown, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard } from 'lucide-react';
+import { Zap, Crown, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock } from 'lucide-react';
 import { SimpleBot } from './SimpleBot';
 import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, credits, creditsFree, creditsPaid, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
+  const { user, credits, creditsFree, creditsPaid, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits, freeCreditsResetDate } = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -20,6 +21,50 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       refreshCredits();
     }
   }, [user, refreshCredits]);
+
+  // Timer pour les crédits gratuits
+  useEffect(() => {
+    if (!freeCreditsResetDate || !user) {
+      setTimeRemaining('');
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date();
+      const resetDate = new Date(freeCreditsResetDate);
+      
+      // Si la date de reset est passée, calculer la prochaine (7 jours après)
+      if (resetDate <= now) {
+        resetDate.setDate(resetDate.getDate() + 7);
+      }
+
+      const diff = resetDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining('Recharge disponible !');
+        refreshCredits();
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        setTimeRemaining(`${days}j ${hours}h`);
+      } else if (hours > 0) {
+        setTimeRemaining(`${hours}h ${minutes}m`);
+      } else {
+        setTimeRemaining(`${minutes}m ${seconds}s`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [freeCreditsResetDate, user, refreshCredits]);
 
   // Gestion du Dark Mode (Application de la classe 'dark' sur <html>)
   useEffect(() => {
@@ -92,9 +137,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-neo-white dark:bg-gray-800 border-b-2 border-black dark:border-gray-600 px-4 py-3 shadow-neo-sm dark:shadow-none transition-all duration-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link 
+            to="/" 
+            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded px-2 py-1"
+            aria-label="Retour à la page d'accueil SimplePlate"
+          >
             {/* LOGO */}
-            <div className="relative w-10 h-10">
+            <div className="relative w-10 h-10" aria-hidden="true">
                 <div className="absolute inset-0 bg-neo-yellow border-2 border-black dark:border-gray-500 rounded-sm translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform"></div>
                 <div className="absolute inset-0 bg-neo-black dark:bg-gray-700 border-2 border-black dark:border-gray-500 rounded-sm flex items-center justify-center z-10">
                     <span className="font-display font-bold text-white dark:text-white text-xl tracking-tighter">SP</span>
@@ -110,15 +159,18 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
              {/* Dark Mode Toggle */}
              <button 
                 onClick={toggleDarkMode} 
-                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white"
+                aria-label={isDarkMode ? "Passer en mode clair" : "Passer en mode sombre"}
+                aria-pressed={isDarkMode}
+                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
                 title={isDarkMode ? "Passer en mode clair" : "Passer en mode nuit"}
              >
-                 {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
+                 {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
              </button>
 
              <Link 
                to="/pricing" 
-               className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white"
+               className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded px-2 py-1"
+               aria-label="Voir les tarifs et abonnements"
              >
                Tarifs
              </Link>
@@ -136,6 +188,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                             <span className="text-xs text-gray-600 dark:text-gray-400">
                                 {creditsFree} gratuits + {creditsPaid} payants
                             </span>
+                            {timeRemaining && creditsFree < 5 && (
+                                <span className="text-xs text-neo-green dark:text-neo-green flex items-center gap-1 mt-0.5">
+                                    <Clock className="w-3 h-3" />
+                                    Recharge: {timeRemaining}
+                                </span>
+                            )}
                         </div>
                     </Link>
 
@@ -178,10 +236,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                  {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
             </button>
             <button 
-                className="p-2 text-black dark:text-white"
+                className="p-2 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+                aria-expanded={isMenuOpen}
             >
-                {isMenuOpen ? <X /> : <Menu />}
+                {isMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -207,6 +267,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">
                             {creditsFree} gratuits (hebdo) + {creditsPaid} payants
+                            {timeRemaining && creditsFree < 5 && (
+                                <span className="text-xs text-neo-green dark:text-neo-green flex items-center gap-1 mt-0.5">
+                                    <Clock className="w-3 h-3" />
+                                    Recharge: {timeRemaining}
+                                </span>
+                            )}
                         </div>
                     </div>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
@@ -231,9 +297,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8" tabIndex={-1}>
         {children}
-      </main>
 
       {/* Footer */}
       <footer className="border-t-2 border-black dark:border-gray-700 py-8 bg-white dark:bg-gray-800 mt-12 transition-colors duration-300">
@@ -252,6 +317,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex flex-wrap justify-center gap-6 text-sm font-bold underline dark:text-gray-300">
             <Link to="/contact" className="hover:text-neo-violet">Nous Contacter</Link>
             <Link to="/legal">Mentions Légales</Link>
+            <Link to="/privacy">Confidentialité (RGPD)</Link>
             <Link to="/pricing">Tarifs</Link>
             <Link to="/sitemap">Plan du Site</Link>
           </div>

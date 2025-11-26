@@ -112,13 +112,27 @@ SORTIE ATTENDUE (Format Markdown) :
     },
     inputs: [
       { 
+        name: 'type', 
+        label: 'Type de site', 
+        type: 'select', 
+        options: ['Landing Page', 'Portfolio', 'Blog', 'E-commerce', 'Application Web', 'Site Vitrine', 'Autre'],
+        required: true 
+      },
+      { 
+        name: 'business', 
+        label: 'Secteur / Business', 
+        type: 'text', 
+        placeholder: 'Ex: App de fitness, Restaurant, Startup tech...', 
+        required: true 
+      },
+      { 
         name: 'desc', 
-        label: 'Description du site web', 
+        label: 'Description détaillée (Optionnel)', 
         type: 'textarea', 
-        rows: 6, 
-        placeholder: 'Ex: Une landing page moderne pour une app de fitness avec hero section, fonctionnalités, témoignages et CTA.', 
-        required: true,
-        helpText: 'Décrivez le type de site, le style, les sections souhaitées, les couleurs, etc.'
+        rows: 3, 
+        placeholder: 'Ex: Hero section avec CTA, section fonctionnalités, témoignages clients...', 
+        required: false,
+        helpText: 'Décrivez les éléments spécifiques à inclure'
       },
       { 
         name: 'style', 
@@ -184,9 +198,35 @@ GÉNÈRE LE CODE MAINTENANT :`;
       description: 'Obtenez des scripts Python prêts à l\'emploi pour l\'automatisation, la data science ou le web scraping. Code propre et commenté.', 
       keywords: ['générateur python', 'script python ia', 'automatisation', 'code python professionnel', 'aide programmation'] 
     },
-    inputs: [{ name: 'task', label: 'Que doit faire le script ?', type: 'textarea', rows: 8, placeholder: 'Ex: Scraper les titres des dernières news sur HackerNews et les sauvegarder dans un CSV...', required: true }],
+    inputs: [
+      { 
+        name: 'type', 
+        label: 'Type de script', 
+        type: 'select', 
+        options: ['Scraping Web', 'Traitement de données', 'Automatisation', 'API/Requêtes HTTP', 'Fichiers (CSV/JSON)', 'Autre'],
+        required: true 
+      },
+      { 
+        name: 'objectif', 
+        label: 'Objectif du script', 
+        type: 'text', 
+        placeholder: 'Ex: Scraper les titres de HackerNews', 
+        required: true 
+      },
+      { 
+        name: 'details', 
+        label: 'Détails techniques (Optionnel)', 
+        type: 'textarea', 
+        rows: 3, 
+        placeholder: 'Ex: Sauvegarder dans un CSV, utiliser BeautifulSoup, gérer les erreurs...', 
+        required: false 
+      }
+    ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Agis comme un Expert Python. Écris un script complet pour : "${data.task}".
+TÂCHE: Agis comme un Expert Python. Écris un script complet pour :
+TYPE: ${data.type}
+OBJECTIF: ${data.objectif}
+${data.details ? `DÉTAILS: ${data.details}` : ''}
 INSTRUCTIONS:
 1. Code robuste (Gestion d'erreurs try/except).
 2. Respecte la PEP8.
@@ -238,8 +278,67 @@ DIRECTIVES:
       description: 'Créez un business plan professionnel en 1 clic. Executive Summary, Analyse de marché, Stratégie financière et SWOT.', 
       keywords: ['business plan generator', 'créer business plan', 'modèle business plan', 'startup', 'investisseurs'] 
     },
-    inputs: [{ name: 'idea', label: 'Décrivez votre idée de business', type: 'textarea', rows: 6, placeholder: 'Ex: Une application de livraison de repas par drone à Paris...', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Rédige un Business Plan structuré pour cette idée : "${data.idea}".\nSections obligatoires :\n1. Executive Summary\n2. Analyse de Marché (Tam/Sam/Som)\n3. Modèle Économique\n4. Stratégie Go-To-Market\n5. Analyse SWOT.`
+    inputs: [
+      { 
+        name: 'secteur', 
+        label: 'Secteur d\'activité', 
+        type: 'text', 
+        placeholder: 'Ex: Tech, E-commerce, Services, Food...', 
+        required: true,
+        helpText: 'Le secteur principal de votre business'
+      },
+      { 
+        name: 'produit', 
+        label: 'Produit ou Service', 
+        type: 'text', 
+        placeholder: 'Ex: Application mobile de livraison par drone', 
+        required: true 
+      },
+      { 
+        name: 'cible', 
+        label: 'Cible principale', 
+        type: 'text', 
+        placeholder: 'Ex: Particuliers 25-45 ans, Restaurants, Entreprises...', 
+        required: true 
+      },
+      { 
+        name: 'objectif', 
+        label: 'Objectif principal', 
+        type: 'select', 
+        options: ['Lever des fonds', 'Valider le concept', 'Présenter aux investisseurs', 'Planifier la croissance', 'Autre'],
+        required: true 
+      },
+      { 
+        name: 'budget', 
+        label: 'Budget initial (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: 50 000€, 100k€, Non défini...', 
+        required: false 
+      },
+      { 
+        name: 'contexte', 
+        label: 'Contexte supplémentaire (Optionnel)', 
+        type: 'textarea', 
+        rows: 3, 
+        placeholder: 'Informations complémentaires, contraintes, opportunités...', 
+        required: false 
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Rédige un Business Plan structuré pour cette entreprise :
+
+SECTEUR: ${data.secteur}
+PRODUIT/SERVICE: ${data.produit}
+CIBLE: ${data.cible}
+OBJECTIF: ${data.objectif}
+${data.budget ? `BUDGET INITIAL: ${data.budget}` : ''}
+${data.contexte ? `CONTEXTE: ${data.contexte}` : ''}
+
+Sections obligatoires :
+1. Executive Summary
+2. Analyse de Marché (Tam/Sam/Som)
+3. Modèle Économique
+4. Stratégie Go-To-Market
+5. Analyse SWOT.`
   },
   {
     id: 'smart-contract-audit',
@@ -261,16 +360,57 @@ DIRECTIVES:
   },
 
   // --- E-COMMERCE TOOLS ---
-  createSimpleTool(
-    'ecom-ad-gen', 
-    'Pub Facebook & TikTok', 
-    'Générez des textes publicitaires qui convertissent (ROAS).', 
-    'Business', 
-    'Agis comme un expert Media Buyer. Rédige 3 variantes de publicité (Facebook/Instagram/TikTok) pour ce produit. Utilise des hooks viraux, des emojis et la méthode AIDA (Attention, Intérêt, Désir, Action). Produit :', 
-    'Megaphone', 'textarea', { rows: 4, placeholder: 'Ex: Un correcteur de posture pour le dos...' },
-    { title: 'Générateur de Publicité Facebook & TikTok Ads IA', description: 'Créez des textes publicitaires performants pour vos campagnes. Copywriting optimisé pour le dropshipping et l\'e-commerce.', keywords: ['pub facebook generator', 'tiktok ads script', 'copywriting e-commerce', 'marketing ia'] }, 
-    1
-  ),
+  {
+    id: 'ecom-ad-gen',
+    slug: 'pub-facebook-tiktok',
+    title: 'Pub Facebook & TikTok',
+    description: 'Générez des textes publicitaires qui convertissent (ROAS).',
+    category: 'Business',
+    cost: 1,
+    isPremium: false,
+    iconName: 'Megaphone',
+    outputType: 'text',
+    seo: { 
+      title: 'Générateur de Publicité Facebook & TikTok Ads IA', 
+      description: 'Créez des textes publicitaires performants pour vos campagnes. Copywriting optimisé pour le dropshipping et l\'e-commerce.', 
+      keywords: ['pub facebook generator', 'tiktok ads script', 'copywriting e-commerce', 'marketing ia'] 
+    },
+    inputs: [
+      { 
+        name: 'produit', 
+        label: 'Produit / Service', 
+        type: 'text', 
+        placeholder: 'Ex: Correcteur de posture pour le dos', 
+        required: true 
+      },
+      { 
+        name: 'plateforme', 
+        label: 'Plateforme', 
+        type: 'select', 
+        options: ['Facebook/Instagram', 'TikTok', 'Les deux'],
+        required: true 
+      },
+      { 
+        name: 'cible', 
+        label: 'Cible (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: Personnes travaillant au bureau, Sportifs...', 
+        required: false 
+      },
+      { 
+        name: 'avantage', 
+        label: 'Avantage principal (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: Soulage les douleurs, Améliore la posture...', 
+        required: false 
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un expert Media Buyer. Rédige 3 variantes de publicité pour ${data.plateforme} pour ce produit. Utilise des hooks viraux, des emojis et la méthode AIDA (Attention, Intérêt, Désir, Action).
+
+PRODUIT: ${data.produit}
+${data.cible ? `CIBLE: ${data.cible}` : ''}
+${data.avantage ? `AVANTAGE: ${data.avantage}` : ''}`
+  },
   createSimpleTool(
     'ecom-review-reply', 
     'Répondeur Avis Clients', 
@@ -344,8 +484,57 @@ DIRECTIVES:
       description: 'Créez des prompts parfaits pour ChatGPT, Midjourney ou Claude. Optimisez vos résultats IA avec la méthode Chain-of-Thought.', 
       keywords: ['prompt generator', 'prompt engineering', 'meilleur prompt chatgpt', 'générateur de prompt', 'midjourney helper'] 
     },
-    inputs: [{ name: 'idea', label: 'Votre idée de base', type: 'textarea', rows: 4, placeholder: 'Ex: Je veux un plan marketing pour vendre des chaussures...', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un expert mondial en Prompt Engineering. Transforme cette idée simple : "${data.idea}" en un MEGA-PROMPT structuré et optimisé.\nStructure attendue :\n1. Rôle (Persona)\n2. Contexte & Tâche\n3. Contraintes & Format\n4. Étapes de réflexion (Chain of Thought).`
+    inputs: [
+      { 
+        name: 'type', 
+        label: 'Type de prompt', 
+        type: 'select', 
+        options: ['Texte (ChatGPT, Claude)', 'Image (Midjourney, DALL-E)', 'Code (GitHub Copilot)', 'Analyse de données', 'Création de contenu', 'Autre'],
+        required: true 
+      },
+      { 
+        name: 'objectif', 
+        label: 'Objectif du prompt', 
+        type: 'text', 
+        placeholder: 'Ex: Créer un plan marketing, Générer une image de logo...', 
+        required: true 
+      },
+      { 
+        name: 'contexte', 
+        label: 'Contexte (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: Pour une startup tech, Pour un restaurant...', 
+        required: false 
+      },
+      { 
+        name: 'style', 
+        label: 'Style/Ton souhaité (Optionnel)', 
+        type: 'select', 
+        options: ['Professionnel', 'Créatif', 'Technique', 'Simple', 'Détaillé', 'Aucune préférence'],
+        required: false 
+      },
+      { 
+        name: 'contraintes', 
+        label: 'Contraintes spécifiques (Optionnel)', 
+        type: 'textarea', 
+        rows: 2, 
+        placeholder: 'Ex: Maximum 500 mots, Format JSON, Style minimaliste...', 
+        required: false 
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un expert mondial en Prompt Engineering. Crée un MEGA-PROMPT structuré et optimisé avec ces informations :
+
+TYPE: ${data.type}
+OBJECTIF: ${data.objectif}
+${data.contexte ? `CONTEXTE: ${data.contexte}` : ''}
+${data.style ? `STYLE: ${data.style}` : ''}
+${data.contraintes ? `CONTRAINTES: ${data.contraintes}` : ''}
+
+Structure attendue :
+1. Rôle (Persona)
+2. Contexte & Tâche
+3. Contraintes & Format
+4. Étapes de réflexion (Chain of Thought).`
   },
 
   // --- MANDATORY / FLAGSHIP TOOLS (IA) ---
@@ -364,8 +553,24 @@ DIRECTIVES:
       description: 'Copiez-collez un message suspect. Notre IA analyse s\'il s\'agit d\'une tentative de phishing, smishing ou d\'arnaque au CPF.', 
       keywords: ['arnaque sms', 'détecteur phishing', 'numéro suspect', 'vérifier arnaque', 'signalement spam'] 
     },
-    inputs: [{ name: 'content', label: 'Message ou Numéro suspect', type: 'textarea', rows: 4, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Analyse ce message suspect : "${data.content}". \nFormat de réponse :\n1. **VERDICT** : (ARNAQUE CERTAINE / SUSPECT / SÛR)\n2. **Risque** : X/10\n3. **Analyse** : Explique pourquoi en 2 phrases.`
+    inputs: [
+      { 
+        name: 'type', 
+        label: 'Type de message', 
+        type: 'select', 
+        options: ['SMS', 'Email', 'Appel téléphonique', 'Message WhatsApp', 'Autre'],
+        required: true 
+      },
+      { 
+        name: 'content', 
+        label: 'Message ou Numéro suspect', 
+        type: 'textarea', 
+        rows: 4, 
+        required: true,
+        placeholder: 'Collez le message suspect ou le numéro de téléphone'
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Analyse ce message suspect de type ${data.type} : "${data.content}". \nFormat de réponse :\n1. **VERDICT** : (ARNAQUE CERTAINE / SUSPECT / SÛR)\n2. **Risque** : X/10\n3. **Analyse** : Explique pourquoi en 2 phrases.\n4. **Recommandation** : Que faire ?`
   },
   {
     id: 'legal-translator',
@@ -720,6 +925,14 @@ DIRECTIVES:
     },
     inputs: [
       { 
+        name: 'matiere', 
+        label: 'Matière', 
+        type: 'select', 
+        options: ['Mathématiques', 'Français', 'Sciences (Physique/Chimie)', 'Histoire-Géographie', 'Anglais', 'Espagnol', 'SVT', 'Autre'],
+        required: false,
+        helpText: 'Sélectionnez la matière concernée pour une meilleure explication'
+      },
+      { 
         name: 'image', 
         label: 'Photo de l\'exercice (Optionnel)', 
         type: 'file', 
@@ -729,12 +942,12 @@ DIRECTIVES:
       },
       { 
         name: 'question', 
-        label: 'Votre question ou exercice (Optionnel)', 
+        label: 'Votre question ou exercice', 
         type: 'textarea', 
-        rows: 6, 
+        rows: 4, 
         required: false,
         placeholder: 'Ex: Explique-moi comment résoudre une équation du second degré...',
-        helpText: 'Décrivez votre question ou copiez l\'énoncé de l\'exercice. Au moins une photo OU une question est requise.'
+        helpText: 'Décrivez votre question ou copiez l\'énoncé. Au moins une photo OU une question est requise.'
       }
     ],
     promptGenerator: (data) => {
@@ -746,13 +959,14 @@ DIRECTIVES:
       }
       
       const questionText = hasText ? data.question : 'Analyse cette image et explique-moi tout en détail.';
+      const matiereText = data.matiere ? `MATIÈRE: ${data.matiere}\n` : '';
       
       return `${SYSTEM_PROMPT}
 RÔLE: Tu es un professeur patient et pédagogue, expert dans toutes les matières scolaires (Mathématiques, Français, Histoire, Sciences, Langues, etc.).
 
 MISSION: Aider l'élève à comprendre et résoudre son exercice ou sa question en donnant des explications DÉTAILLÉES et PÉDAGOGIQUES.
 
-${hasImage ? 'L\'élève a fourni une photo de son exercice. Analyse-la attentivement.' : ''}
+${matiereText}${hasImage ? 'L\'élève a fourni une photo de son exercice. Analyse-la attentivement.' : ''}
 ${hasText ? `QUESTION DE L'ÉLÈVE : "${questionText}"` : ''}
 
 INSTRUCTIONS STRICTES:
@@ -1248,12 +1462,20 @@ INSTRUCTIONS:
       keywords: ['générateur recette', 'recette cuisine', 'idées repas', 'recette avec ingrédients', 'cuisine ia']
     },
     inputs: [
-      { name: 'ingredients', label: 'Ingrédients disponibles', type: 'textarea', rows: 4, placeholder: 'Ex: Poulet, Riz, Tomates, Ail, Basilic...', required: true },
-      { name: 'diet', label: 'Régime alimentaire (Optionnel)', type: 'text', placeholder: 'Ex: Végétarien, Sans gluten, Keto...', required: false }
+      { 
+        name: 'type', 
+        label: 'Type de plat', 
+        type: 'select', 
+        options: ['Plat principal', 'Entrée', 'Dessert', 'Goûter', 'Petit-déjeuner', 'Apéritif'],
+        required: true 
+      },
+      { name: 'ingredients', label: 'Ingrédients disponibles', type: 'text', placeholder: 'Ex: Poulet, Riz, Tomates, Ail, Basilic...', required: true, helpText: 'Séparez par des virgules' },
+      { name: 'diet', label: 'Régime alimentaire (Optionnel)', type: 'select', options: ['Aucune restriction', 'Végétarien', 'Végan', 'Sans gluten', 'Keto', 'Halal', 'Casher'], required: false }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
 TÂCHE: Génère une recette de cuisine complète et détaillée en Markdown.
 
+TYPE DE PLAT: ${data.type}
 INGRÉDIENTS DISPONIBLES: "${data.ingredients}"
 RÉGIME: ${data.diet || 'Aucune restriction'}
 
@@ -1297,8 +1519,22 @@ FORMAT ATTENDU:
     inputs: [
       { name: 'poste', label: 'Poste visé', type: 'text', placeholder: 'Ex: Développeur Full Stack', required: true },
       { name: 'entreprise', label: 'Nom de l\'entreprise', type: 'text', placeholder: 'Ex: TechCorp', required: true },
-      { name: 'competences', label: 'Vos compétences clés', type: 'textarea', rows: 4, placeholder: 'Ex: React, Node.js, Gestion de projet...', required: true },
-      { name: 'experience', label: 'Expérience pertinente (Optionnel)', type: 'textarea', rows: 3, placeholder: 'Ex: 3 ans en développement web...', required: false }
+      { 
+        name: 'poste', 
+        label: 'Poste visé', 
+        type: 'text', 
+        placeholder: 'Ex: Développeur Full-Stack, Chef de projet...', 
+        required: true 
+      },
+      { name: 'competences', label: 'Compétences clés', type: 'text', placeholder: 'Ex: React, Node.js, Gestion de projet...', required: true, helpText: 'Séparez par des virgules' },
+      { name: 'experience', label: 'Expérience (Optionnel)', type: 'text', placeholder: 'Ex: 3 ans en développement web', required: false },
+      { 
+        name: 'entreprise', 
+        label: 'Nom de l\'entreprise (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: Google, Startup Tech...', 
+        required: false 
+      }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
 TÂCHE: Rédige une lettre de motivation professionnelle et personnalisée en Markdown.

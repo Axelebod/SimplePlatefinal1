@@ -26,6 +26,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://simpleplate.dev/privacy</loc>
+    <lastmod>2025-11-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://simpleplate.dev/sitemap</loc>
     <lastmod>2025-11-25</lastmod>
     <changefreq>monthly</changefreq>

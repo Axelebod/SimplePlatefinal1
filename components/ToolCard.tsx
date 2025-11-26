@@ -17,7 +17,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
   return (
     <Link 
       to={`/tool/${tool.slug || tool.id}`}
-      className="group relative block h-full"
+      className="group relative block h-full focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded-lg"
+      aria-label={`Ouvrir l'outil ${tool.title}: ${tool.description}`}
     >
       <div className={`
         h-full flex flex-col justify-between

@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { ToolPage } from './pages/ToolPage';
 import { Pricing } from './pages/Pricing';
 import { Legal } from './pages/Legal';
+import { Privacy } from './pages/Privacy';
 import { Auth } from './pages/Auth';
 import { ResetPassword } from './pages/ResetPassword';
 import { Contact } from './pages/Contact';
@@ -25,6 +26,7 @@ function App() {
           <Route path="/tool/:slug" element={<ToolPage />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/legal" element={<Legal />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/signup" element={<Auth />} />

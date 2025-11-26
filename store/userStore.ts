@@ -14,6 +14,7 @@ export const useUserStore = create<UserState>()(
       creditsPaid: 0,
       isPro: false,
       isDarkMode: false,
+      freeCreditsResetDate: null,
 
       login: async (user: User) => {
         set({ user });
@@ -48,12 +49,14 @@ export const useUserStore = create<UserState>()(
           const creditsFreeFromDB = data?.credits_free ?? 0;
           const creditsPaidFromDB = data?.credits_paid ?? 0;
           const isProFromDB = data?.is_pro ?? false;
+          const freeCreditsResetDate = data?.free_credits_reset_date ? new Date(data.free_credits_reset_date) : null;
           
           set({ 
             credits: creditsFromDB,
             creditsFree: creditsFreeFromDB,
             creditsPaid: creditsPaidFromDB,
-            isPro: isProFromDB
+            isPro: isProFromDB,
+            freeCreditsResetDate: freeCreditsResetDate
           });
           
           // Forcer la mise à jour du localStorage aussi
@@ -98,12 +101,14 @@ export const useUserStore = create<UserState>()(
           const creditsFreeFromDB = data.credits_free ?? 0;
           const creditsPaidFromDB = data.credits_paid ?? 0;
           const isProFromDB = data.is_pro ?? false;
+          const freeCreditsResetDate = data.free_credits_reset_date ? new Date(data.free_credits_reset_date) : null;
           
           set({ 
             credits: creditsFromDB,
             creditsFree: creditsFreeFromDB,
             creditsPaid: creditsPaidFromDB,
-            isPro: isProFromDB
+            isPro: isProFromDB,
+            freeCreditsResetDate: freeCreditsResetDate
           });
           
           // Forcer la mise à jour du localStorage aussi

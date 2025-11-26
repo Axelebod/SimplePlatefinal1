@@ -8,6 +8,7 @@ import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, 
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
+import { generateToolSEOContent } from '../utils/toolContentGenerator';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -328,8 +329,12 @@ export const ToolPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
-        <button onClick={() => navigate('/')} className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white mb-4">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Retour aux outils
+        <button 
+          onClick={() => navigate('/')} 
+          aria-label="Retour à la page d'accueil"
+          className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white mb-4 focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded px-2 py-1"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" aria-hidden="true" /> Retour aux outils
         </button>
         <div className="flex items-center gap-3">
            <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white">{tool.title}</h1>
@@ -348,9 +353,10 @@ export const ToolPage: React.FC = () => {
             </p>
             <button
               onClick={() => navigate('/signup')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors text-sm"
+              aria-label="Créer un compte pour utiliser cet outil"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-neo-green focus:ring-offset-2"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-4 h-4" aria-hidden="true" />
               Créer un compte
             </button>
           </div>
@@ -454,8 +460,17 @@ export const ToolPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading || (isLoggedIn && (isLocked || !hasCredits))}
+                aria-label={
+                  !isLoggedIn ? "Créer un compte pour utiliser cet outil" :
+                  isLocked ? "Cet outil nécessite un abonnement PRO" :
+                  !hasCredits ? `Pas assez de crédits (nécessite ${tool.cost} crédit${tool.cost > 1 ? 's' : ''})` :
+                  loading ? "Génération en cours..." :
+                  `Générer avec ${tool.cost} crédit${tool.cost > 1 ? 's' : ''}`
+                }
+                aria-busy={loading}
                 className={`
                   w-full py-4 font-bold text-lg border-2 border-black dark:border-gray-500 rounded-md flex items-center justify-center gap-2 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-neo-green focus:ring-offset-2
                   ${!isLoggedIn
                     ? 'bg-neo-yellow text-black hover:bg-yellow-400 cursor-pointer shadow-[4px_4px_0px_0px_#000] dark:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000]'
                     : isLocked 
@@ -508,17 +523,21 @@ export const ToolPage: React.FC = () => {
                      <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
                         <button 
                             onClick={() => setShowPreview(true)}
-                            className={`p-1 rounded ${showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
+                            aria-label="Afficher l'aperçu du site"
+                            aria-pressed={showPreview}
+                            className={`p-1 rounded focus:outline-none focus:ring-2 focus:ring-neo-blue focus:ring-offset-2 ${showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
                             title="Aperçu Site"
                         >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4" aria-hidden="true" />
                         </button>
                         <button 
                             onClick={() => setShowPreview(false)}
-                            className={`p-1 rounded ${!showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
+                            aria-label="Afficher le code HTML"
+                            aria-pressed={!showPreview}
+                            className={`p-1 rounded focus:outline-none focus:ring-2 focus:ring-neo-blue focus:ring-offset-2 ${!showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
                             title="Voir le Code"
                         >
-                            <Code className="w-4 h-4" />
+                            <Code className="w-4 h-4" aria-hidden="true" />
                         </button>
                      </div>
                  )}
@@ -526,7 +545,14 @@ export const ToolPage: React.FC = () => {
 
              {result && (
                <div className="flex gap-2">
-                 <button onClick={copyToClipboard} className="btn-small-icon dark:text-white" title="Copier"><Copy className="w-4 h-4" /></button>
+                 <button 
+                   onClick={copyToClipboard} 
+                   aria-label="Copier le résultat dans le presse-papiers"
+                   className="btn-small-icon dark:text-white focus:outline-none focus:ring-2 focus:ring-neo-green focus:ring-offset-2 rounded" 
+                   title="Copier"
+                 >
+                   <Copy className="w-4 h-4" aria-hidden="true" />
+                 </button>
                </div>
              )}
            </div>
@@ -548,7 +574,13 @@ export const ToolPage: React.FC = () => {
              {result && (
                tool.outputType === 'image' ? (
                  <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500">
-                    <img src={result} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" />
+                    <img 
+                      src={result} 
+                      alt="Résultat généré par l'outil" 
+                      loading="lazy"
+                      decoding="async"
+                      className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" 
+                    />
                     <div className="mt-4 text-center">
                       <a href={result} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
                         Télécharger l'image
@@ -621,7 +653,9 @@ export const ToolPage: React.FC = () => {
                                     <div className="flex flex-col items-center my-4">
                                       <img 
                                         src={src} 
-                                        alt={alt || 'Image'} 
+                                        alt={alt || (isQRCode ? 'QR Code généré' : 'Image générée')} 
+                                        loading="lazy"
+                                        decoding="async"
                                         {...props} 
                                         className="max-w-full h-auto border-2 border-black dark:border-gray-500 rounded-lg shadow-neo p-2 bg-white"
                                         style={{maxWidth: '300px', display: 'block'}}
@@ -633,7 +667,8 @@ export const ToolPage: React.FC = () => {
                                       {isQRCode && src && (
                                         <button
                                           onClick={handleDownload}
-                                          className="mt-3 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                                          aria-label="Télécharger le QR Code généré"
+                                          className="mt-3 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-neo-green focus:ring-offset-2"
                                         >
                                           Télécharger le QR Code
                                         </button>
@@ -663,123 +698,46 @@ export const ToolPage: React.FC = () => {
         </div>
       </div>
 
-      {/* SEO CONTENT SECTION - Contenu textuel riche pour le référencement */}
-      <div className="mt-12 space-y-8">
-        {/* Description détaillée */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {tool.title} est un outil professionnel alimenté par l'intelligence artificielle qui vous permet de {tool.description.toLowerCase()}. 
-              Que vous soyez un développeur, un entrepreneur, un créateur de contenu ou un professionnel, cet outil vous fait gagner du temps 
-              en automatisant des tâches complexes qui nécessiteraient normalement des heures de travail manuel.
-            </p>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-              Grâce à la puissance de l'IA, {tool.title} génère des résultats de haute qualité en quelques secondes. 
-              L'outil est conçu pour être intuitif et accessible, même si vous n'avez pas d'expérience technique préalable.
-            </p>
-          </div>
-        </section>
+      {/* SEO CONTENT SECTION - Contenu textuel riche et personnalisé */}
+      {(() => {
+        const content = generateToolSEOContent(tool);
+        return (
+          <div className="mt-12 space-y-8">
+            {/* Description détaillée personnalisée */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {content.intro}
+                </p>
+              </div>
+            </section>
 
-        {/* Comment utiliser */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
-          <ol className="space-y-4 list-decimal list-inside">
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Remplissez le formulaire</strong> : Entrez les informations demandées dans les champs ci-dessus. 
-              {tool.inputs.length > 1 ? ` L'outil nécessite ${tool.inputs.length} informations pour générer le meilleur résultat.` : ' L\'outil nécessite une seule information pour générer le résultat.'}
-            </li>
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Cliquez sur "Générer"</strong> : 
-              {tool.cost === 0 
-                ? ' L\'outil est entièrement gratuit et ne consomme aucun crédit.' 
-                : ` L'utilisation coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''}. ${tool.isPremium ? 'Cet outil est réservé aux membres PRO.' : ''}`}
-            </li>
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Récupérez votre résultat</strong> : Le résultat apparaît instantanément dans la colonne de droite. 
-              Vous pouvez le copier, le télécharger ou l'utiliser directement selon vos besoins.
-            </li>
-          </ol>
-        </section>
+            {/* Comment utiliser personnalisé */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
+              <ol className="space-y-4">
+                {content.howTo.map((step, index) => (
+                  <li key={index} className="text-gray-700 dark:text-gray-300 flex gap-3">
+                    <span className="font-bold text-neo-black dark:text-white flex-shrink-0">{index + 1}.</span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
 
-        {/* Cas d'usage */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Cas d'usage de {tool.title}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tool.category === 'Dev' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Développeurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Accélérez votre workflow de développement et automatisez des tâches répétitives.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Freelances</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Livrez des projets plus rapidement et augmentez votre productivité.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Business' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Entrepreneurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Optimisez vos processus métier et prenez de meilleures décisions stratégiques.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">E-commerce</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Améliorez vos descriptions produits et boostez vos ventes en ligne.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Text' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Rédacteurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez du contenu de qualité en quelques secondes et respectez vos deadlines.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Marketers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Créez des textes publicitaires performants et optimisez vos campagnes.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Image' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Designers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Analysez et créez des visuels professionnels avec l'aide de l'IA.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Créateurs de contenu</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez des images uniques pour vos réseaux sociaux et vos projets.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Life' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Simplifiez votre quotidien et résolvez vos problèmes du quotidien.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Étudiants</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Obtenez de l'aide pour vos devoirs et améliorez votre productivité.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Security' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Professionnels IT</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Sécurisez vos systèmes et protégez-vous contre les menaces en ligne.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Détectez les arnaques et protégez vos données personnelles.</p>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+            {/* Cas d'usage personnalisés */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qui utilise {tool.title} ?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {content.useCases.map((useCase, index) => (
+                  <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <h3 className="font-bold text-sm mb-2 dark:text-white">{useCase.title}</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{useCase.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
         {/* FAQ */}
         <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
@@ -817,41 +775,24 @@ export const ToolPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Avantages */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Rapidité</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Obtenez des résultats en quelques secondes au lieu d'heures de travail manuel.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Qualité professionnelle</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Des résultats optimisés et prêts à l'emploi, générés par l'IA la plus avancée.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Facilité d'utilisation</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Interface intuitive, aucune compétence technique requise.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Sécurité et confidentialité</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Vos données sont protégées et ne sont jamais partagées.</p>
-              </div>
-            </li>
-          </ul>
-        </section>
-      </div>
+            {/* Avantages personnalisés */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
+              <ul className="space-y-3">
+                {content.benefits.map((benefit, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-neo-green font-bold text-xl flex-shrink-0">✓</span>
+                    <div>
+                      <strong className="text-black dark:text-white">{benefit.title}</strong>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{benefit.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        );
+      })()}
     </div>
   );
 };
