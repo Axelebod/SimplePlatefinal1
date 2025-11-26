@@ -126,7 +126,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({ location }) => {
   // --- RENDER ADSENSE (Si activé et configuré) ---
   if (showAdSense && ADSENSE_CLIENT_ID && ADSENSE_SLOT_ID) {
       return (
-          <div className="w-full flex justify-center my-4 overflow-hidden min-h-[100px] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <div className="w-full flex justify-center my-4 overflow-hidden min-h-[100px] bg-gray-50 dark:bg-gray-600 border border-gray-200 dark:border-white rounded-lg">
               <div className="w-full" id={`adsense-${location}`}>
                   <ins 
                       className="adsbygoogle"

@@ -148,7 +148,7 @@ export const SimpleBot: React.FC = () => {
       
       {/* CHAT WINDOW */}
       {isOpen && (
-        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
+        <div className="mb-4 w-[90vw] md:w-80 h-96 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
           {/* Header */}
           <div className="bg-neo-black dark:bg-white text-white dark:text-black p-3 flex justify-between items-center border-b-2 border-black dark:border-gray-300">
             <div className="flex flex-col">
@@ -171,7 +171,7 @@ export const SimpleBot: React.FC = () => {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neo-white dark:bg-gray-800">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-gray-600">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`
@@ -225,14 +225,14 @@ export const SimpleBot: React.FC = () => {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={handleSend} className="p-2 border-t-2 border-black dark:border-white bg-white dark:bg-gray-900 flex gap-2">
+          <form onSubmit={handleSend} className="p-2 border-t-2 border-black dark:border-white bg-white dark:bg-gray-600 flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={usage.count >= DAILY_LIMIT ? "Quota épuisé" : "Posez votre question..."}
               disabled={usage.count >= DAILY_LIMIT}
-              className="flex-1 p-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+              className="flex-1 p-2 text-base border border-gray-300 dark:border-white rounded focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-500 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-400 disabled:cursor-not-allowed"
               autoFocus
               style={{ fontSize: '16px' }} // Prevents iOS zoom
             />
