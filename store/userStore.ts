@@ -282,7 +282,17 @@ export const useUserStore = create<UserState>()(
 
 
       toggleDarkMode: () => {
-          set((state) => ({ isDarkMode: !state.isDarkMode }));
+          set((state) => {
+              const newDarkMode = !state.isDarkMode;
+              // Appliquer immédiatement la classe sur <html>
+              const root = window.document.documentElement;
+              if (newDarkMode) {
+                  root.classList.add('dark');
+              } else {
+                  root.classList.remove('dark');
+              }
+              return { isDarkMode: newDarkMode };
+          });
       }
     }),
     {

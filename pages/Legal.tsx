@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Legal: React.FC = () => {
   return (
@@ -42,6 +43,9 @@ export const Legal: React.FC = () => {
           </p>
           <p className="mt-2">
             Vous disposez d'un droit d'accès, de modification et de suppression de vos données de compte.
+          </p>
+          <p className="mt-4">
+            Pour plus d'informations, consultez notre <Link to="/privacy" className="text-neo-violet font-bold underline">Politique de Confidentialité (RGPD)</Link>.
           </p>
         </section>
       </div>

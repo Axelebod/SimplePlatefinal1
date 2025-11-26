@@ -2,15 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
-import { Zap, Crown, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard } from 'lucide-react';
+import { Zap, Crown, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock } from 'lucide-react';
 import { SimpleBot } from './SimpleBot';
 import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
+import { supabase } from '../lib/supabaseClient';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, credits, creditsFree, creditsPaid, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -136,6 +138,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                             <span className="text-xs text-gray-600 dark:text-gray-400">
                                 {creditsFree} gratuits + {creditsPaid} payants
                             </span>
+                            {creditsFree < 5 && timeRemaining && (
+                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <Clock className="w-3 h-3" aria-hidden="true" />
+                                    <span>Reset: {timeRemaining}</span>
+                                </div>
+                            )}
                         </div>
                     </Link>
 
@@ -207,6 +215,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">
                             {creditsFree} gratuits (hebdo) + {creditsPaid} payants
+                        </div>
+                        {creditsFree < 5 && timeRemaining && (
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                <Clock className="w-3 h-3" aria-hidden="true" />
+                                <span>Reset crédits gratuits: {timeRemaining}</span>
+                            </div>
+                        )}
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                            {creditsFree} gratuits (hebdo) + {creditsPaid} payants
+                            {creditsFree < 5 && timeRemaining && (
+                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                    <Clock className="w-3 h-3" aria-hidden="true" />
+                                    <span>Reset crédits gratuits: {timeRemaining}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">

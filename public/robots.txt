@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /404
+Disallow: /dashboard
+
+Sitemap: https://simpleplate.dev/sitemap.xml
+

@@ -42,6 +42,19 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Séparer les vendors pour un meilleur cache
+              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+              'ui-vendor': ['lucide-react', 'react-markdown'],
+              'store-vendor': ['zustand', '@supabase/supabase-js'],
+            },
+          },
+        },
+        chunkSizeWarningLimit: 1000, // Augmenter la limite pour éviter les warnings
+      },
     };
 });

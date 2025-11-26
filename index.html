@@ -15,40 +15,57 @@
 
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- QR Code Library - Version UMD qui s'expose mieux -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script>
-      tailwind.config = {
-        darkMode: 'class', // Activation manuelle via classe 'dark'
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['Space Grotesk', 'sans-serif'],
-            },
-            colors: {
-              'neo-white': '#FAFAFA',
-              'neo-black': '#050505',
-              'neo-violet': '#d8b4fe',
-              'neo-orange': '#fdba74',
-              'neo-blue': '#93c5fd',
-              'neo-green': '#86efac',
-              'neo-red': '#fca5a5',
-              'neo-yellow': '#fde047',
-            },
-            boxShadow: {
-              'neo': '4px 4px 0px 0px #000000',
-              'neo-sm': '2px 2px 0px 0px #000000',
-              'neo-white': '4px 4px 0px 0px #e5e7eb', // Ombres plus douces en mode sombre
-              'neo-white-sm': '2px 2px 0px 0px #e5e7eb',
-            }
+      // Attendre que Tailwind soit chargé avant de définir la config
+      (function() {
+        function initTailwind() {
+          if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+              darkMode: 'class', // Activation manuelle via classe 'dark'
+              theme: {
+                extend: {
+                  fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    display: ['Space Grotesk', 'sans-serif'],
+                  },
+                  colors: {
+                    'neo-white': '#FAFAFA',
+                    'neo-black': '#050505',
+                    'neo-violet': '#d8b4fe',
+                    'neo-orange': '#fdba74',
+                    'neo-blue': '#93c5fd',
+                    'neo-green': '#86efac',
+                    'neo-red': '#fca5a5',
+                    'neo-yellow': '#fde047',
+                  },
+                  boxShadow: {
+                    'neo': '4px 4px 0px 0px #000000',
+                    'neo-sm': '2px 2px 0px 0px #000000',
+                    'neo-white': '4px 4px 0px 0px #e5e7eb', // Ombres plus douces en mode sombre
+                    'neo-white-sm': '2px 2px 0px 0px #e5e7eb',
+                  }
+                }
+              }
+            };
+          } else {
+            // Si Tailwind n'est pas encore chargé, réessayer après un court délai
+            setTimeout(initTailwind, 10);
           }
         }
-      }
+        // Démarrer l'initialisation
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initTailwind);
+        } else {
+          initTailwind();
+        }
+      })();
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://aistudiocdn.com">
+    <link rel="dns-prefetch" href="https://api.qrserver.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
     <style>
       body {
         background-color: #FAFAFA;
@@ -106,9 +123,33 @@
  <!-- Google AdSense -->
  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3795795150757338"
       crossorigin="anonymous"></script>
-</head>
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+  <script>
+    // Initialisation du dark mode AVANT le rendu React (évite le flash)
+    (function() {
+      const stored = localStorage.getItem('simpleplate-storage');
+      let isDark = false;
+      
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          isDark = parsed?.state?.isDarkMode ?? false;
+        } catch (e) {
+          // Si erreur de parsing, on reste en mode clair par défaut
+          isDark = false;
+        }
+      }
+      // Si pas de préférence stockée, on reste en mode clair par défaut
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <script type="module" src="/index.tsx" defer></script>
 </body>
 </html>

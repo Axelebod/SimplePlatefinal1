@@ -4,7 +4,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
 import { Zap, Crown, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
 
 export const Dashboard: React.FC = () => {
   const { user, credits, isPro, logout, togglePro, refreshCredits } = useUserStore();
@@ -88,12 +87,12 @@ export const Dashboard: React.FC = () => {
   if (!user) return null;
 
   const handleManageSubscription = () => {
-      // Redirection vers le portail client Stripe pour gérer/annuler l'abo
+      // Redirection vers le portail client Stripe
       const portalUrl = SITE_CONFIG.stripe.customerPortal;
       if (portalUrl && !portalUrl.includes('votre_portail')) {
           window.location.href = portalUrl;
       } else {
-          alert("Le portail client Stripe n'est pas encore configuré.");
+          alert("Le portail client Stripe n'est pas encore configuré. Veuillez configurer REACT_APP_STRIPE_PORTAL dans vos variables d'environnement.");
       }
   };
 

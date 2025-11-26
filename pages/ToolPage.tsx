@@ -8,6 +8,7 @@ import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, 
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
+import { generateToolSEOContent } from '../utils/toolContentGenerator';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -384,14 +385,14 @@ export const ToolPage: React.FC = () => {
                       placeholder={input.placeholder}
                       rows={input.rows || 4}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked || !isLoggedIn}
+                      disabled={loading || isLocked}
                       maxLength={MAX_CHARS}
                     />
                   ) : input.type === 'select' ? (
                     <select
                        className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                        onChange={(e) => handleInputChange(input.name, e.target.value)}
-                       disabled={loading || isLocked || !isLoggedIn}
+                       disabled={loading || isLocked}
                     >
                       <option value="">Sélectionnez une option</option>
                       {input.options?.map(opt => (
@@ -425,7 +426,7 @@ export const ToolPage: React.FC = () => {
                                 className="hidden" 
                                 accept={input.accept}
                                 onChange={(e) => handleFileChange(e, input.name)}
-                                disabled={loading || isLocked || !isLoggedIn}
+                                disabled={loading || isLocked}
                             />
                         </label>
                     </div>
@@ -435,7 +436,7 @@ export const ToolPage: React.FC = () => {
                       className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                       placeholder={input.placeholder}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked || !isLoggedIn}
+                      disabled={loading || isLocked}
                       maxLength={MAX_CHARS}
                     />
                   )}
@@ -664,194 +665,96 @@ export const ToolPage: React.FC = () => {
       </div>
 
       {/* SEO CONTENT SECTION - Contenu textuel riche pour le référencement */}
-      <div className="mt-12 space-y-8">
-        {/* Description détaillée */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {tool.title} est un outil professionnel alimenté par l'intelligence artificielle qui vous permet de {tool.description.toLowerCase()}. 
-              Que vous soyez un développeur, un entrepreneur, un créateur de contenu ou un professionnel, cet outil vous fait gagner du temps 
-              en automatisant des tâches complexes qui nécessiteraient normalement des heures de travail manuel.
-            </p>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-              Grâce à la puissance de l'IA, {tool.title} génère des résultats de haute qualité en quelques secondes. 
-              L'outil est conçu pour être intuitif et accessible, même si vous n'avez pas d'expérience technique préalable.
-            </p>
+      {(() => {
+        const seoContent = generateToolSEOContent(tool);
+        return (
+          <div className="mt-12 space-y-8">
+            {/* Description détaillée */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {seoContent.intro}
+                </p>
+              </div>
+            </section>
+
+            {/* Comment utiliser */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
+              <ol className="space-y-4 list-decimal list-inside">
+                {seoContent.howTo.map((step, index) => (
+                  <li key={index} className="text-gray-700 dark:text-gray-300">
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            {/* Cas d'usage */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qui utilise {tool.title} ?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {seoContent.useCases.map((useCase, index) => (
+                  <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <h3 className="font-bold text-sm mb-2 dark:text-white">{useCase.title}</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{useCase.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Avantages */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {seoContent.benefits.map((benefit, index) => (
+                  <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <h3 className="font-bold text-sm mb-2 dark:text-white">{benefit.title}</h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{benefit.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* FAQ */}
+            <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Questions fréquentes</h2>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Combien coûte l'utilisation de {tool.title} ?</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {tool.cost === 0 
+                      ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
+                      : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. ${tool.isPremium ? 'Cet outil est disponible uniquement pour les membres PRO.' : 'Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.'}`}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Les résultats sont-ils de bonne qualité ?</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Oui, {tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité. 
+                    Les résultats sont optimisés pour être utilisables directement dans vos projets.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Mes données sont-elles sécurisées ?</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers. 
+                    {tool.inputs.some(i => i.type === 'file') ? ' Les fichiers uploadés sont traités uniquement pour la génération et supprimés immédiatement après.' : ''}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">Puis-je utiliser les résultats commercialement ?</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Oui, vous êtes libre d'utiliser les résultats générés par {tool.title} pour vos projets personnels ou professionnels, 
+                    y compris à des fins commerciales. Les résultats vous appartiennent.
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
-
-        {/* Comment utiliser */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
-          <ol className="space-y-4 list-decimal list-inside">
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Remplissez le formulaire</strong> : Entrez les informations demandées dans les champs ci-dessus. 
-              {tool.inputs.length > 1 ? ` L'outil nécessite ${tool.inputs.length} informations pour générer le meilleur résultat.` : ' L\'outil nécessite une seule information pour générer le résultat.'}
-            </li>
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Cliquez sur "Générer"</strong> : 
-              {tool.cost === 0 
-                ? ' L\'outil est entièrement gratuit et ne consomme aucun crédit.' 
-                : ` L'utilisation coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''}. ${tool.isPremium ? 'Cet outil est réservé aux membres PRO.' : ''}`}
-            </li>
-            <li className="text-gray-700 dark:text-gray-300">
-              <strong className="text-black dark:text-white">Récupérez votre résultat</strong> : Le résultat apparaît instantanément dans la colonne de droite. 
-              Vous pouvez le copier, le télécharger ou l'utiliser directement selon vos besoins.
-            </li>
-          </ol>
-        </section>
-
-        {/* Cas d'usage */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Cas d'usage de {tool.title}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tool.category === 'Dev' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Développeurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Accélérez votre workflow de développement et automatisez des tâches répétitives.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Freelances</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Livrez des projets plus rapidement et augmentez votre productivité.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Business' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Entrepreneurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Optimisez vos processus métier et prenez de meilleures décisions stratégiques.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">E-commerce</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Améliorez vos descriptions produits et boostez vos ventes en ligne.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Text' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Rédacteurs</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez du contenu de qualité en quelques secondes et respectez vos deadlines.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Marketers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Créez des textes publicitaires performants et optimisez vos campagnes.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Image' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Designers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Analysez et créez des visuels professionnels avec l'aide de l'IA.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Créateurs de contenu</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Générez des images uniques pour vos réseaux sociaux et vos projets.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Life' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Simplifiez votre quotidien et résolvez vos problèmes du quotidien.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Étudiants</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Obtenez de l'aide pour vos devoirs et améliorez votre productivité.</p>
-                </div>
-              </>
-            )}
-            {tool.category === 'Security' && (
-              <>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Professionnels IT</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Sécurisez vos systèmes et protégez-vous contre les menaces en ligne.</p>
-                </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Particuliers</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Détectez les arnaques et protégez vos données personnelles.</p>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Questions fréquentes</h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-bold text-sm mb-2 dark:text-white">Combien coûte l'utilisation de {tool.title} ?</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {tool.cost === 0 
-                  ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
-                  : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. ${tool.isPremium ? 'Cet outil est disponible uniquement pour les membres PRO.' : 'Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.'}`}
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-sm mb-2 dark:text-white">Les résultats sont-ils de bonne qualité ?</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Oui, {tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité. 
-                Les résultats sont optimisés pour être utilisables directement dans vos projets.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-sm mb-2 dark:text-white">Mes données sont-elles sécurisées ?</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers. 
-                {tool.inputs.some(i => i.type === 'file') ? ' Les fichiers uploadés sont traités uniquement pour la génération et supprimés immédiatement après.' : ''}
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-sm mb-2 dark:text-white">Puis-je utiliser les résultats commercialement ?</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Oui, vous êtes libre d'utiliser les résultats générés par {tool.title} pour vos projets personnels ou professionnels, 
-                y compris à des fins commerciales. Les résultats vous appartiennent.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Avantages */}
-        <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-          <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Rapidité</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Obtenez des résultats en quelques secondes au lieu d'heures de travail manuel.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Qualité professionnelle</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Des résultats optimisés et prêts à l'emploi, générés par l'IA la plus avancée.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Facilité d'utilisation</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Interface intuitive, aucune compétence technique requise.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-green font-bold text-xl">✓</span>
-              <div>
-                <strong className="text-black dark:text-white">Sécurité et confidentialité</strong>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Vos données sont protégées et ne sont jamais partagées.</p>
-              </div>
-            </li>
-          </ul>
-        </section>
-      </div>
+        );
+      })()}
     </div>
   );
 };

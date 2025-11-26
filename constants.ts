@@ -18,7 +18,7 @@ export const SITE_CONFIG = {
     // STRIPE LINKS (À récupérer dans votre Dashboard Stripe > Products)
     stripe: {
         subscription: process.env.REACT_APP_STRIPE_SUB_LINK || 'https://buy.stripe.com/votre_lien_abo_pro',
-        customerPortal: process.env.REACT_APP_STRIPE_PORTAL || 'https://billing.stripe.com/p/login/votre_portail',
+        customerPortal: process.env.REACT_APP_STRIPE_PORTAL || 'https://billing.stripe.com/p/login/5kQ28r3JR0Jgg7C7KL0Fi00',
         packs: {
             1: process.env.REACT_APP_STRIPE_PACK_1 || 'https://buy.stripe.com/votre_lien_pack_1',
             50: process.env.REACT_APP_STRIPE_PACK_50 || 'https://buy.stripe.com/votre_lien_pack_50',
