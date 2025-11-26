@@ -299,6 +299,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Main Content */}
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8" tabIndex={-1}>
         {children}
+      </main>
 
       {/* Footer */}
       <footer className="border-t-2 border-black dark:border-gray-700 py-8 bg-white dark:bg-gray-800 mt-12 transition-colors duration-300">
