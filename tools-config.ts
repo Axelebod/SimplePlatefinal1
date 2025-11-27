@@ -69,7 +69,7 @@ export const tools: ToolConfig[] = [
     id: 'ecom-product-scanner',
     slug: 'scanner-produit-ecommerce',
     title: 'Scanner Produit E-com',
-    description: 'Prenez une photo de n\'importe quel produit, et notre IA vous génère une fiche produit Shopify prête à vendre. Plus besoin de réfléchir aux descriptions !',
+    description: 'Studio complet de création de fiches produits. Analyse photo, génération IA, templates Shopify/Amazon, export CSV/JSON. Tout pour vendre plus vite !',
     category: 'Business',
     cost: 3,
     isPremium: true,
@@ -82,24 +82,106 @@ export const tools: ToolConfig[] = [
     },
     inputs: [
       { name: 'image', label: 'Photo du produit', type: 'file', accept: 'image/*', required: true, helpText: 'Même une photo amateur suffit. L\'IA analyse les détails visuels.' },
-      { name: 'niche', label: 'Niche / Cible (Optionnel)', type: 'text', placeholder: 'Ex: Sportifs, Parents, Luxe...', required: false }
+      { 
+        name: 'platform', 
+        label: 'Plateforme cible', 
+        type: 'select', 
+        options: ['Shopify', 'Amazon', 'WooCommerce', 'PrestaShop', 'Les deux (Shopify + Amazon)'],
+        required: true,
+        helpText: 'Choisissez la plateforme pour adapter le format'
+      },
+      { 
+        name: 'niche', 
+        label: 'Niche / Cible', 
+        type: 'text', 
+        placeholder: 'Ex: Sportifs, Parents, Luxe, Tech...', 
+        required: true,
+        helpText: 'Définit le ton et le style marketing'
+      },
+      { 
+        name: 'priceRange', 
+        label: 'Gamme de prix (€)', 
+        type: 'select', 
+        options: ['Moins de 20€', '20-50€', '50-100€', '100-200€', '200-500€', 'Plus de 500€'],
+        required: false,
+        helpText: 'Aide l\'IA à calibrer le positionnement'
+      },
+      { 
+        name: 'competitors', 
+        label: 'Concurrents principaux (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: Apple, Samsung, Xiaomi...', 
+        required: false,
+        helpText: 'Pour un positionnement différenciant'
+      }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Analyse cette image de produit comme un expert Copywriter E-commerce (Amazon FBA / Shopify).
+TÂCHE: Analyse cette image de produit comme un expert Copywriter E-commerce spécialisé ${data.platform || 'Shopify/Amazon'}.
 CIBLE: ${data.niche || "Grand public"}
-SORTIE ATTENDUE (Format Markdown) :
-1. **Titre SEO** (Accrocheur, < 80 caractères).
-2. **Description Courte** (2 phrases impactantes).
-3. **5 Bullet Points** (Avantages clés et caractéristiques visibles).
-4. **Description Longue** (Storytelling persuasif).
-5. **Mots-clés SEO** (Liste de 10 tags).
-6. **Estimation de Prix** (Basé sur la valeur perçue).`
+GAMME PRIX: ${data.priceRange || 'Non spécifiée'}
+${data.competitors ? `CONCURRENTS: ${data.competitors}` : ''}
+
+SORTIE ATTENDUE (Format Markdown structuré) :
+
+## 📦 FICHE PRODUIT ${data.platform || 'E-COMMERCE'}
+
+### 1. **TITRE SEO**
+- Format ${data.platform === 'Amazon' ? 'Amazon (max 200 caractères)' : 'Shopify (max 80 caractères)'}
+- Inclure : Marque (si visible), Type produit, Caractéristique principale
+- Exemple format : "[Marque] [Produit] - [Bénéfice clé]"
+
+### 2. **DESCRIPTION COURTE** (Meta Description)
+- 2-3 phrases impactantes
+- Appel à l'émotion + bénéfice principal
+- ${data.platform === 'Amazon' ? 'Format Amazon (paragraphe court)' : 'Format Shopify (2-3 lignes)'}
+
+### 3. **BULLET POINTS** (5 points max)
+- Format : ${data.platform === 'Amazon' ? 'Amazon (5 points max, 200 caractères chacun)' : 'Shopify (5 points, format liste)'}
+- Chaque point = 1 bénéfice/feature visible sur l'image
+- Utiliser des verbes d'action
+
+### 4. **DESCRIPTION LONGUE** (Storytelling)
+- 3-4 paragraphes
+- Parler au "vous"
+- Inclure : Problème résolu, Expérience utilisateur, Garanties/Confiance
+
+### 5. **MOTS-CLÉS SEO**
+- 15-20 mots-clés pertinents
+- Format : Liste séparée par virgules
+- Inclure : Long tail keywords, Synonymes, Catégories
+
+### 6. **ESTIMATION PRIX & POSITIONNEMENT**
+- Prix suggéré basé sur l'analyse visuelle et la gamme ${data.priceRange || ''}
+- Positionnement marché (Premium/Mid-range/Budget)
+- Justification du prix
+
+### 7. **TAGS & CATÉGORIES**
+- Catégories principales (3-5)
+- Tags secondaires (10-15)
+- Format compatible ${data.platform || 'Shopify/Amazon'}
+
+${data.platform === 'Amazon' ? `
+### 8. **FORMAT AMAZON SPÉCIFIQUE**
+- A+ Content suggestions (si applicable)
+- Backend Search Terms (250 caractères max)
+- Product Type & Browse Node suggestions
+` : ''}
+
+${data.platform === 'Shopify' ? `
+### 8. **FORMAT SHOPIFY SPÉCIFIQUE**
+- Product Type
+- Vendor suggestion
+- Tags format Shopify
+- Collection suggestions
+` : ''}
+
+Génère maintenant la fiche complète.`
   },
   {
     id: 'website-generator',
     slug: 'generateur-site-web',
     title: 'Générateur Site Web',
-    description: 'Vous avez une idée de site ? Décrivez-la simplement, et on vous génère le code HTML complet. Responsive, moderne, prêt à déployer !',
+    description: 'Créez des sites web complets avec éditeur visuel intégré. Aperçu en temps réel, export du code, et déploiement en un clic. Plus qu\'un simple générateur, un vrai studio web !',
     category: 'Dev',
     cost: 3,
     isPremium: true,
@@ -112,59 +194,98 @@ SORTIE ATTENDUE (Format Markdown) :
     },
     inputs: [
       { 
+        name: 'siteType', 
+        label: 'Type de site', 
+        type: 'select', 
+        options: ['Landing Page', 'Portfolio', 'Blog', 'E-commerce', 'SaaS App', 'Corporate', 'Event', 'Autre'],
+        required: true,
+        helpText: 'Sélectionnez le type de site à générer'
+      },
+      { 
+        name: 'primaryColor', 
+        label: 'Couleur principale', 
+        type: 'text', 
+        placeholder: 'Ex: #6366f1 (bleu), #10b981 (vert)...', 
+        required: false,
+        helpText: 'Code couleur hexadécimal pour le thème'
+      },
+      { 
+        name: 'companyName', 
+        label: 'Nom / Titre', 
+        type: 'text', 
+        placeholder: 'Ex: MonApp, Mon Entreprise...', 
+        required: true 
+      },
+      { 
+        name: 'tagline', 
+        label: 'Slogan / Sous-titre', 
+        type: 'text', 
+        placeholder: 'Ex: La solution qui change tout', 
+        required: false 
+      },
+      { 
         name: 'desc', 
-        label: 'Description du site web', 
+        label: 'Description détaillée', 
         type: 'textarea', 
         rows: 6, 
-        placeholder: 'Ex: Une landing page moderne pour une app de fitness avec hero section, fonctionnalités, témoignages et CTA.', 
+        placeholder: 'Décrivez le contenu, les fonctionnalités clés, le message à transmettre, les call-to-actions...', 
         required: true,
-        helpText: 'Décrivez le type de site, le style, les sections souhaitées, les couleurs, etc.'
+        helpText: 'Plus vous êtes précis, meilleur sera le résultat'
       },
       { 
         name: 'style', 
-        label: 'Style visuel (Optionnel)', 
+        label: 'Style visuel', 
         type: 'select', 
-        options: ['Moderne & Minimaliste', 'Bold & Coloré', 'Élégant & Professionnel', 'Créatif & Artistique', 'Tech & Futuriste', 'Classique & Corporate'],
+        options: ['Moderne & Minimaliste', 'Bold & Coloré', 'Élégant & Professionnel', 'Créatif & Artistique', 'Tech & Futuriste', 'Classique & Corporate', 'Dark Mode'],
         required: false,
-        helpText: 'Choisissez le style général du design'
+        helpText: 'Style général du design'
       },
       { 
         name: 'sections', 
-        label: 'Sections à inclure (Optionnel)', 
-        type: 'text', 
-        placeholder: 'Hero, Features, Testimonials, Pricing, Contact',
+        label: 'Sections à inclure', 
+        type: 'select', 
+        options: ['Hero + Features + CTA', 'Hero + About + Services + Contact', 'Hero + Pricing + Testimonials + FAQ', 'Hero + Portfolio + Blog + Contact', 'Tout (recommandé)'],
         required: false,
-        helpText: 'Listez les sections souhaitées (séparées par des virgules)'
+        helpText: 'Structure de la page'
       }
     ],
     promptGenerator: (data) => {
       const styleGuide = data.style ? `\nSTYLE: ${data.style}` : '';
+      const colorGuide = data.primaryColor ? `\nCOULEUR PRINCIPALE: ${data.primaryColor}` : '';
       const sectionsList = data.sections ? `\nSECTIONS: ${data.sections}` : '';
+      const taglineText = data.tagline ? `\nTAGLINE: ${data.tagline}` : '';
       
       return `${SYSTEM_PROMPT}
-TÂCHE: Code une landing page HTML complète et fonctionnelle pour : "${data.desc}".${styleGuide}${sectionsList}
+TÂCHE: Code une page web HTML complète, moderne et professionnelle.
+
+TYPE DE SITE: ${data.siteType}
+NOM: ${data.companyName}${taglineText}
+DESCRIPTION: ${data.desc}${styleGuide}${colorGuide}${sectionsList}
 
 RÈGLES STRICTES (RESPECTE-LES) :
 
-1. **HTML5 COMPLET** : <!DOCTYPE html>, <html lang="fr">, <head> avec meta (viewport, charset, title), <body>
+1. **HTML5 COMPLET** : <!DOCTYPE html>, <html lang="fr">, <head> avec meta (viewport, charset, title="${data.companyName}"), <body>
 
 2. **TAILWIND CSS** : <script src="https://cdn.tailwindcss.com"></script> dans <head>
 
-3. **RESPONSIVE** : Mobile-first avec md: et lg: breakpoints
+3. **RESPONSIVE** : Mobile-first avec md: et lg: breakpoints. Testé sur mobile, tablette, desktop.
 
-4. **SECTIONS MAX 4** :
-   - Hero (titre + sous-titre + CTA + image)
-   - Features (3 items max)
-   - CTA final
-   - Footer simple
+4. **STRUCTURE OPTIMISÉE** :
+   - Hero section (impact visuel fort avec ${data.tagline || 'slogan'})
+   - Features/Services (3-4 items avec icônes)
+   - Section supplémentaire selon type (About, Pricing, Portfolio, etc.)
+   - CTA section (call-to-action clair)
+   - Footer simple (liens, copyright)
 
-5. **IMAGES** : https://placehold.co/600x400/6366f1/white (remplace COLOR par une couleur appropriée)
+5. **COULEURS** : Utilise ${data.primaryColor || 'une palette cohérente'} comme couleur principale. Gradients modernes si approprié.
 
-6. **JAVASCRIPT MINIMAL** : Seulement pour smooth scroll et animations simples (fade-in au scroll)
+6. **IMAGES** : Utilise https://placehold.co/ avec des couleurs harmonieuses. Format: https://placehold.co/800x600/[COULEUR]/white?text=${encodeURIComponent(data.companyName)}
 
-7. **CODE COURT** : Maximum 200 lignes HTML. Pas de sections inutiles. Code propre et indenté.
+7. **ANIMATIONS** : Smooth scroll, fade-in au scroll (JavaScript vanilla minimal)
 
-8. **SORTIE** : UNIQUEMENT le code HTML dans \`\`\`html. Pas de texte avant/après.
+8. **CODE PROPRE** : Maximum 250 lignes HTML. Indentation correcte. Commentaires pour sections principales.
+
+9. **SORTIE** : UNIQUEMENT le code HTML dans \`\`\`html. Pas de texte avant/après.
 
 GÉNÈRE LE CODE MAINTENANT :`;
     }
@@ -173,7 +294,7 @@ GÉNÈRE LE CODE MAINTENANT :`;
     id: 'python-pro-gen',
     slug: 'generateur-python-pro',
     title: 'Générateur Python Pro',
-    description: 'Besoin d\'automatiser une tâche ? Dites-nous ce que vous voulez faire, et on vous génère un script Python propre et commenté. Même pour les débutants !',
+    description: 'Studio Python complet : génération de code, validation automatique, tests unitaires, documentation, analyse de complexité. Plus qu\'un générateur, un vrai IDE !',
     category: 'Dev',
     cost: 3,
     isPremium: true,
@@ -184,15 +305,122 @@ GÉNÈRE LE CODE MAINTENANT :`;
       description: 'Obtenez des scripts Python prêts à l\'emploi pour l\'automatisation, la data science ou le web scraping. Code propre et commenté.', 
       keywords: ['générateur python', 'script python ia', 'automatisation', 'code python professionnel', 'aide programmation'] 
     },
-    inputs: [{ name: 'task', label: 'Que doit faire le script ?', type: 'textarea', rows: 8, placeholder: 'Ex: Scraper les titres des dernières news sur HackerNews et les sauvegarder dans un CSV...', required: true }],
+    inputs: [
+      { 
+        name: 'task', 
+        label: 'Description de la tâche', 
+        type: 'textarea', 
+        rows: 6, 
+        placeholder: 'Ex: Scraper les titres des dernières news sur HackerNews et les sauvegarder dans un CSV avec timestamp...', 
+        required: true,
+        helpText: 'Décrivez précisément ce que le script doit faire'
+      },
+      { 
+        name: 'complexity', 
+        label: 'Niveau de complexité', 
+        type: 'select', 
+        options: ['Simple (script basique)', 'Intermédiaire (fonctions, classes)', 'Avancé (architecture complète)', 'Expert (design patterns, optimisations)'],
+        required: false,
+        helpText: 'Définit la sophistication du code généré'
+      },
+      { 
+        name: 'includeTests', 
+        label: 'Inclure des tests unitaires', 
+        type: 'select', 
+        options: ['Oui (avec pytest)', 'Non (code uniquement)'],
+        required: false,
+        helpText: 'Génère des tests automatiques pour valider le code'
+      },
+      { 
+        name: 'dependencies', 
+        label: 'Bibliothèques spécifiques (Optionnel)', 
+        type: 'text', 
+        placeholder: 'Ex: requests, pandas, beautifulsoup4, selenium...', 
+        required: false,
+        helpText: 'Listez les dépendances si vous en connaissez'
+      },
+      { 
+        name: 'requirements', 
+        label: 'Exigences spéciales (Optionnel)', 
+        type: 'textarea', 
+        rows: 3, 
+        placeholder: 'Ex: Doit être asynchrone, utiliser des type hints, respecter SOLID...', 
+        required: false 
+      }
+    ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Agis comme un Expert Python. Écris un script complet pour : "${data.task}".
-INSTRUCTIONS:
-1. Code robuste (Gestion d'erreurs try/except).
-2. Respecte la PEP8.
-3. Ajoute des commentaires expliquant chaque étape importante.
-4. Utilise des bibliothèques populaires si nécessaire (requests, pandas, beautifulsoup).
-5. Structure avec \`if __name__ == "__main__":\`.`
+TÂCHE: Agis comme un Expert Python Senior. Écris un script complet, professionnel et production-ready pour : "${data.task}".
+
+NIVEAU DE COMPLEXITÉ: ${data.complexity || 'Intermédiaire'}
+TESTS: ${data.includeTests === 'Oui (avec pytest)' ? 'OUI - Génère des tests pytest complets' : 'NON'}
+${data.dependencies ? `DÉPENDANCES SPÉCIFIQUES: ${data.dependencies}` : ''}
+${data.requirements ? `EXIGENCES: ${data.requirements}` : ''}
+
+STRUCTURE DU CODE À GÉNÉRER :
+
+## 📝 SCRIPT PYTHON COMPLET
+
+### 1. **IMPORTS & CONFIGURATION**
+- Imports organisés (standard library, third-party, local)
+- Type hints partout (Python 3.9+)
+- Configuration via variables ou fichier .env si nécessaire
+
+### 2. **CODE PRINCIPAL**
+- Structure claire et modulaire
+- Gestion d'erreurs robuste (try/except avec logging)
+- Respect strict de la PEP8
+- Docstrings (Google style) pour toutes les fonctions/classes
+- Commentaires explicatifs pour la logique complexe
+
+### 3. **FONCTIONNALITÉS AVANCÉES**
+${data.complexity?.includes('Avancé') || data.complexity?.includes('Expert') ? `
+- Classes si approprié (OOP)
+- Design patterns si pertinent
+- Optimisations (caching, lazy loading, etc.)
+- Configuration externalisée
+` : `
+- Fonctions bien définies
+- Séparation des responsabilités
+`}
+
+### 4. **GESTION D'ERREURS**
+- Try/except spécifiques (pas de bare except)
+- Logging approprié (niveaux DEBUG/INFO/ERROR)
+- Messages d'erreur clairs et actionnables
+- Validation des inputs
+
+### 5. **MAIN BLOCK**
+\`\`\`python
+if __name__ == "__main__":
+    # Code d'exécution avec argparse si nécessaire
+\`\`\`
+
+${data.includeTests === 'Oui (avec pytest)' ? `
+### 6. **TESTS UNITAIRES (pytest)**
+- Fichier test_*.py séparé
+- Tests pour chaque fonction principale
+- Fixtures si nécessaire
+- Tests de cas limites et d'erreurs
+- Coverage > 80%
+` : ''}
+
+### 7. **REQUIREMENTS.TXT**
+- Liste complète des dépendances avec versions
+- Format pip install compatible
+
+### 8. **DOCUMENTATION**
+- README.md avec :
+  - Description du script
+  - Installation (pip install -r requirements.txt)
+  - Usage avec exemples
+  - Configuration requise
+
+### 9. **ANALYSE DE CODE**
+- Complexité cyclomatique estimée
+- Points d'attention (performance, sécurité)
+- Suggestions d'amélioration
+
+Génère maintenant le code complet avec tous ces éléments.`
   },
 
   // --- PRO TOOLS (HIGH VALUE) ---
@@ -200,7 +428,7 @@ INSTRUCTIONS:
     id: 'ai-image-analysis',
     slug: 'analyseur-image-ia',
     title: 'Analyseur d\'Image IA',
-    description: 'Une image vous intrigue ? On vous dit si c\'est de l\'IA, et on vous donne même le prompt probable. Parfait pour les créateurs curieux !',
+    description: 'Laboratoire d\'analyse d\'images avancé. Détection IA, reverse engineering de prompts, métriques techniques, rapport complet avec scores. Pour créateurs et professionnels !',
     category: 'Image',
     cost: 2,
     isPremium: true,
@@ -213,21 +441,101 @@ INSTRUCTIONS:
     },
     inputs: [
       { name: 'image', label: 'Uploadez votre image', type: 'file', accept: 'image/*', required: true, helpText: 'L\'image est analysée directement et ne sera jamais stockée sur nos serveurs.' },
-      { name: 'question', label: 'Votre question sur l\'image', type: 'text', placeholder: 'Est-ce une IA ? Quel est le prompt ?', required: false }
+      { 
+        name: 'analysisType', 
+        label: 'Type d\'analyse', 
+        type: 'select', 
+        options: ['Complète (IA + Technique + Prompt)', 'Détection IA uniquement', 'Reverse Prompt uniquement', 'Analyse technique (résolution, couleurs, etc.)'],
+        required: true,
+        helpText: 'Choisissez le type d\'analyse souhaité'
+      },
+      { 
+        name: 'aiModel', 
+        label: 'Modèle IA suspecté (Optionnel)', 
+        type: 'select', 
+        options: ['Auto-détection', 'Midjourney', 'DALL-E', 'Stable Diffusion', 'Imagen', 'Autre'],
+        required: false,
+        helpText: 'Aide à affiner l\'analyse si vous avez une idée'
+      },
+      { name: 'question', label: 'Question spécifique (Optionnel)', type: 'text', placeholder: 'Ex: Quel est le style artistique ? Y a-t-il des artefacts ?', required: false }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Analyse cette image fournie.
-QUESTION UTILISATEUR: "${data.question || "Dis-moi si cette image est générée par IA et donne le prompt probable."}"
-DIRECTIVES:
-1. Cherche les défauts visuels (mains, texte, cohérence lumière).
-2. Donne un pourcentage de probabilité IA.
-3. Génère le prompt de création détaillé.`
+TÂCHE: Analyse approfondie de cette image avec rapport professionnel structuré.
+
+TYPE D'ANALYSE: ${data.analysisType || 'Complète'}
+${data.aiModel && data.aiModel !== 'Auto-détection' ? `MODÈLE SUSPECTÉ: ${data.aiModel}` : ''}
+QUESTION SPÉCIFIQUE: "${data.question || 'Analyse complète de l\'image'}"
+
+GÉNÈRE UN RAPPORT STRUCTURÉ EN MARKDOWN :
+
+## 🔍 RAPPORT D'ANALYSE D'IMAGE
+
+### 1. **SCORE DE DÉTECTION IA**
+- **Probabilité IA** : [X]% (0-100)
+- **Confiance** : [Faible/Moyenne/Forte/Très forte]
+- **Modèle probable** : [Midjourney/DALL-E/Stable Diffusion/Imagen/Inconnu]
+- **Justification** : Liste des indices trouvés
+
+### 2. **ANALYSE TECHNIQUE**
+- **Résolution** : [Largeur x Hauteur] pixels
+- **Format** : [JPEG/PNG/WebP/etc.]
+- **Taille fichier estimée** : [KB/MB]
+- **Profondeur de couleur** : [8-bit/16-bit/etc.]
+- **Compression** : [Niveau estimé]
+
+### 3. **ANALYSE VISUELLE**
+- **Composition** : [Règle des tiers, symétrie, etc.]
+- **Éclairage** : [Naturel/Artificiel, Direction, Intensité]
+- **Couleurs dominantes** : [Palette principale]
+- **Style artistique** : [Réaliste/Surréaliste/Abstrait/etc.]
+- **Qualité générale** : [Faible/Moyenne/Bonne/Excellente]
+
+### 4. **DÉFAUTS & ARTEFACTS DÉTECTÉS**
+Liste détaillée avec localisation si possible :
+- [ ] Mains/Doigts anormaux
+- [ ] Texte illisible ou incohérent
+- [ ] Incohérences d'éclairage
+- [ ] Objets flottants ou impossibles
+- [ ] Répétitions de motifs
+- [ ] Bords flous ou artefacts de compression
+- [ ] Autres anomalies
+
+### 5. **REVERSE PROMPT ENGINEERING**
+Si l'image semble générée par IA, génère le prompt probable :
+
+**Prompt probable** :
+\`\`\`
+[Prompt détaillé avec paramètres techniques]
+\`\`\`
+
+**Paramètres estimés** :
+- Style : [photorealistic/artistic/etc.]
+- Qualité : [--quality, --stylize, etc.]
+- Ratio : [16:9, 1:1, etc.]
+- Seed possible : [Si détectable]
+
+### 6. **MÉTRIQUES DE QUALITÉ**
+- **Score de réalisme** : [X]/10
+- **Score de cohérence** : [X]/10
+- **Score technique** : [X]/10
+- **Score artistique** : [X]/10
+- **Score global** : [X]/10
+
+### 7. **RECOMMANDATIONS**
+- Utilisation suggérée : [Commerciale/Éditoriale/Personnelle]
+- Améliorations possibles : [Liste]
+- Compatibilité licences : [Si applicable]
+
+### 8. **DÉTAILS SUPPLÉMENTAIRES**
+${data.question ? `Réponse à la question spécifique : "${data.question}"` : 'Analyse approfondie des éléments visuels remarquables'}
+
+Génère maintenant le rapport complet.`
   },
   {
     id: 'business-plan-pro',
     slug: 'business-plan-pro',
     title: 'Business Plan Pro',
-    description: 'Vous avez une idée de startup ? On vous génère un business plan complet et professionnel, prêt à présenter à vos investisseurs. En quelques minutes !',
+    description: 'Créez un business plan professionnel structuré avec notre éditeur intelligent. Sections pré-remplies, calculs financiers automatiques, et export PDF prêt pour investisseurs.',
     category: 'Business',
     cost: 2,
     isPremium: true,
@@ -238,8 +546,64 @@ DIRECTIVES:
       description: 'Créez un business plan professionnel en 1 clic. Executive Summary, Analyse de marché, Stratégie financière et SWOT.', 
       keywords: ['business plan generator', 'créer business plan', 'modèle business plan', 'startup', 'investisseurs'] 
     },
-    inputs: [{ name: 'idea', label: 'Décrivez votre idée de business', type: 'textarea', rows: 6, placeholder: 'Ex: Une application de livraison de repas par drone à Paris...', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Rédige un Business Plan structuré pour cette idée : "${data.idea}".\nSections obligatoires :\n1. Executive Summary\n2. Analyse de Marché (Tam/Sam/Som)\n3. Modèle Économique\n4. Stratégie Go-To-Market\n5. Analyse SWOT.`
+    inputs: [
+      { 
+        name: 'companyName', 
+        label: 'Nom de l\'entreprise', 
+        type: 'text', 
+        placeholder: 'Ex: TechDrone Solutions', 
+        required: true 
+      },
+      { 
+        name: 'sector', 
+        label: 'Secteur d\'activité', 
+        type: 'select', 
+        options: ['Tech/SaaS', 'E-commerce', 'Services', 'Manufacturing', 'Food & Beverage', 'Healthcare', 'Education', 'Finance', 'Autre'], 
+        required: true 
+      },
+      { 
+        name: 'targetMarket', 
+        label: 'Marché cible', 
+        type: 'text', 
+        placeholder: 'Ex: PME françaises, Particuliers 25-45 ans...', 
+        required: true 
+      },
+      { 
+        name: 'fundingNeeded', 
+        label: 'Montant recherché (€)', 
+        type: 'number', 
+        placeholder: '50000', 
+        required: false,
+        helpText: 'Montant d\'investissement recherché'
+      },
+      { 
+        name: 'idea', 
+        label: 'Description détaillée du projet', 
+        type: 'richtext', 
+        useEditor: true,
+        placeholder: 'Décrivez votre produit/service, votre vision, vos avantages concurrentiels...', 
+        required: true,
+        helpText: 'Utilisez l\'éditeur pour formater votre texte professionnellement'
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Rédige un Business Plan structuré et professionnel pour :
+
+ENTREPRISE: ${data.companyName}
+SECTEUR: ${data.sector}
+MARCHÉ CIBLE: ${data.targetMarket}
+FUNDING: ${data.fundingNeeded ? `${data.fundingNeeded}€` : 'Non spécifié'}
+DESCRIPTION: ${data.idea}
+
+Sections obligatoires (format Markdown professionnel) :
+1. **Executive Summary** (1 page max)
+2. **Analyse de Marché** (TAM/SAM/SOM avec chiffres)
+3. **Modèle Économique** (Revenue streams, Coûts, Projections 3 ans)
+4. **Stratégie Go-To-Market** (Channels, Pricing, Marketing)
+5. **Analyse SWOT** (Forces, Faiblesses, Opportunités, Menaces)
+6. **Équipe & Gouvernance**
+7. **Plan Financier** (Tableaux de projections si funding spécifié)
+
+Tone: Professionnel, convaincant, data-driven.`
   },
   {
     id: 'smart-contract-audit',

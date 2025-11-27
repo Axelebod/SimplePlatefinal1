@@ -6,7 +6,7 @@ export type ToolCategory = 'Text' | 'Image' | 'Dev' | 'Life' | 'Business' | 'Sec
 export interface ToolInput {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'file';
+  type: 'text' | 'textarea' | 'select' | 'number' | 'file' | 'richtext';
   placeholder?: string;
   options?: string[]; // For select inputs
   required?: boolean;
@@ -14,6 +14,7 @@ export interface ToolInput {
   className?: string; // Classes CSS spécifiques (ex: font-mono)
   helpText?: string; // Petit texte d'aide sous le label
   accept?: string; // Pour les inputs file (ex: image/*)
+  useEditor?: boolean; // Utiliser l'éditeur WYSIWYG pour ce champ
 }
 
 export interface ToolSEO {

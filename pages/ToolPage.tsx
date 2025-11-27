@@ -9,6 +9,11 @@ import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
 import { generateToolSEOContent } from '../utils/toolContentGenerator';
+import { ToolHistory } from '../components/ToolHistory';
+import { ToolTemplates } from '../components/ToolTemplates';
+import { saveToolResult } from '../services/toolHistoryService';
+import { RichTextEditor } from '../components/RichTextEditor';
+import { ProductSheetExporter } from '../components/ProductSheetExporter';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -305,11 +310,32 @@ export const ToolPage: React.FC = () => {
 
       setResult(output);
       
+      // Sauvegarder dans l'historique (micro SaaS) - seulement si crédits utilisés
+      if (isLoggedIn && tool.cost > 0) {
+        await saveToolResult(
+          tool.id,
+          inputsWithFile,
+          output,
+          tool.outputType,
+          tool.cost,
+          {
+            model: tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
+            prompt_length: prompt.length
+          }
+        );
+      }
+      
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadTemplate = (templateInputs: Record<string, any>) => {
+    setInputs(templateInputs);
+    // Scroll vers le formulaire
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const copyToClipboard = () => {
@@ -379,7 +405,14 @@ export const ToolPage: React.FC = () => {
                       )}
                   </div>
                   
-                  {input.type === 'textarea' ? (
+                  {input.type === 'richtext' || input.useEditor ? (
+                    <RichTextEditor
+                      content={inputs[input.name] || ''}
+                      onChange={(content) => handleInputChange(input.name, content)}
+                      placeholder={input.placeholder || 'Commencez à écrire...'}
+                      editable={!loading && !isLocked}
+                    />
+                  ) : input.type === 'textarea' ? (
                     <textarea
                       className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white text-sm ${input.className || ''}`}
                       placeholder={input.placeholder}
@@ -559,6 +592,16 @@ export const ToolPage: React.FC = () => {
                       </p>
                     </div>
                  </div>
+               ) : tool.id === 'business-plan-pro' ? (
+                 // Business Plan avec éditeur WYSIWYG pour édition
+                 <div className="animate-in fade-in duration-500">
+                   <RichTextEditor
+                     content={result}
+                     onChange={(content) => setResult(content)}
+                     placeholder="Votre business plan apparaîtra ici..."
+                     editable={true}
+                   />
+                 </div>
                ) : (
                  <>
                     {/* WEBSITE GENERATOR IFRAME */}
@@ -575,6 +618,85 @@ export const ToolPage: React.FC = () => {
                             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                                 Ceci est une prévisualisation live. Cliquez sur le bouton &lt;/&gt; en haut pour copier le code.
                             </p>
+                        </div>
+                    ) : tool.id === 'ecom-product-scanner' ? (
+                        // Scanner Produit avec export Shopify/Amazon
+                        <div className="animate-in fade-in duration-500">
+                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
+                            <ReactMarkdown>{result}</ReactMarkdown>
+                          </div>
+                          <ProductSheetExporter 
+                            result={result} 
+                            platform={inputs.platform || 'Shopify'} 
+                          />
+                        </div>
+                    ) : tool.id === 'ai-image-analysis' ? (
+                        // Analyseur d'Image avec métriques visuelles
+                        <div className="animate-in fade-in duration-500">
+                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
+                            <ReactMarkdown>{result}</ReactMarkdown>
+                          </div>
+                          {/* Métriques visuelles extraites du rapport */}
+                          {result.match(/Probabilité IA.*?(\d+)%/)?.[1] && (
+                            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg">
+                              <h4 className="font-bold text-sm mb-2 dark:text-white">📊 Métriques Rapides</h4>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <span className="text-gray-600 dark:text-gray-400">Probabilité IA:</span>
+                                  <span className="ml-2 font-bold text-neo-violet">
+                                    {result.match(/Probabilité IA.*?(\d+)%/)?.[1]}%
+                                  </span>
+                                </div>
+                                {result.match(/Score global.*?(\d+)\/10/)?.[1] && (
+                                  <div>
+                                    <span className="text-gray-600 dark:text-gray-400">Score global:</span>
+                                    <span className="ml-2 font-bold text-neo-green">
+                                      {result.match(/Score global.*?(\d+)\/10/)?.[1]}/10
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                    ) : tool.id === 'python-pro-gen' ? (
+                        // Python Pro avec syntax highlighting amélioré
+                        <div className="animate-in fade-in duration-500">
+                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
+                            <ReactMarkdown
+                              components={{
+                                code: ({node, inline, className, children, ...props}: any) => {
+                                  const match = /language-(\w+)/.exec(className || '');
+                                  const isPython = !inline && (match?.[1] === 'python' || className?.includes('python'));
+                                  
+                                  if (isPython) {
+                                    return (
+                                      <div className="relative">
+                                        <pre className="bg-gray-900 dark:bg-gray-950 p-4 rounded-lg overflow-x-auto border-2 border-gray-700">
+                                          <code className="text-green-400 font-mono text-sm" {...props}>
+                                            {children}
+                                          </code>
+                                        </pre>
+                                        <button
+                                          onClick={() => {
+                                            const code = String(children).replace(/\n$/, '');
+                                            navigator.clipboard.writeText(code);
+                                            alert('Code copié !');
+                                          }}
+                                          className="absolute top-2 right-2 px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600"
+                                        >
+                                          Copier
+                                        </button>
+                                      </div>
+                                    );
+                                  }
+                                  return <code className={className} {...props}>{children}</code>;
+                                }
+                              }}
+                            >
+                              {result}
+                            </ReactMarkdown>
+                          </div>
                         </div>
                     ) : (
                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -663,6 +785,18 @@ export const ToolPage: React.FC = () => {
            </div>
         </div>
       </div>
+
+      {/* HISTORIQUE ET TEMPLATES - Micro SaaS Features */}
+      {isLoggedIn && (
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ToolTemplates 
+            toolId={tool.id} 
+            currentInputs={inputs}
+            onLoadTemplate={handleLoadTemplate}
+          />
+          <ToolHistory toolId={tool.id} onLoadTemplate={handleLoadTemplate} />
+        </div>
+      )}
 
       {/* SEO CONTENT SECTION - Contenu textuel riche pour le référencement */}
       {(() => {
