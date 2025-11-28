@@ -15,6 +15,8 @@ export interface ToolInput {
   helpText?: string; // Petit texte d'aide sous le label
   accept?: string; // Pour les inputs file (ex: image/*)
   useEditor?: boolean; // Utiliser l'éditeur WYSIWYG pour ce champ
+  fileMode?: 'base64' | 'text';
+  mapTo?: string;
 }
 
 export interface ToolSEO {

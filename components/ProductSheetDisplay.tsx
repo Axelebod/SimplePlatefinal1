@@ -1,6 +1,6 @@
-import React from 'react';
-import { Download, ShoppingCart, FileText, Share2, Save } from 'lucide-react';
-import { ProductSheetExporter } from './ProductSheetExporter';
+import React, { useMemo } from 'react';
+import { Save } from 'lucide-react';
+import { ProductSheetExporter, ParsedProductSheet } from './ProductSheetExporter';
 
 interface ProductSheetDisplayProps {
   result: string;
@@ -10,95 +10,77 @@ interface ProductSheetDisplayProps {
   isSaving?: boolean;
 }
 
-export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({ 
-  result, 
+const cleanLine = (line: string) =>
+  line
+    .replace(/^\s*[-*]\s*/, '')
+    .replace(/^\d+\.\s*/, '')
+    .replace(/^\*\*/, '')
+    .replace(/\*\*$/, '')
+    .trim();
+
+const getSectionBlock = (markdown: string, label: string) => {
+  const safe = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`###\\s+${safe}[\\s\\S]*?(?=\\n###\\s+\\d|\\n##\\s|$)`, 'i');
+  const match = markdown.match(regex);
+  if (!match) return '';
+  return match[0].replace(new RegExp(`###\\s+${safe}`, 'i'), '').trim();
+};
+
+const parseSheet = (markdown: string, platform: string): ParsedProductSheet => {
+  const block = (index: number, title: string) => getSectionBlock(markdown, `${index}\\. \\*\\*${title}\\*\\*`);
+
+  const titleBlock = block(1, 'TITRE SEO');
+  const shortBlock = block(2, 'DESCRIPTION COURTE');
+  const bulletBlock = block(3, 'BULLET POINTS');
+  const longBlock = block(4, 'DESCRIPTION LONGUE');
+  const tagsBlock = block(5, 'MOTS-CLÉS SEO');
+  const priceBlock = block(6, 'ESTIMATION PRIX & POSITIONNEMENT');
+
+  const bulletPoints = bulletBlock
+    ? bulletBlock
+        .split('\n')
+        .map(cleanLine)
+        .filter(Boolean)
+        .slice(0, 10)
+    : [];
+
+  const seoKeywords = tagsBlock
+    ? tagsBlock
+        .split(/[,|\n]/)
+        .map(tag => tag.trim())
+        .filter(Boolean)
+    : [];
+
+  return {
+    title: cleanLine(titleBlock.split('\n')[0] || ''),
+    shortDescription: cleanLine(shortBlock),
+    bulletPoints,
+    longDescription: longBlock.trim(),
+    seoKeywords,
+    price: cleanLine(priceBlock),
+    platform,
+    rawMarkdown: markdown,
+  };
+};
+
+export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
+  result,
   platform,
   onSave,
   isSaved = false,
-  isSaving = false
+  isSaving = false,
 }) => {
-  // Parser le markdown pour extraire les sections
-  const extractSection = (sectionName: string) => {
-    // Essayer plusieurs formats de markdown
-    const patterns = [
-      new RegExp(`### ${sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?^- (.*?)$`, 'm'),
-      new RegExp(`### ${sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?^\\*\\*([^*]+)\\*\\*`, 'm'),
-      new RegExp(`${sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?:\\s*(.*?)(?=\\n###|\\n##|$)`, 'm'),
-      new RegExp(`${sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?\\n\\n(.*?)(?=\\n###|\\n##|$)`, 'm'),
-    ];
-    
-    for (const pattern of patterns) {
-      const match = result.match(pattern);
-      if (match?.[1]) {
-        const content = match[1].trim();
-        // Nettoyer le markdown basique
-        return content.replace(/^\*\*|\*\*$/g, '').replace(/^\- /, '').trim();
-      }
-    }
-    return '';
-  };
-
-  const extractBullets = () => {
-    const patterns = [
-      /### 3\. \*\*BULLET POINTS\*\*[\s\S]*?^- (.*?)$/gm,
-      /### 3\. \*\*BULLET POINTS\*\*[\s\S]*?^\- (.*?)$/gm,
-      /BULLET POINTS[\s\S]*?^- (.*?)$/gm,
-      /Points clés[\s\S]*?^- (.*?)$/gm,
-    ];
-    
-    for (const pattern of patterns) {
-      const matches = Array.from(result.matchAll(pattern));
-      if (matches.length > 0) {
-        return matches.map(m => m[1]?.replace(/^- /, '').replace(/^\- /, '').trim()).filter(Boolean).slice(0, 5);
-      }
-    }
-    // Fallback: chercher des listes markdown
-    const listMatch = result.match(/### 3\. \*\*BULLET POINTS\*\*[\s\S]*?((?:^[-*] .*$\\n?)+)/m);
-    if (listMatch?.[1]) {
-      return listMatch[1].split('\n')
-        .map(line => line.replace(/^[-*] /, '').trim())
-        .filter(Boolean)
-        .slice(0, 5);
-    }
-    return [];
-  };
-
-  // Extraction avec fallbacks multiples
-  const title = extractSection('1\\. \\*\\*TITRE SEO\\*\\*') 
-    || extractSection('TITRE SEO') 
-    || result.match(/TITRE SEO[\\s\\S]*?^- (.*?)$/m)?.[1]?.trim() 
-    || result.match(/## 📦[\\s\\S]*?TITRE SEO[\\s\\S]*?^- (.*?)$/m)?.[1]?.trim()
-    || '';
-    
-  const shortDesc = extractSection('2\\. \\*\\*DESCRIPTION COURTE\\*\\*') 
-    || extractSection('DESCRIPTION COURTE') 
-    || '';
-    
-  const bullets = extractBullets();
-  
-  const longDesc = extractSection('4\\. \\*\\*DESCRIPTION LONGUE\\*\\*') 
-    || extractSection('DESCRIPTION LONGUE') 
-    || '';
-    
-  const tags = extractSection('5\\. \\*\\*MOTS-CLÉS SEO\\*\\*') 
-    || extractSection('MOTS-CLÉS SEO') 
-    || result.match(/MOTS-CLÉS SEO[\\s\\S]*?: (.*?)(?=\\n|$)/m)?.[1]?.trim()
-    || '';
-    
-  const price = extractSection('6\\. \\*\\*ESTIMATION PRIX & POSITIONNEMENT\\*\\*') 
-    || extractSection('ESTIMATION PRIX') 
-    || '';
+  const sheet = useMemo(() => parseSheet(result, platform), [result, platform]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header avec actions */}
       <div className="flex items-center justify-between border-b-2 border-gray-200 dark:border-gray-600 pb-4">
         <h3 className="font-display text-2xl font-bold dark:text-white">Fiche Produit</h3>
         <div className="flex gap-2">
           {onSave && (
             <button
               type="button"
-              onClick={(e) => {
+              onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 onSave();
@@ -120,35 +102,25 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
         </div>
       </div>
 
-      {/* Carte principale */}
       <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-black dark:border-gray-600 rounded-lg p-8 shadow-neo dark:shadow-none">
-        {/* Titre */}
         <div className="mb-6">
           <h1 className="text-3xl font-display font-bold text-neo-black dark:text-white mb-2">
-            {title || 'Titre du produit'}
+            {sheet.title || 'Titre du produit'}
           </h1>
-          {price && (
-            <p className="text-2xl font-bold text-neo-violet dark:text-neo-blue">
-              {price}
-            </p>
-          )}
+          {sheet.price && <p className="text-2xl font-bold text-neo-violet dark:text-neo-blue">{sheet.price}</p>}
         </div>
 
-        {/* Description courte */}
-        {shortDesc && (
+        {sheet.shortDescription && (
           <div className="mb-6">
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              {shortDesc}
-            </p>
+            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">{sheet.shortDescription}</p>
           </div>
         )}
 
-        {/* Bullet points */}
-        {bullets.length > 0 && (
+        {sheet.bulletPoints.length > 0 && (
           <div className="mb-6">
             <h3 className="font-bold text-lg mb-3 dark:text-white">Points clés</h3>
             <ul className="space-y-2">
-              {bullets.map((bullet, idx) => (
+              {sheet.bulletPoints.map((bullet, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="text-neo-green text-xl mt-1">✓</span>
                   <span className="text-gray-700 dark:text-gray-300 flex-1">{bullet}</span>
@@ -158,33 +130,30 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
           </div>
         )}
 
-        {/* Description longue */}
-        {longDesc && (
+        {sheet.longDescription && (
           <div className="mb-6">
             <h3 className="font-bold text-lg mb-3 dark:text-white">Description détaillée</h3>
-            <div className="prose prose-sm max-w-none dark:prose-invert text-gray-700 dark:text-gray-300">
-              <p className="whitespace-pre-line leading-relaxed">{longDesc}</p>
+            <div className="prose prose-sm max-w-none dark:prose-invert text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+              {sheet.longDescription}
             </div>
           </div>
         )}
 
-        {/* Tags */}
-        {tags && (
+        {sheet.seoKeywords.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-            {tags.split(',').map((tag, idx) => (
+            {sheet.seoKeywords.map((tag, idx) => (
               <span
-                key={idx}
+                key={`${tag}-${idx}`}
                 className="px-3 py-1 bg-neo-yellow/30 dark:bg-neo-yellow/20 text-neo-black dark:text-white rounded-full text-sm font-bold"
               >
-                {tag.trim()}
+                {tag}
               </span>
             ))}
           </div>
         )}
       </div>
 
-      {/* Export */}
-      <ProductSheetExporter result={result} platform={platform} />
+      <ProductSheetExporter sheet={sheet} />
     </div>
   );
 };

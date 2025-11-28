@@ -5,12 +5,17 @@ import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
 import { Zap, Crown, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
+import { getRecentActivity } from '../services/toolHistoryService';
+import { ToolResult } from '../types/toolHistory';
+import { tools } from '../tools-config';
 
 export const Dashboard: React.FC = () => {
   const { user, credits, isPro, logout, togglePro, refreshCredits } = useUserStore();
   const navigate = useNavigate();
   const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [recentActivity, setRecentActivity] = useState<ToolResult[]>([]);
+  const [activityLoading, setActivityLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -47,6 +52,20 @@ export const Dashboard: React.FC = () => {
     } catch (err) {
       console.error('Erreur chargement date reset:', err);
     }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadRecentActivity();
+    }
+  }, [user]);
+
+  const loadRecentActivity = async () => {
+    if (!user) return;
+    setActivityLoading(true);
+    const data = await getRecentActivity(6);
+    setRecentActivity(data);
+    setActivityLoading(false);
   };
 
   // Timer en temps réel
@@ -220,16 +239,60 @@ export const Dashboard: React.FC = () => {
               </ul>
           </div>
 
-          {/* COLONNE DROITE : STATS */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6">
-              <h3 className="font-bold text-lg mb-6 flex items-center gap-2 dark:text-white">
-                  <TrendingUp className="w-5 h-5" /> Activité
+        {/* COLONNE DROITE : STATS */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg flex items-center gap-2 dark:text-white">
+                  <TrendingUp className="w-5 h-5" /> Activité récente
               </h3>
+              <button
+                onClick={loadRecentActivity}
+                className="text-xs font-bold px-3 py-1 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Actualiser
+              </button>
+            </div>
 
-              <p className="text-gray-500 dark:text-gray-400 text-sm italic">
-                  L'historique détaillé des générations sera bientôt disponible.
+            {activityLoading ? (
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Chargement de vos dernières actions...</p>
+            ) : recentActivity.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                Aucune sauvegarde récente. Utilisez un outil et enregistrez le résultat pour voir l'activité ici.
               </p>
-          </div>
+            ) : (
+              <div className="space-y-3">
+                {recentActivity.map((activity) => {
+                  const toolMeta = tools.find(t => t.id === activity.tool_id);
+                  return (
+                    <div
+                      key={activity.id}
+                      className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border border-gray-200 dark:border-gray-500 rounded-lg p-4"
+                    >
+                      <div>
+                        <p className="font-bold text-sm dark:text-white">{toolMeta?.title || activity.tool_id}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(activity.created_at).toLocaleString('fr-FR')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="text-gray-500 dark:text-gray-300">
+                          -{activity.credits_used} crédit{activity.credits_used > 1 ? 's' : ''}
+                        </span>
+                        {toolMeta && (
+                          <Link
+                            to={`/tool/${toolMeta.slug || toolMeta.id}`}
+                            className="px-3 py-1 bg-neo-black dark:bg-white text-white dark:text-black rounded-md font-bold text-xs hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                          >
+                            Ouvrir
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+        </div>
       </div>
 
       <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-md flex gap-4 items-start">

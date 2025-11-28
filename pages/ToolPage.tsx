@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tools } from '../tools-config';
 import { useUserStore } from '../store/userStore';
 import { generateToolContent, isApiReady } from '../services/geminiService';
-import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save } from 'lucide-react';
+import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save, Download } from 'lucide-react';
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
@@ -13,13 +13,15 @@ import { ToolHistory } from '../components/ToolHistory';
 import { ToolTemplates } from '../components/ToolTemplates';
 import { saveToolResult } from '../services/toolHistoryService';
 import { RichTextEditor } from '../components/RichTextEditor';
-import { ProductSheetExporter } from '../components/ProductSheetExporter';
 import { ProductSheetDisplay } from '../components/ProductSheetDisplay';
 import { InvoiceDisplay } from '../components/InvoiceDisplay';
 import { CVDisplay } from '../components/CVDisplay';
 import { PoemDisplay } from '../components/PoemDisplay';
 import { EnhancedResultDisplay } from '../components/EnhancedResultDisplay';
 import { ToolSuggestions } from '../components/ToolSuggestions';
+import { BusinessPlanDisplay } from '../components/BusinessPlanDisplay';
+import { HexColorDisplay } from '../components/HexColorDisplay';
+import { ToolInput } from '../types';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -122,6 +124,17 @@ export const ToolPage: React.FC = () => {
       }
       canonical.setAttribute('href', window.location.href);
 
+      const updateFavicon = (href: string) => {
+        let fav = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+        if (!fav) {
+          fav = document.createElement('link');
+          fav.rel = 'icon';
+          document.head.appendChild(fav);
+        }
+        fav.href = href;
+      };
+      updateFavicon(`/icons/${tool.iconName?.toLowerCase() || 'default'}.svg`);
+
       // 6. JSON-LD Structured Data (The Secret Weapon for SEO)
       const scriptId = 'json-ld-tool';
       let script = document.getElementById(scriptId);
@@ -207,6 +220,10 @@ export const ToolPage: React.FC = () => {
 
     // Cleanup function to reset generic metas if needed
     return () => {
+      const defaultIcon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+      if (defaultIcon) {
+        defaultIcon.href = '/favicon.ico';
+      }
       // Optional: Reset metas when leaving
     };
   }, [tool]);
@@ -245,15 +262,14 @@ export const ToolPage: React.FC = () => {
   const isLocked = false;
   const hasCredits = credits >= tool.cost;
 
-  const handleInputChange = (name: string, value: any) => {
-    // Vérification de la limite de caractères pour les champs texte
-    if (typeof value === 'string' && value.length > MAX_CHARS) {
-        return; // Bloque la saisie
+  const handleInputChange = (name: string, value: any, options?: { bypassLimit?: boolean }) => {
+    if (!options?.bypassLimit && typeof value === 'string' && value.length > MAX_CHARS) {
+        return;
     }
     setInputs(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, inputConfig: ToolInput) => {
       const file = e.target.files?.[0];
       if (file) {
           if (file.size > 4 * 1024 * 1024) { // Limit 4MB
@@ -262,13 +278,22 @@ export const ToolPage: React.FC = () => {
           }
           setFileName(file.name);
           
-          // Convert to Base64
-          const reader = new FileReader();
-          reader.onloadend = () => {
+          const targetName = inputConfig.mapTo || inputConfig.name;
+
+          if (inputConfig.fileMode === 'text') {
+            const reader = new FileReader();
+            reader.onload = () => {
+              handleInputChange(targetName, reader.result as string, { bypassLimit: true });
+            };
+            reader.readAsText(file, 'utf-8');
+          } else {
+            const reader = new FileReader();
+            reader.onloadend = () => {
               setFileInput(reader.result as string);
-              handleInputChange(name, 'FILE_UPLOADED'); // Just flag it as filled
-          };
-          reader.readAsDataURL(file);
+              handleInputChange(targetName, 'FILE_UPLOADED');
+            };
+            reader.readAsDataURL(file);
+          }
       }
   };
 
@@ -419,6 +444,40 @@ export const ToolPage: React.FC = () => {
     }
   };
 
+  const extractPythonCode = (output: string) => {
+    const match = output.match(/```(?:python)?\s*([\s\S]*?)```/i);
+    if (match) {
+      return match[1].trim();
+    }
+    return output.trim();
+  };
+
+  const handleDownloadPythonZip = async () => {
+    if (!result) return;
+    try {
+      const { default: JSZip } = await import('jszip');
+      const zip = new JSZip();
+      const pythonCode = extractPythonCode(result) || '# Script généré par SimplePlate AI';
+      zip.file('main.py', pythonCode);
+
+      const readme = `# Script généré avec Python Pro\n\nTâche: ${inputs.task || 'Non spécifiée'}\nComplexité: ${
+        inputs.complexity || 'Standard'
+      }\n\nGénéré automatiquement via SimplePlate AI.`;
+      zip.file('README.md', readme);
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `python-pro-${Date.now()}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('ZIP generation error:', error);
+      alert('Impossible de préparer le ZIP. Réessayez dans un instant.');
+    }
+  };
+
   // Extraction du code HTML propre pour la preview
   const getCleanHtml = (markdown: string) => {
       return markdown.replace(/```html|```/g, '').trim();
@@ -524,7 +583,9 @@ export const ToolPage: React.FC = () => {
                                     <>
                                         <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
                                         <p className="text-sm text-gray-500 dark:text-gray-400 font-bold">Cliquez pour uploader</p>
-                                        <p className="text-xs text-gray-400">PNG, JPG (Max 4Mo)</p>
+                                        <p className="text-xs text-gray-400">
+                                          {input.accept?.includes('csv') ? 'CSV (Max 4Mo)' : 'PNG, JPG (Max 4Mo)'}
+                                        </p>
                                     </>
                                 )}
                             </div>
@@ -532,7 +593,7 @@ export const ToolPage: React.FC = () => {
                                 type="file" 
                                 className="hidden" 
                                 accept={input.accept}
-                                onChange={(e) => handleFileChange(e, input.name)}
+                                onChange={(e) => handleFileChange(e, input)}
                                 disabled={loading || isLocked}
                             />
                         </label>
@@ -666,17 +727,19 @@ export const ToolPage: React.FC = () => {
                       </p>
                     </div>
                  </div>
-               ) : tool.id === 'business-plan-pro' ? (
-                 // Business Plan avec éditeur WYSIWYG pour édition
-                 <div className="animate-in fade-in duration-500">
-                   <RichTextEditor
-                     content={result}
-                     onChange={(content) => setResult(content)}
-                     placeholder="Votre business plan apparaîtra ici..."
-                     editable={true}
-                   />
-                 </div>
-               ) : tool.id === 'website-generator' && showPreview ? (
+              ) : tool.id === 'business-plan-pro' ? (
+                <BusinessPlanDisplay
+                  result={result}
+                  onSave={isLoggedIn ? handleSaveResult : undefined}
+                  isSaved={isResultSaved}
+                  isSaving={savingResult}
+                  onChange={(value) => {
+                    setResult(value);
+                    setIsResultSaved(false);
+                  }}
+                />
+              ) : tool.id === 'website-generator' ? (
+                showPreview ? (
                     // Website Generator avec iframe preview
                     <div className="flex flex-col h-full animate-in fade-in duration-500">
                         <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
@@ -691,6 +754,28 @@ export const ToolPage: React.FC = () => {
                             Ceci est une prévisualisation live. Cliquez sur le bouton &lt;/&gt; en haut pour copier le code.
                         </p>
                     </div>
+                ) : (
+                  <div className="flex flex-col h-full animate-in fade-in duration-500">
+                    <textarea
+                      value={result}
+                      onChange={(e) => {
+                        setResult(e.target.value);
+                        setIsResultSaved(false);
+                      }}
+                      className="flex-1 w-full border-2 border-gray-200 dark:border-gray-600 rounded-md p-4 font-mono text-sm bg-gray-900 text-green-200"
+                      spellCheck={false}
+                    />
+                    <div className="flex justify-end mt-3">
+                      <button
+                        type="button"
+                        onClick={copyToClipboard}
+                        className="px-4 py-2 bg-neo-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors"
+                      >
+                        Copier le code
+                      </button>
+                    </div>
+                  </div>
+                )
                ) : tool.id === 'ecom-product-scanner' ? (
                         // Scanner Produit avec mise en page professionnelle
                         <ProductSheetDisplay 
@@ -729,9 +814,19 @@ export const ToolPage: React.FC = () => {
                             </div>
                           )}
                         </div>
-               ) : tool.id === 'python-pro-gen' ? (
-                        // Python Pro avec syntax highlighting amélioré
-                        <div className="animate-in fade-in duration-500">
+              ) : tool.id === 'python-pro-gen' ? (
+                        // Python Pro avec exports
+                        <div className="animate-in fade-in duration-500 space-y-3">
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={handleDownloadPythonZip}
+                              className="px-4 py-2 bg-neo-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Télécharger le ZIP
+                            </button>
+                          </div>
                           <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
                             <ReactMarkdown
                               components={{
@@ -768,6 +863,9 @@ export const ToolPage: React.FC = () => {
                             </ReactMarkdown>
                           </div>
                         </div>
+              ) : tool.id === 'hex-to-rgb' ? (
+                        <HexColorDisplay result={result} inputValue={inputs.hex}
+                        />
                ) : tool.id === 'invoice-generator' ? (
                         // Facture avec template et export PDF/PNG
                         <InvoiceDisplay 
@@ -775,6 +873,10 @@ export const ToolPage: React.FC = () => {
                           onSave={isLoggedIn ? handleSaveResult : undefined}
                           isSaved={isResultSaved}
                           isSaving={savingResult}
+                          onChange={(value) => {
+                            setResult(value);
+                            setIsResultSaved(false);
+                          }}
                         />
                ) : tool.id === 'cv-generator' ? (
                         // CV avec template et export PDF/PNG
@@ -783,6 +885,10 @@ export const ToolPage: React.FC = () => {
                           onSave={isLoggedIn ? handleSaveResult : undefined}
                           isSaved={isResultSaved}
                           isSaving={savingResult}
+                          onChange={(value) => {
+                            setResult(value);
+                            setIsResultSaved(false);
+                          }}
                         />
                ) : tool.id === 'poem-generator' ? (
                         // Poème avec mise en page stylée
@@ -791,6 +897,10 @@ export const ToolPage: React.FC = () => {
                           onSave={isLoggedIn ? handleSaveResult : undefined}
                           isSaved={isResultSaved}
                           isSaving={savingResult}
+                          onChange={(value) => {
+                            setResult(value);
+                            setIsResultSaved(false);
+                          }}
                         />
                ) : tool.id === 'qr-code-generator' ? (
                         // QR Code avec affichage spécial

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Download, Palette, Sparkles, Save } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Download, Palette, Sparkles, Save, Edit3, Eye } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -8,27 +8,46 @@ interface PoemDisplayProps {
   onSave?: () => void;
   isSaved?: boolean;
   isSaving?: boolean;
+  onChange?: (content: string) => void;
 }
 
 const POEM_STYLES = [
-  { name: 'Classique', bg: 'bg-gradient-to-br from-amber-50 to-orange-50', border: 'border-amber-300', text: 'text-amber-900' },
-  { name: 'Moderne', bg: 'bg-gradient-to-br from-purple-50 to-pink-50', border: 'border-purple-300', text: 'text-purple-900' },
-  { name: 'Sombre', bg: 'bg-gradient-to-br from-gray-800 to-gray-900', border: 'border-gray-600', text: 'text-gray-100' },
-  { name: 'Nature', bg: 'bg-gradient-to-br from-green-50 to-emerald-50', border: 'border-green-300', text: 'text-green-900' },
+  { name: 'Classique', bg: 'bg-gradient-to-br from-amber-50 to-orange-50', border: 'border-amber-300', textHex: '#92400E' },
+  { name: 'Moderne', bg: 'bg-gradient-to-br from-purple-50 to-pink-50', border: 'border-purple-300', textHex: '#86198F' },
+  { name: 'Sombre', bg: 'bg-gradient-to-br from-gray-900 to-gray-800', border: 'border-gray-600', textHex: '#F3F4F6' },
+  { name: 'Nature', bg: 'bg-gradient-to-br from-green-50 to-emerald-50', border: 'border-green-300', textHex: '#065F46' },
 ];
 
 export const PoemDisplay: React.FC<PoemDisplayProps> = ({ 
   result,
   onSave,
   isSaved = false,
-  isSaving = false
+  isSaving = false,
+  onChange,
 }) => {
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const [textColor, setTextColor] = useState(POEM_STYLES[0].textHex);
+  const [isEditing, setIsEditing] = useState(false);
+  const [content, setContent] = useState(result);
   const poemRef = React.useRef<HTMLDivElement>(null);
 
-  // Extraire le poème du markdown
-  const poemText = result.replace(/^#.*$/m, '').trim();
-  const lines = poemText.split('\n').filter(line => line.trim());
+  useEffect(() => {
+    setContent(result);
+  }, [result]);
+
+  useEffect(() => {
+    setTextColor(POEM_STYLES[selectedStyle].textHex);
+  }, [selectedStyle]);
+
+  const lines = useMemo(() => {
+    const poemText = content.replace(/^#.*$/m, '').trim();
+    return poemText.split('\n');
+  }, [content]);
+
+  const handleContentChange = (value: string) => {
+    setContent(value);
+    onChange?.(value);
+  };
 
   const exportToPDF = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -93,10 +112,12 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
     <div className="space-y-4 animate-in fade-in duration-500">
       {/* Contrôles */}
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <Palette className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          <span className="font-bold text-sm dark:text-white">Style :</span>
-          <div className="flex gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <span className="font-bold text-sm dark:text-white">Style :</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
             {POEM_STYLES.map((s, idx) => (
               <button
                 key={idx}
@@ -111,6 +132,31 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
               </button>
             ))}
           </div>
+          <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-300">
+            Couleur texte
+            <input
+              type="color"
+              value={textColor}
+              onChange={e => setTextColor(e.target.value)}
+              className="w-10 h-6 border border-gray-300 rounded cursor-pointer"
+            />
+          </label>
+          <button
+            onClick={() => setIsEditing(prev => !prev)}
+            className="px-3 py-1.5 rounded-md text-xs font-bold border border-gray-300 dark:border-gray-600 flex items-center gap-1"
+          >
+            {isEditing ? (
+              <>
+                <Eye className="w-4 h-4" />
+                Aperçu
+              </>
+            ) : (
+              <>
+                <Edit3 className="w-4 h-4" />
+                Modifier
+              </>
+            )}
+          </button>
         </div>
 
         <div className="flex gap-2">
@@ -175,12 +221,21 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
         </div>
       </div>
 
+      {isEditing && (
+        <textarea
+          value={content}
+          onChange={e => handleContentChange(e.target.value)}
+          rows={10}
+          className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-lg p-4 font-mono text-sm bg-white dark:bg-gray-900 dark:text-white"
+        />
+      )}
+
       {/* Poème stylisé */}
       <div
         ref={poemRef}
         className={`${style.bg} ${style.border} border-4 rounded-lg p-12 max-w-3xl mx-auto shadow-neo dark:shadow-none`}
       >
-        <div className={`${style.text} text-center space-y-4`}>
+        <div className="text-center space-y-4" style={{ color: textColor }}>
           {lines.map((line, idx) => {
             // Détecter les strophes (lignes vides)
             if (!line.trim()) {

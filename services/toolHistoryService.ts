@@ -228,6 +228,25 @@ export const getToolStats = async (toolId: string): Promise<ToolStats | null> =>
   return data;
 };
 
+export const getRecentActivity = async (limit: number = 5): Promise<ToolResult[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('tool_results')
+    .select('id, tool_id, created_at, credits_used, metadata')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching recent activity:', error);
+    return [];
+  }
+
+  return data || [];
+};
+
 // ============================================
 // EXPORT
 // ============================================

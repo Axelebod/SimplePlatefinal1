@@ -605,25 +605,6 @@ Sections obligatoires (format Markdown professionnel) :
 
 Tone: Professionnel, convaincant, data-driven.`
   },
-  {
-    id: 'smart-contract-audit',
-    slug: 'audit-smart-contract',
-    title: 'Audit Smart Contract',
-    description: 'Vous développez sur la blockchain ? Faites auditer votre smart contract avant de le déployer. On détecte les failles avant les hackers !',
-    category: 'Security',
-    cost: 2,
-    isPremium: false,
-    iconName: 'ShieldCheck',
-    outputType: 'text',
-    seo: { 
-      title: 'Audit de Smart Contract Solidity IA - Sécurité Blockchain', 
-      description: 'Analysez votre code Solidity pour trouver les failles de sécurité (Reentrancy, Overflow). Outil indispensable pour développeurs Web3.', 
-      keywords: ['audit smart contract', 'solidity linter', 'sécurité blockchain', 'ethereum dev', 'code review'] 
-    },
-    inputs: [{ name: 'code', label: 'Code Solidity', type: 'textarea', rows: 15, className: 'font-mono text-xs', placeholder: 'pragma solidity ^0.8.0; ...', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un auditeur de sécurité Blockchain expert (Certik/OpenZeppelin). Analyse ce code Solidity : "${data.code}".\n1. Liste les vulnérabilités critiques (Reentrancy, Gas Limit, Overflow).\n2. Donne un score de sécurité sur 100.\n3. Fournis le code corrigé et sécurisé.`
-  },
-
   // --- E-COMMERCE TOOLS ---
   createSimpleTool(
     'ecom-ad-gen', 
@@ -691,7 +672,21 @@ Tone: Professionnel, convaincant, data-driven.`
       keywords: ['humaniser texte', 'bypass ai detection', 'reformuler chatgpt', 'style humain', 'paraphraseur ia'] 
     },
     inputs: [{ name: 'content', label: 'Texte robotique à humaniser', type: 'textarea', rows: 8, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un éditeur littéraire humain expérimenté. Réécris ce texte généré par IA : "${data.content}".\nConsignes : Varie la longueur des phrases, ajoute des nuances émotionnelles, utilise des idiomes français naturels, supprime les listes à puces inutiles. Le but est qu'il soit INDÉTECTABLE par les outils anti-IA.`
+    promptGenerator: (data) => `${SYSTEM_PROMPT}
+RÔLE: Tu es un copywriter senior français, spécialisé dans la réécriture "anti-IA".
+MISSION: Réécris le texte suivant pour qu'il paraisse écrit par un humain cultivé : "${data.content}".
+
+CONSIGNES STRICTES :
+- Change la structure et l'ordre des idées (pas seulement les mots).
+- Varie les longueurs de phrases, ajoute des tournures idiomatiques et des transitions naturelles.
+- Ajoute des micro-détails crédibles (ex: "on dirait un lundi pluvieux", "c'est un peu comme quand...") pour ancrer le texte dans le réel.
+- Supprime toute répétition, évite les listes et les formulations trop scolaires.
+- Indique le ton adopté (pro, friendly, storytelling...) et justifie-le.
+
+FORMAT DE SORTIE :
+1. **Texte humanisé** : (2-4 paragraphes fluides)
+2. **Ton & intention** : phrase expliquant le style choisi
+3. **Suggestions** : 2 mini-idées pour pousser encore plus loin la personnalisation`
   },
   {
     id: 'pro-prompt-gen',
@@ -802,7 +797,27 @@ Tone: Professionnel, convaincant, data-driven.`
       description: 'Transformez vos fichiers CSV en JSON instantanément. Traitement 100% local, vos données ne quittent pas votre navigateur.', 
       keywords: ['csv to json', 'convertisseur csv', 'csv json en ligne', 'dev tools', 'excel to json'] 
     },
-    inputs: [{ name: 'csv', label: 'Collez votre CSV (avec en-têtes)', type: 'textarea', rows: 8, className: 'font-mono text-xs', required: true }],
+    inputs: [
+      { 
+        name: 'csv', 
+        label: 'Collez votre CSV (avec en-têtes)', 
+        type: 'textarea', 
+        rows: 8, 
+        className: 'font-mono text-xs', 
+        required: true,
+        helpText: 'Chaque colonne doit être séparée par une virgule.'
+      },
+      {
+        name: 'csv_upload',
+        label: 'Ou importez un fichier CSV',
+        type: 'file',
+        accept: '.csv,text/csv',
+        required: false,
+        helpText: 'Nous ne l\'envoyons jamais sur un serveur, conversion 100% locale.',
+        fileMode: 'text',
+        mapTo: 'csv'
+      }
+    ],
     promptGenerator: (data) => `LOCAL:CSV_JSON;;;${data.csv}`
   },
   {
@@ -1258,40 +1273,6 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
     1
   ),
   // Image Tools
-  {
-    id: 'logo-creator',
-    title: 'Générateur Logo',
-    description: 'Logos vectoriels minimalistes par IA.',
-    category: 'Image',
-    cost: 2,
-    isPremium: false,
-    iconName: 'Hexagon',
-    outputType: 'image',
-    seo: { 
-      title: 'Créateur de Logo IA - Design Vectoriel & Moderne', 
-      description: 'Générez des logos uniques pour votre startup ou projet. Style vectoriel, propre et professionnel.', 
-      keywords: ['logo maker', 'générateur logo ia', 'création logo', 'design professionnel', 'logo vectoriel'] 
-    },
-    inputs: [{ name: 'desc', label: 'Nom et description du logo', type: 'text', required: true }],
-    promptGenerator: (data) => `Vector logo for ${data.desc}. Minimalist, flat, vector art, white background, high quality.`
-  },
-  {
-    id: 'wallpaper-gen',
-    title: 'Fond d\'Écran 4K',
-    description: 'Wallpapers artistiques uniques.',
-    category: 'Image',
-    cost: 2,
-    isPremium: false,
-    iconName: 'Monitor',
-    outputType: 'image',
-    seo: { 
-      title: 'Générateur de Fond d\'Écran 4K IA - Wallpaper HD', 
-      description: 'Créez votre propre wallpaper PC ou Mobile. Art unique généré par intelligence artificielle en haute définition.', 
-      keywords: ['fond d\'écran 4k', 'wallpaper generator', 'art ia', 'background', 'fond écran pc'] 
-    },
-    inputs: [{ name: 'style', label: 'Décrivez votre fond d\'écran idéal', type: 'text', required: true }],
-    promptGenerator: (data) => `4k abstract wallpaper: ${data.style}. High quality, detailed, masterpiece, vibrant colors.`
-  },
   // --- GÉNÉRATEUR DE CV ---
   {
     id: 'cv-generator',
