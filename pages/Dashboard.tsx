@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
+import { supabase } from '../lib/supabaseClient';
 import { Zap, Crown, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {

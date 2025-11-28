@@ -30,7 +30,7 @@ export const Legal: React.FC = () => {
           <h2 className="text-xl font-bold border-b-2 border-black pb-2 mb-4">3. Conditions Générales d'Utilisation (CGU)</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Accès :</strong> L'accès au site nécessite une inscription. Les fonctionnalités utilisent un système de crédits.</li>
-            <li><strong>Crédits :</strong> Les utilisateurs gratuits disposent de 5 crédits par mois. Les utilisateurs PRO disposent de 100 crédits par mois.</li>
+            <li><strong>Crédits :</strong> Les utilisateurs gratuits disposent de 5 crédits gratuits par semaine (non cumulables). Les utilisateurs PRO disposent de 100 crédits payants par mois qui s'accumulent.</li>
             <li><strong>Usage :</strong> Vous vous engagez à ne pas utiliser nos outils pour générer du contenu illégal, haineux ou diffamatoire.</li>
             <li><strong>Responsabilité :</strong> SimplePlate n'est pas responsable des contenus générés par l'IA. Vérifiez toujours les informations.</li>
           </ul>

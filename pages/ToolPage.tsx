@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tools } from '../tools-config';
 import { useUserStore } from '../store/userStore';
 import { generateToolContent, isApiReady } from '../services/geminiService';
-import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn } from 'lucide-react';
+import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save } from 'lucide-react';
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
@@ -14,11 +14,35 @@ import { ToolTemplates } from '../components/ToolTemplates';
 import { saveToolResult } from '../services/toolHistoryService';
 import { RichTextEditor } from '../components/RichTextEditor';
 import { ProductSheetExporter } from '../components/ProductSheetExporter';
+import { ProductSheetDisplay } from '../components/ProductSheetDisplay';
+import { InvoiceDisplay } from '../components/InvoiceDisplay';
+import { CVDisplay } from '../components/CVDisplay';
+import { PoemDisplay } from '../components/PoemDisplay';
+import { EnhancedResultDisplay } from '../components/EnhancedResultDisplay';
+import { ToolSuggestions } from '../components/ToolSuggestions';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const tool = tools.find(t => (t.slug || t.id) === slug);
+  
+  // Trouver l'outil correspondant au slug
+  const tool = tools.find(t => {
+    const toolSlug = t.slug || t.id;
+    return toolSlug === slug;
+  });
+  
+  // Debug en développement
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ToolPage - Slug reçu:', slug);
+      if (tool) {
+        console.log('ToolPage - Outil trouvé:', tool.title);
+      } else {
+        console.warn('ToolPage - Outil NON trouvé pour slug:', slug);
+        console.log('ToolPage - Slugs disponibles:', tools.map(t => t.slug || t.id).slice(0, 10));
+      }
+    }
+  }, [slug, tool]);
   
   const { user, credits, deductCredits, isPro } = useUserStore();
   
@@ -34,6 +58,11 @@ export const ToolPage: React.FC = () => {
   
   // Preview Toggle for Website Generator
   const [showPreview, setShowPreview] = useState(true);
+  // Suggestions d'outils complémentaires
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  // État pour savoir si le résultat est sauvegardé
+  const [isResultSaved, setIsResultSaved] = useState(false);
+  const [savingResult, setSavingResult] = useState(false);
 
   const MAX_CHARS = 3500; // Limite de caractères pour éviter les abus
 
@@ -49,6 +78,7 @@ export const ToolPage: React.FC = () => {
       setResult(null);
       setError(null);
       setShowPreview(true);
+      setShowSuggestions(false);
 
       // 1. Title
       document.title = tool.seo.title;
@@ -193,14 +223,26 @@ export const ToolPage: React.FC = () => {
 
   if (!tool) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 px-4">
         <h2 className="text-2xl font-bold mb-4 dark:text-white">Outil non trouvé</h2>
-        <Link to="/" className="underline text-neo-violet">Retour à l'accueil</Link>
+        <p className="text-gray-600 dark:text-gray-400 mb-2">
+          Slug recherché: <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{slug}</code>
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+          Vérifiez que l'URL est correcte ou retournez à la page d'accueil.
+        </p>
+        <Link 
+          to="/" 
+          className="inline-block px-6 py-3 bg-neo-violet text-white rounded-md font-bold hover:bg-purple-500 transition-colors"
+        >
+          Retour à l'accueil
+        </Link>
       </div>
     );
   }
 
-  const isLocked = tool.isPremium && !isPro;
+  // Plus de restrictions PRO - tous les outils sont accessibles
+  const isLocked = false;
   const hasCredits = credits >= tool.cost;
 
   const handleInputChange = (name: string, value: any) => {
@@ -309,21 +351,14 @@ export const ToolPage: React.FC = () => {
       }
 
       setResult(output);
+      setIsResultSaved(false); // Réinitialiser l'état de sauvegarde pour le nouveau résultat
       
-      // Sauvegarder dans l'historique (micro SaaS) - seulement si crédits utilisés
-      if (isLoggedIn && tool.cost > 0) {
-        await saveToolResult(
-          tool.id,
-          inputsWithFile,
-          output,
-          tool.outputType,
-          tool.cost,
-          {
-            model: tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
-            prompt_length: prompt.length
-          }
-        );
-      }
+      // Plus d'enregistrement automatique - l'utilisateur sauvegarde manuellement
+
+      // Afficher les suggestions d'outils complémentaires après génération réussie
+      setTimeout(() => {
+        setShowSuggestions(true);
+      }, 1000); // Délai de 1 seconde pour laisser le résultat s'afficher
       
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue.");
@@ -334,8 +369,47 @@ export const ToolPage: React.FC = () => {
 
   const handleLoadTemplate = (templateInputs: Record<string, any>) => {
     setInputs(templateInputs);
+    setResult(null);
+    setError(null);
+    setIsResultSaved(false);
     // Scroll vers le formulaire
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSaveResult = async () => {
+    if (!result || !isLoggedIn) return;
+    
+    setSavingResult(true);
+    try {
+      // Préparer les inputs avec le fichier si nécessaire
+      const inputsWithFile = tool.id === 'homework-helper' && fileInput 
+        ? { ...inputs, image: 'FILE_UPLOADED' }
+        : inputs;
+
+      const response = await saveToolResult(
+        tool.id,
+        inputsWithFile,
+        result,
+        tool.outputType,
+        tool.cost,
+        {
+          model: tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
+        },
+        isPro || false
+      );
+
+      if (response.success) {
+        setIsResultSaved(true);
+        alert('✅ Résultat sauvegardé avec succès !');
+      } else {
+        alert(`❌ ${response.message || 'Erreur lors de la sauvegarde.'}`);
+      }
+    } catch (error: any) {
+      console.error('Error saving result:', error);
+      alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
+    } finally {
+      setSavingResult(false);
+    }
   };
 
   const copyToClipboard = () => {
@@ -602,35 +676,31 @@ export const ToolPage: React.FC = () => {
                      editable={true}
                    />
                  </div>
-               ) : (
-                 <>
-                    {/* WEBSITE GENERATOR IFRAME */}
-                    {tool.id === 'website-generator' && showPreview ? (
-                        <div className="flex flex-col h-full animate-in fade-in duration-500">
-                            <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
-                                <iframe 
-                                    srcDoc={getCleanHtml(result)} 
-                                    title="Aperçu du site"
-                                    className="w-full h-full absolute inset-0"
-                                    sandbox="allow-scripts"
-                                />
-                            </div>
-                            <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                                Ceci est une prévisualisation live. Cliquez sur le bouton &lt;/&gt; en haut pour copier le code.
-                            </p>
+               ) : tool.id === 'website-generator' && showPreview ? (
+                    // Website Generator avec iframe preview
+                    <div className="flex flex-col h-full animate-in fade-in duration-500">
+                        <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
+                            <iframe 
+                                srcDoc={getCleanHtml(result)} 
+                                title="Aperçu du site"
+                                className="w-full h-full absolute inset-0"
+                                sandbox="allow-scripts"
+                            />
                         </div>
-                    ) : tool.id === 'ecom-product-scanner' ? (
-                        // Scanner Produit avec export Shopify/Amazon
-                        <div className="animate-in fade-in duration-500">
-                          <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
-                            <ReactMarkdown>{result}</ReactMarkdown>
-                          </div>
-                          <ProductSheetExporter 
-                            result={result} 
-                            platform={inputs.platform || 'Shopify'} 
-                          />
-                        </div>
-                    ) : tool.id === 'ai-image-analysis' ? (
+                        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                            Ceci est une prévisualisation live. Cliquez sur le bouton &lt;/&gt; en haut pour copier le code.
+                        </p>
+                    </div>
+               ) : tool.id === 'ecom-product-scanner' ? (
+                        // Scanner Produit avec mise en page professionnelle
+                        <ProductSheetDisplay 
+                          result={result} 
+                          platform={inputs.platform || 'Shopify'}
+                          onSave={isLoggedIn ? handleSaveResult : undefined}
+                          isSaved={isResultSaved}
+                          isSaving={savingResult}
+                        />
+               ) : tool.id === 'ai-image-analysis' ? (
                         // Analyseur d'Image avec métriques visuelles
                         <div className="animate-in fade-in duration-500">
                           <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
@@ -659,7 +729,7 @@ export const ToolPage: React.FC = () => {
                             </div>
                           )}
                         </div>
-                    ) : tool.id === 'python-pro-gen' ? (
+               ) : tool.id === 'python-pro-gen' ? (
                         // Python Pro avec syntax highlighting amélioré
                         <div className="animate-in fade-in duration-500">
                           <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
@@ -698,79 +768,75 @@ export const ToolPage: React.FC = () => {
                             </ReactMarkdown>
                           </div>
                         </div>
-                    ) : (
-                         <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            <ReactMarkdown 
-                              components={{
-                                img: ({node, src, alt, ...props}) => {
-                                  // Détecter si c'est un QR code (outil qr-code-generator)
-                                  const isQRCode = tool.id === 'qr-code-generator';
-                                  
-                                  const handleDownload = async (e: React.MouseEvent) => {
-                                    e.preventDefault();
-                                    try {
-                                      // Si c'est déjà une data URL (base64), on peut télécharger directement
-                                      if (src?.startsWith('data:')) {
-                                        const link = document.createElement('a');
-                                        link.href = src;
-                                        link.download = `qr-code-${Date.now()}.png`;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                        return;
-                                      }
-                                      
-                                      // Sinon, on fetch l'image et on la convertit en blob
-                                      const response = await fetch(src || '');
-                                      const blob = await response.blob();
-                                      const blobUrl = URL.createObjectURL(blob);
-                                      
-                                      const link = document.createElement('a');
-                                      link.href = blobUrl;
-                                      link.download = `qr-code-${Date.now()}.png`;
-                                      document.body.appendChild(link);
-                                      link.click();
-                                      document.body.removeChild(link);
-                                      
-                                      // Nettoyer l'URL du blob
-                                      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-                                    } catch (error) {
-                                      console.error('Erreur téléchargement:', error);
-                                      alert('Erreur lors du téléchargement. Essayez de faire un clic droit sur l\'image et "Enregistrer l\'image sous..."');
-                                    }
-                                  };
-                                  
-                                  return (
-                                    <div className="flex flex-col items-center my-4">
-                                      <img 
-                                        src={src} 
-                                        alt={alt || 'Image'} 
-                                        {...props} 
-                                        className="max-w-full h-auto border-2 border-black dark:border-gray-500 rounded-lg shadow-neo p-2 bg-white"
-                                        style={{maxWidth: '300px', display: 'block'}}
-                                        onError={(e) => {
-                                          console.error('Erreur chargement image:', src);
-                                          (e.target as HTMLImageElement).style.display = 'none';
-                                        }}
-                                      />
-                                      {isQRCode && src && (
-                                        <button
-                                          onClick={handleDownload}
-                                          className="mt-3 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-                                        >
-                                          Télécharger le QR Code
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                }
-                              }}
-                            >
-                              {result}
-                            </ReactMarkdown>
+               ) : tool.id === 'invoice-generator' ? (
+                        // Facture avec template et export PDF/PNG
+                        <InvoiceDisplay 
+                          result={result}
+                          onSave={isLoggedIn ? handleSaveResult : undefined}
+                          isSaved={isResultSaved}
+                          isSaving={savingResult}
+                        />
+               ) : tool.id === 'cv-generator' ? (
+                        // CV avec template et export PDF/PNG
+                        <CVDisplay 
+                          result={result}
+                          onSave={isLoggedIn ? handleSaveResult : undefined}
+                          isSaved={isResultSaved}
+                          isSaving={savingResult}
+                        />
+               ) : tool.id === 'poem-generator' ? (
+                        // Poème avec mise en page stylée
+                        <PoemDisplay 
+                          result={result}
+                          onSave={isLoggedIn ? handleSaveResult : undefined}
+                          isSaved={isResultSaved}
+                          isSaving={savingResult}
+                        />
+               ) : tool.id === 'qr-code-generator' ? (
+                        // QR Code avec affichage spécial
+                        <div className="flex flex-col items-center justify-center min-h-[400px] animate-in fade-in duration-500">
+                          {result && result.startsWith('http') ? (
+                            <>
+                              <img 
+                                src={result} 
+                                alt="QR Code" 
+                                className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm bg-white p-4"
+                                style={{maxWidth: '300px', display: 'block'}}
+                                onError={(e) => {
+                                  console.error('Erreur chargement QR code:', result);
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                              <div className="mt-4 text-center">
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                  Données encodées : <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">{inputs.input || 'N/A'}</code>
+                                </p>
+                                <a 
+                                  href={result} 
+                                  download={`qr-code-${Date.now()}.png`} 
+                                  className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                                >
+                                  Télécharger le QR Code
+                                </a>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-center text-gray-500 dark:text-gray-400">
+                              <p>Erreur lors de la génération du QR code</p>
+                              <p className="text-sm mt-2">{result}</p>
+                            </div>
+                          )}
                         </div>
-                    )}
-                 </>
+               ) : (
+                    // Affichage amélioré pour tous les autres outils
+                    <EnhancedResultDisplay 
+                      result={result} 
+                      toolId={tool.id} 
+                      toolTitle={tool.title}
+                      onSave={isLoggedIn ? handleSaveResult : undefined}
+                      isSaved={isResultSaved}
+                      isSaving={savingResult}
+                    />
                )
              )}
 
@@ -785,6 +851,14 @@ export const ToolPage: React.FC = () => {
            </div>
         </div>
       </div>
+
+      {/* Suggestions d'outils complémentaires */}
+      {showSuggestions && result && (
+        <ToolSuggestions 
+          currentToolId={tool.id} 
+          onClose={() => setShowSuggestions(false)} 
+        />
+      )}
 
       {/* HISTORIQUE ET TEMPLATES - Micro SaaS Features */}
       {isLoggedIn && (

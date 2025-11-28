@@ -72,7 +72,7 @@ export const tools: ToolConfig[] = [
     description: 'Studio complet de création de fiches produits. Analyse photo, génération IA, templates Shopify/Amazon, export CSV/JSON. Tout pour vendre plus vite !',
     category: 'Business',
     cost: 3,
-    isPremium: true,
+    isPremium: false,
     iconName: 'ScanBarcode',
     outputType: 'text',
     seo: { 
@@ -184,7 +184,7 @@ Génère maintenant la fiche complète.`
     description: 'Créez des sites web complets avec éditeur visuel intégré. Aperçu en temps réel, export du code, et déploiement en un clic. Plus qu\'un simple générateur, un vrai studio web !',
     category: 'Dev',
     cost: 3,
-    isPremium: true,
+    isPremium: false,
     iconName: 'Layout',
     outputType: 'text',
     seo: { 
@@ -297,7 +297,7 @@ GÉNÈRE LE CODE MAINTENANT :`;
     description: 'Studio Python complet : génération de code, validation automatique, tests unitaires, documentation, analyse de complexité. Plus qu\'un générateur, un vrai IDE !',
     category: 'Dev',
     cost: 3,
-    isPremium: true,
+    isPremium: false,
     iconName: 'Terminal',
     outputType: 'text',
     seo: { 
@@ -431,7 +431,7 @@ Génère maintenant le code complet avec tous ces éléments.`
     description: 'Laboratoire d\'analyse d\'images avancé. Détection IA, reverse engineering de prompts, métriques techniques, rapport complet avec scores. Pour créateurs et professionnels !',
     category: 'Image',
     cost: 2,
-    isPremium: true,
+    isPremium: false,
     iconName: 'ScanSearch',
     outputType: 'text',
     seo: { 
@@ -538,7 +538,7 @@ Génère maintenant le rapport complet.`
     description: 'Créez un business plan professionnel structuré avec notre éditeur intelligent. Sections pré-remplies, calculs financiers automatiques, et export PDF prêt pour investisseurs.',
     category: 'Business',
     cost: 2,
-    isPremium: true,
+    isPremium: false,
     iconName: 'Briefcase',
     outputType: 'text',
     seo: { 
@@ -612,7 +612,7 @@ Tone: Professionnel, convaincant, data-driven.`
     description: 'Vous développez sur la blockchain ? Faites auditer votre smart contract avant de le déployer. On détecte les failles avant les hackers !',
     category: 'Security',
     cost: 2,
-    isPremium: true,
+    isPremium: false,
     iconName: 'ShieldCheck',
     outputType: 'text',
     seo: { 
@@ -1158,16 +1158,6 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
 
   // --- AI TOOLS (Restants utiles/Fun - Passés à 1 Crédit) ---
   createSimpleTool(
-    'emoji-translator', 
-    'Traducteur Emojis', 
-    'Transforme le texte en une suite d\'emojis.', 
-    'Life', 
-    'Réécris cette phrase UNIQUEMENT avec des emojis (pas de texte, sois créatif) :', 
-    'Smile', 'text', { placeholder: 'Ex: Je vais à la plage' }, 
-    { title: 'Traducteur Texte vers Emojis - Professionnel', description: 'Convertir des phrases en emojis. Fun pour les réseaux sociaux.', keywords: ['traducteur emoji', 'emoji maker', 'texte en emoji'] }, 
-    1
-  ),
-  createSimpleTool(
     'hashtag-gen', 
     'Générateur Hashtags', 
     'Boostez votre visibilité sur Insta/TikTok.', 
@@ -1267,47 +1257,6 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
     { title: 'Débuggeur de Code en Ligne - Correction IA', description: 'Trouvez pourquoi votre code plante. Correction de bugs Python, JS, PHP, C++.', keywords: ['debug code', 'corriger erreur', 'aide programmation', 'fix code'] },
     1
   ),
-  createSimpleTool(
-    'password-strength', 
-    'Test Mots de Passe (IA)', 
-    'Analysez la force de vos mots de passe.', 
-    'Security', 
-    'Analyse la sécurité de ce mot de passe. Est-il fort ? Combien de temps pour le cracker ? (Ne le stocke pas) :', 
-    'Lock', 'text', { className: 'font-mono' },
-    { title: 'Testeur de Mot de Passe IA - Vérification Sécurité', description: 'Vérifiez si votre mot de passe est piratable et combien de temps il faudrait pour le casser.', keywords: ['test mot de passe', 'sécurité mdp', 'password strength', 'how secure is my password'] },
-    1
-  ),
-  createSimpleTool(
-    'excuse-gen', 
-    'Générateur d\'Excuses', 
-    'L\'excuse parfaite pour annuler au dernier moment.', 
-    'Life', 
-    'Invente une excuse crédible, polie mais ferme pour annuler cet événement :', 
-    'Ghost', 'text', { placeholder: 'Annuler quoi ?' },
-    { title: 'Générateur d\'Excuses Bidons - Annuler RDV', description: 'Besoin d\'annuler ? Trouvez l\'excuse parfaite générée par IA pour ne pas y aller.', keywords: ['excuse annulation', 'générateur excuse', 'pas envie', 'annuler soirée'] },
-    1
-  ),
-  createSimpleTool(
-    'passive-aggressive', 
-    'Traducteur Corpo', 
-    'Dites-le méchamment, mais poliment (Email Pro).', 
-    'Business', 
-    'Réécris cette phrase en langage "Corporate" professionnel mais avec un ton passif-agressif subtil :', 
-    'Briefcase', 'textarea', { rows: 3, placeholder: 'Tu me saoules...' },
-    { title: 'Traducteur Langage Corporate - Email Passif Agressif', description: 'Transformez vos insultes en emails professionnels courtois. L\'art de la diplomatie de bureau.', keywords: ['mail pro', 'langage corporate', 'rédaction mail', 'traducteur chef'] },
-    1
-  ),
-  createSimpleTool(
-    'rap-lyrics', 
-    'Parolier de Rap', 
-    'Génère des lyrics et des rimes lourdes.', 
-    'Life', 
-    'Comporte-toi comme un rappeur français célèbre. Écris un couplet de 16 mesures (avec rimes multisyllabiques) sur le sujet :', 
-    'Mic', 'text', { placeholder: 'Sujet du rap' },
-    { title: 'Générateur de Rap & Rimes - Paroles IA', description: 'Écrivez des textes de rap comme un pro. Rimes, punchlines et flow inclus.', keywords: ['rap generator', 'écrire rap', 'générateur rimes', 'parolier ia'] },
-    1
-  ),
-
   // Image Tools
   {
     id: 'logo-creator',
@@ -1315,7 +1264,7 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
     description: 'Logos vectoriels minimalistes par IA.',
     category: 'Image',
     cost: 2,
-    isPremium: true,
+    isPremium: false,
     iconName: 'Hexagon',
     outputType: 'image',
     seo: { 
@@ -1332,7 +1281,7 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
     description: 'Wallpapers artistiques uniques.',
     category: 'Image',
     cost: 2,
-    isPremium: true,
+    isPremium: false,
     iconName: 'Monitor',
     outputType: 'image',
     seo: { 
@@ -1703,30 +1652,6 @@ INSTRUCTIONS:
 - Format prêt à être copié dans Word`
   },
   createSimpleTool(
-    'slogan-generator',
-    'Générateur de Slogans',
-    'Trouvez le slogan parfait pour votre marque ou campagne.',
-    'Business',
-    'Génère 10 slogans accrocheurs, mémorables et viraux pour cette marque/produit. Sois créatif, utilise des jeux de mots si possible :',
-    'Megaphone',
-    'text',
-    { placeholder: 'Ex: Une marque de café bio éthique' },
-    { title: 'Générateur de Slogan Publicitaire IA - Créer un Slogan', description: 'Trouvez le slogan parfait pour votre marque, produit ou campagne marketing. Idées créatives et mémorables.', keywords: ['générateur slogan', 'créer slogan', 'slogan publicitaire', 'tagline generator', 'slogan marque'] },
-    1
-  ),
-  createSimpleTool(
-    'quiz-generator',
-    'Générateur de Quiz',
-    'Créez des quiz interactifs pour vos cours ou formations.',
-    'Business',
-    'Génère un quiz complet (10 questions) avec 4 options de réponse chacune sur ce sujet. Inclus les bonnes réponses à la fin :',
-    'HelpCircle',
-    'textarea',
-    { rows: 3, placeholder: 'Ex: Histoire de France, Python, Marketing Digital...' },
-    { title: 'Générateur de Quiz IA - Créer un Quiz Interactif', description: 'Créez des quiz éducatifs avec questions et réponses. Parfait pour les formateurs et enseignants.', keywords: ['générateur quiz', 'créer quiz', 'questions quiz', 'quiz éducatif', 'test connaissances'] },
-    1
-  ),
-  createSimpleTool(
     'poem-generator',
     'Générateur de Poèmes',
     'Écrivez des poèmes sur n\'importe quel thème.',
@@ -1791,18 +1716,6 @@ FORMAT ATTENDU:
 ## 📊 Progression
 [Comment progresser semaine après semaine]`
   },
-  createSimpleTool(
-    'story-instagram-gen',
-    'Générateur Story Instagram',
-    'Créez des stories engageantes avec des hooks viraux.',
-    'Business',
-    'Génère 5 idées de stories Instagram avec hooks accrocheurs, emojis et call-to-action pour ce sujet. Format court et visuel :',
-    'Instagram',
-    'text',
-    { placeholder: 'Ex: Lancement nouveau produit, Astuce du jour...' },
-    { title: 'Générateur de Story Instagram IA - Idées Stories', description: 'Créez des stories Instagram qui convertissent. Hooks viraux, emojis et CTA optimisés pour l\'engagement.', keywords: ['story instagram', 'générateur story', 'idées stories', 'instagram content', 'social media'] },
-    1
-  ),
   {
     id: 'domain-name-gen',
     title: 'Générateur Nom de Domaine',
@@ -1850,18 +1763,6 @@ FORMAT ATTENDU:
 
 **Note:** Vérifiez la disponibilité sur un registrar (OVH, Namecheap, etc.)`
   },
-  createSimpleTool(
-    'tweet-viral-gen',
-    'Générateur Tweet Viral',
-    'Créez des tweets qui font exploser les likes et RT.',
-    'Business',
-    'Génère 5 tweets viraux, accrocheurs et optimisés pour Twitter/X sur ce sujet. Utilise des hooks, des questions, des stats si possible (max 280 caractères) :',
-    'Twitter',
-    'text',
-    { placeholder: 'Ex: Astuce productivité, Opinion tech...' },
-    { title: 'Générateur de Tweet Viral IA - Créer un Tweet', description: 'Créez des tweets qui génèrent de l\'engagement. Hooks viraux, questions et format optimisé pour Twitter/X.', keywords: ['générateur tweet', 'tweet viral', 'twitter content', 'créer tweet', 'engagement twitter'] },
-    1
-  ),
   {
     id: 'meal-plan-gen',
     title: 'Générateur Plan Repas',

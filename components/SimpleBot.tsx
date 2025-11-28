@@ -157,7 +157,7 @@ export const SimpleBot: React.FC = () => {
                     <span className="font-bold font-display tracking-wide text-sm">SimpleBot</span>
                 </div>
                 <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
-                    {DAILY_LIMIT - usage.count} msgs restants
+                    {DAILY_LIMIT - usage.count} msg{DAILY_LIMIT - usage.count > 1 ? 's' : ''} restant{DAILY_LIMIT - usage.count > 1 ? 's' : ''}
                 </span>
             </div>
             <div className="flex items-center gap-2">

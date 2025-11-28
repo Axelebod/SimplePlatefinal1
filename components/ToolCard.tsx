@@ -34,11 +34,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
             <div className={`w-12 h-12 ${bgClass} border border-black dark:border-white rounded-md flex items-center justify-center shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff]`}>
                 <Icon className="w-6 h-6 text-black" />
             </div>
-            {tool.isPremium && (
-                <span className="px-2 py-0.5 bg-neo-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase tracking-wider rounded-sm">
-                PRO
-                </span>
-            )}
             </div>
 
             <h3 className="font-display font-bold text-lg leading-tight mb-2 group-hover:text-neo-violet dark:group-hover:text-neo-violet transition-colors text-black dark:text-white">

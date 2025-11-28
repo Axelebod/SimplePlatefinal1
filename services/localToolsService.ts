@@ -23,7 +23,20 @@ export const handleLocalTool = async (command: string): Promise<string> => {
       }
 
     case 'UUID_GEN':
-      const uuid = crypto.randomUUID();
+      // Fonction de génération UUID v4 compatible avec tous les navigateurs
+      const generateUUID = (): string => {
+        // Utiliser crypto.randomUUID si disponible (navigateurs modernes)
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+          return crypto.randomUUID();
+        }
+        // Fallback pour les navigateurs plus anciens
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+      const uuid = generateUUID();
       return Promise.resolve(`### UUID v4 :\n\n\`${uuid}\``);
 
     case 'CASE_CONVERT':
@@ -160,8 +173,8 @@ export const handleLocalTool = async (command: string): Promise<string> => {
             const encodedInput = encodeURIComponent(input);
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedInput}`;
             
-            // Retourner le QR code avec un format markdown simple pour un meilleur affichage
-            return Promise.resolve(`### QR Code généré 📱\n\n![QR Code](${qrUrl})\n\n**Données encodées :** \`${input}\`\n\n*Scannez le QR code avec votre téléphone pour accéder au contenu.*`);
+            // Retourner directement l'URL du QR code (ToolPage.tsx a un affichage spécialisé)
+            return Promise.resolve(qrUrl);
         } catch (error) {
             console.error('QR Code service error:', error);
             return Promise.resolve(`❌ **Erreur lors de la génération** : ${error instanceof Error ? error.message : 'Erreur inconnue'}\n\n**Solution** : Vérifiez votre connexion Internet et réessayez.`);

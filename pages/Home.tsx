@@ -201,14 +201,14 @@ export const Home: React.FC = () => {
                      Comment fonctionnent les crédits ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>
                  </summary>
-                 <p className="mt-2 text-gray-600 dark:text-gray-300">Chaque utilisateur reçoit 5 crédits par mois. Les outils coûtent entre 1 et 3 crédits selon leur complexité. Pour un usage intensif, l'abonnement PRO (9.99€/mois) offre 100 crédits mensuels.</p>
+                 <p className="mt-2 text-gray-600 dark:text-gray-300">Chaque utilisateur reçoit 5 crédits gratuits par semaine (non cumulables). Les outils coûtent entre 0 et 3 crédits selon leur complexité. Pour un usage intensif, l'abonnement PRO (9.99€/mois) offre 100 crédits payants mensuels qui s'accumulent.</p>
              </details>
              <details className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-4 cursor-pointer group">
                  <summary className="font-bold flex justify-between items-center list-none dark:text-white">
                      Mes données sont-elles privées ?
                      <span className="transform group-open:rotate-180 transition-transform">▼</span>
                  </summary>
-                 <p className="mt-2 text-gray-600 dark:text-gray-300">Absolument. Les outils locaux (Calculatrices, Convertisseurs) tournent sur VOTRE navigateur. Les outils IA envoient les données à Google pour traitement et ne sont pas stockées.</p>
+                 <p className="mt-2 text-gray-600 dark:text-gray-300">Absolument. Les outils locaux (Calculatrices, Convertisseurs) tournent sur VOTRE navigateur. Les outils IA envoient les données à Google pour traitement et ne sont pas stockés.</p>
              </details>
          </div>
       </section>

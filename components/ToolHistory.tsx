@@ -73,7 +73,7 @@ export const ToolHistory: React.FC<ToolHistoryProps> = ({ toolId, onLoadTemplate
       <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 text-center">
         <History className="w-12 h-12 mx-auto text-gray-400 mb-4" />
         <p className="text-gray-500 dark:text-gray-400">Aucun résultat sauvegardé</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">Vos résultats seront automatiquement sauvegardés ici</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">Sauvegardez vos résultats manuellement avec le bouton "Sauvegarder" pour les retrouver ici</p>
       </div>
     );
   }
