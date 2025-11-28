@@ -12,34 +12,37 @@ export const saveToolResult = async (
   outputType: 'text' | 'image',
   creditsUsed: number,
   metadata?: Record<string, any>,
-  isPro: boolean = false
+  isPro: boolean = false,
+  skipLimitCheck: boolean = false // Nouveau paramètre pour bypass les limites (sauvegarde auto)
 ): Promise<{ success: boolean; result?: ToolResult; message?: string }> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, message: 'Vous devez être connecté pour sauvegarder.' };
   }
 
-  // Vérifier la limite avant de sauvegarder
-  const maxResults = isPro ? 20 : 5;
-  
-  const { count, error: countError } = await supabase
-    .from('tool_results')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('tool_id', toolId);
+  // Vérifier la limite avant de sauvegarder (sauf si skipLimitCheck = true pour sauvegarde auto)
+  if (!skipLimitCheck) {
+    const maxResults = isPro ? 20 : 5;
+    
+    const { count, error: countError } = await supabase
+      .from('tool_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('tool_id', toolId);
 
-  if (countError) {
-    console.error('Error counting results:', countError);
-    return { success: false, message: 'Erreur lors de la vérification des limites.' };
-  }
+    if (countError) {
+      console.error('Error counting results:', countError);
+      return { success: false, message: 'Erreur lors de la vérification des limites.' };
+    }
 
-  if (count && count >= maxResults) {
-    return { 
-      success: false, 
-      message: isPro 
-        ? `Limite atteinte : vous avez déjà ${maxResults} résultats sauvegardés pour cet outil. Supprimez-en un pour en sauvegarder un nouveau.`
-        : `Limite atteinte : vous avez déjà ${maxResults} résultats sauvegardés (gratuit). Passez PRO pour avoir 20 résultats.`
-    };
+    if (count && count >= maxResults) {
+      return { 
+        success: false, 
+        message: isPro 
+          ? `Limite atteinte : vous avez déjà ${maxResults} résultats sauvegardés pour cet outil. Supprimez-en un pour en sauvegarder un nouveau.`
+          : `Limite atteinte : vous avez déjà ${maxResults} résultats sauvegardés (gratuit). Passez PRO pour avoir 20 résultats.`
+      };
+    }
   }
 
   const { data, error } = await supabase

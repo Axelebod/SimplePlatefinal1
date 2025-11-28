@@ -12,6 +12,7 @@ import { generateToolSEOContent } from '../utils/toolContentGenerator';
 import { ToolHistory } from '../components/ToolHistory';
 import { ToolTemplates } from '../components/ToolTemplates';
 import { saveToolResult } from '../services/toolHistoryService';
+import { incrementGenerationCounter } from '../services/generationCounterService';
 import { RichTextEditor } from '../components/RichTextEditor';
 import { ProductSheetDisplay } from '../components/ProductSheetDisplay';
 import { InvoiceDisplay } from '../components/InvoiceDisplay';
@@ -89,6 +90,21 @@ export const ToolPage: React.FC = () => {
       setError(error.message);
     }
   });
+
+  // Compter chaque génération réussie pour les stats (sans sauvegarder le résultat)
+  useEffect(() => {
+    if (result && user && tool) {
+      // Éviter les comptages multiples pour le même résultat
+      const countKey = `${tool.id}-${result.substring(0, 50)}`;
+      const lastCountKey = sessionStorage.getItem('last_generation_count');
+      
+      if (lastCountKey === countKey) return; // Déjà compté
+      
+      // Compter la génération (silencieux)
+      incrementGenerationCounter(tool.id);
+      sessionStorage.setItem('last_generation_count', countKey);
+    }
+  }, [result, user, tool]);
 
   // Reset states on tool change
   useEffect(() => {
@@ -299,7 +315,8 @@ export const ToolPage: React.FC = () => {
         {
           model: tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
         },
-        isPro || false
+        isPro || false,
+        false // skipLimitCheck = false pour sauvegarde manuelle (avec limites)
       );
 
       if (response.success) {
@@ -607,16 +624,31 @@ export const ToolPage: React.FC = () => {
                     </div>
                  </div>
               ) : tool.id === 'business-plan-pro' ? (
-                <BusinessPlanDisplay
-                  result={result}
-                  onSave={isLoggedIn ? handleSaveResult : undefined}
-                  isSaved={isResultSaved}
-                  isSaving={savingResult}
-                  onChange={(value) => {
-                    setResult(value);
-                    setIsResultSaved(false);
-                  }}
-                />
+                <div className="animate-in fade-in duration-500">
+                  <iframe 
+                    srcDoc={result} 
+                    title="Business Plan Généré"
+                    className="w-full h-[800px] border-2 border-black dark:border-gray-600 rounded-md"
+                    sandbox="allow-same-origin"
+                  />
+                  <div className="mt-4 flex gap-2 justify-end">
+                    <button
+                      onClick={() => {
+                        const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `business-plan-${Date.now()}.html`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                      className="px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Télécharger HTML
+                    </button>
+                  </div>
+                </div>
               ) : tool.id === 'website-generator' ? (
                 showPreview ? (
                     // Website Generator avec iframe preview amélioré
@@ -710,14 +742,31 @@ export const ToolPage: React.FC = () => {
                   </div>
                 )
                ) : tool.id === 'ecom-product-scanner' ? (
-                        // Scanner Produit avec mise en page professionnelle
-                        <ProductSheetDisplay 
-                          result={result} 
-                          platform={inputs.platform || 'Shopify'}
-                          onSave={isLoggedIn ? handleSaveResult : undefined}
-                          isSaved={isResultSaved}
-                          isSaving={savingResult}
-                        />
+                        <div className="animate-in fade-in duration-500">
+                          <iframe 
+                            srcDoc={result} 
+                            title="Fiche Produit Générée"
+                            className="w-full h-[800px] border-2 border-black dark:border-gray-600 rounded-md"
+                            sandbox="allow-same-origin"
+                          />
+                          <div className="mt-4 flex gap-2 justify-end">
+                            <button
+                              onClick={() => {
+                                const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `fiche-produit-${Date.now()}.html`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                              className="px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Télécharger HTML
+                            </button>
+                          </div>
+                        </div>
                ) : tool.id === 'ai-image-analysis' ? (
                         // Analyseur d'Image avec métriques visuelles
                         <div className="animate-in fade-in duration-500">
@@ -812,17 +861,31 @@ export const ToolPage: React.FC = () => {
                           }}
                         />
                ) : tool.id === 'cv-generator' ? (
-                        // CV avec template et export PDF/PNG
-                        <CVDisplay 
-                          result={result}
-                          onSave={isLoggedIn ? handleSaveResult : undefined}
-                          isSaved={isResultSaved}
-                          isSaving={savingResult}
-                          onChange={(value) => {
-                            setResult(value);
-                            setIsResultSaved(false);
-                          }}
-                        />
+                        <div className="animate-in fade-in duration-500">
+                          <iframe 
+                            srcDoc={result} 
+                            title="CV Généré"
+                            className="w-full h-[800px] border-2 border-black dark:border-gray-600 rounded-md"
+                            sandbox="allow-same-origin"
+                          />
+                          <div className="mt-4 flex gap-2 justify-end">
+                            <button
+                              onClick={() => {
+                                const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `cv-${Date.now()}.html`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                              className="px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Télécharger HTML
+                            </button>
+                          </div>
+                        </div>
                ) : tool.id === 'poem-generator' ? (
                         // Poème avec mise en page stylée
                         <PoemDisplay 

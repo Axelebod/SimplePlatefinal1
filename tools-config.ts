@@ -121,61 +121,255 @@ CIBLE: ${data.niche || "Grand public"}
 GAMME PRIX: ${data.priceRange || 'Non spécifiée'}
 ${data.competitors ? `CONCURRENTS: ${data.competitors}` : ''}
 
-SORTIE ATTENDUE (Format Markdown structuré) :
+SORTIE ATTENDUE: Génère une CARTE HTML/CSS complète et professionnelle pour la fiche produit.
 
-## 📦 FICHE PRODUIT ${data.platform || 'E-COMMERCE'}
+TEMPLATE HTML/CSS à utiliser (remplis les placeholders {{...}} avec les données réelles) :
 
-### 1. **TITRE SEO**
-- Format ${data.platform === 'Amazon' ? 'Amazon (max 200 caractères)' : 'Shopify (max 80 caractères)'}
-- Inclure : Marque (si visible), Type produit, Caractéristique principale
-- Exemple format : "[Marque] [Produit] - [Bénéfice clé]"
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}} - Fiche Produit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .product-card {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .product-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+        .product-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .product-title {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .product-price {
+            font-size: 36px;
+            color: #6366f1;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stars {
+            color: #fbbf24;
+            font-size: 20px;
+        }
+        .product-short-desc {
+            font-size: 16px;
+            color: #4b5563;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .product-bullets {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .product-bullets h3 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .product-bullets ul {
+            list-style: none;
+        }
+        .product-bullets li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #4b5563;
+        }
+        .product-bullets li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .product-cta {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-primary {
+            flex: 1;
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .product-details {
+            padding: 40px;
+            background: #f9fafb;
+        }
+        .product-details h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .product-details p {
+            color: #4b5563;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tag {
+            background: #e0e7ff;
+            color: #6366f1;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .guarantees {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 30px 40px;
+            background: white;
+            border-top: 2px solid #e5e7eb;
+        }
+        .guarantee-item {
+            text-align: center;
+        }
+        .guarantee-item .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .guarantee-item h4 {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .product-header {
+                grid-template-columns: 1fr;
+            }
+            .guarantees {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="product-card">
+        <div class="product-header">
+            <div class="product-image">
+                <div>Image du produit</div>
+            </div>
+            <div class="product-info">
+                <h1 class="product-title">{{TITLE}}</h1>
+                <div class="product-price">{{PRICE}}</div>
+                <div class="product-rating">
+                    <span class="stars">★★★★★</span>
+                    <span>(127 avis)</span>
+                </div>
+                <p class="product-short-desc">{{SHORT_DESCRIPTION}}</p>
+                <div class="product-bullets">
+                    <h3>Points clés</h3>
+                    <ul>
+                        {{BULLET_POINTS}}
+                    </ul>
+                </div>
+                <div class="product-cta">
+                    <button class="btn-primary">Ajouter au panier</button>
+                </div>
+            </div>
+        </div>
 
-### 2. **DESCRIPTION COURTE** (Meta Description)
-- 2-3 phrases impactantes
-- Appel à l'émotion + bénéfice principal
-- ${data.platform === 'Amazon' ? 'Format Amazon (paragraphe court)' : 'Format Shopify (2-3 lignes)'}
+        <div class="product-details">
+            <h2>Description détaillée</h2>
+            {{LONG_DESCRIPTION}}
+            <div class="product-tags">
+                {{SEO_KEYWORDS}}
+            </div>
+        </div>
 
-### 3. **BULLET POINTS** (5 points max)
-- Format : ${data.platform === 'Amazon' ? 'Amazon (5 points max, 200 caractères chacun)' : 'Shopify (5 points, format liste)'}
-- Chaque point = 1 bénéfice/feature visible sur l'image
-- Utiliser des verbes d'action
+        <div class="guarantees">
+            <div class="guarantee-item">
+                <div class="icon">🚚</div>
+                <h4>Livraison gratuite</h4>
+            </div>
+            <div class="guarantee-item">
+                <div class="icon">🛡️</div>
+                <h4>Garantie 30j</h4>
+            </div>
+            <div class="guarantee-item">
+                <div class="icon">↩️</div>
+                <h4>Retour gratuit</h4>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
 
-### 4. **DESCRIPTION LONGUE** (Storytelling)
-- 3-4 paragraphes
-- Parler au "vous"
-- Inclure : Problème résolu, Expérience utilisateur, Garanties/Confiance
+INSTRUCTIONS:
+- {{TITLE}} : Titre SEO optimisé (${data.platform === 'Amazon' ? 'max 200 caractères' : 'max 80 caractères'})
+- {{PRICE}} : Prix estimé basé sur l'analyse (ex: "99,99€" ou "À partir de 49,99€")
+- {{SHORT_DESCRIPTION}} : 2-3 phrases impactantes (meta description)
+- {{BULLET_POINTS}} : Liste HTML <li> avec 5 points clés maximum
+- {{LONG_DESCRIPTION}} : 3-4 paragraphes HTML <p> avec storytelling
+- {{SEO_KEYWORDS}} : Tags HTML <span class="tag"> pour chaque mot-clé (15-20 mots-clés)
 
-### 5. **MOTS-CLÉS SEO**
-- 15-20 mots-clés pertinents
-- Format : Liste séparée par virgules
-- Inclure : Long tail keywords, Synonymes, Catégories
-
-### 6. **ESTIMATION PRIX & POSITIONNEMENT**
-- Prix suggéré basé sur l'analyse visuelle et la gamme ${data.priceRange || ''}
-- Positionnement marché (Premium/Mid-range/Budget)
-- Justification du prix
-
-### 7. **TAGS & CATÉGORIES**
-- Catégories principales (3-5)
-- Tags secondaires (10-15)
-- Format compatible ${data.platform || 'Shopify/Amazon'}
-
-${data.platform === 'Amazon' ? `
-### 8. **FORMAT AMAZON SPÉCIFIQUE**
-- A+ Content suggestions (si applicable)
-- Backend Search Terms (250 caractères max)
-- Product Type & Browse Node suggestions
-` : ''}
-
-${data.platform === 'Shopify' ? `
-### 8. **FORMAT SHOPIFY SPÉCIFIQUE**
-- Product Type
-- Vendor suggestion
-- Tags format Shopify
-- Collection suggestions
-` : ''}
-
-Génère maintenant la fiche complète.`
+Génère maintenant le HTML complet avec tous les placeholders remplacés par les vraies données.`
   },
   {
     id: 'website-generator',
@@ -586,7 +780,7 @@ Génère maintenant le rapport complet.`
         helpText: 'Utilisez l\'éditeur pour formater votre texte professionnellement'
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Rédige un Business Plan structuré et professionnel pour :
+    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Génère un Business Plan complet en HTML/CSS professionnel.
 
 ENTREPRISE: ${data.companyName}
 SECTEUR: ${data.sector}
@@ -594,16 +788,173 @@ MARCHÉ CIBLE: ${data.targetMarket}
 FUNDING: ${data.fundingNeeded ? `${data.fundingNeeded}€` : 'Non spécifié'}
 DESCRIPTION: ${data.idea}
 
-Sections obligatoires (format Markdown professionnel) :
-1. **Executive Summary** (1 page max)
-2. **Analyse de Marché** (TAM/SAM/SOM avec chiffres)
-3. **Modèle Économique** (Revenue streams, Coûts, Projections 3 ans)
-4. **Stratégie Go-To-Market** (Channels, Pricing, Marketing)
-5. **Analyse SWOT** (Forces, Faiblesses, Opportunités, Menaces)
-6. **Équipe & Gouvernance**
-7. **Plan Financier** (Tableaux de projections si funding spécifié)
+SORTIE ATTENDUE: Génère une CARTE HTML/CSS complète pour le Business Plan (format A4, prêt pour investisseurs).
 
-Tone: Professionnel, convaincant, data-driven.`
+TEMPLATE HTML/CSS à utiliser (remplis les placeholders {{...}} avec les données réelles) :
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Plan - {{COMPANY_NAME}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.8;
+        }
+        .plan-container {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 50px;
+        }
+        .cover-page {
+            text-align: center;
+            padding: 60px 0;
+            border-bottom: 4px solid #6366f1;
+            margin-bottom: 40px;
+        }
+        .cover-page h1 {
+            font-size: 42px;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .cover-page .company-name {
+            font-size: 28px;
+            color: #6366f1;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .cover-page .date {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            font-size: 24px;
+            color: #1f2937;
+            border-bottom: 3px solid #6366f1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .subsection {
+            margin-bottom: 25px;
+        }
+        .subsection h3 {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .subsection p {
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+        .subsection ul {
+            margin-left: 25px;
+            color: #4b5563;
+        }
+        .subsection li {
+            margin-bottom: 8px;
+        }
+        .financial-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .financial-table th,
+        .financial-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+        }
+        .financial-table th {
+            background: #6366f1;
+            color: white;
+            font-weight: 600;
+        }
+        .financial-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        .highlight-box {
+            background: #eff6ff;
+            border-left: 4px solid #6366f1;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .highlight-box h4 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .plan-container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="plan-container">
+        <div class="cover-page">
+            <h1>BUSINESS PLAN</h1>
+            <div class="company-name">{{COMPANY_NAME}}</div>
+            <div class="date">{{DATE}}</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">1. Executive Summary</div>
+            {{EXECUTIVE_SUMMARY}}
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. Description de l'Entreprise</div>
+            {{COMPANY_DESCRIPTION}}
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Analyse de Marché</div>
+            {{MARKET_ANALYSIS}}
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Stratégie Marketing</div>
+            {{MARKETING_STRATEGY}}
+        </div>
+
+        <div class="section">
+            <div class="section-title">5. Plan Financier</div>
+            {{FINANCIAL_PLAN}}
+        </div>
+
+        <div class="section">
+            <div class="section-title">6. Analyse SWOT</div>
+            {{SWOT_ANALYSIS}}
+        </div>
+    </div>
+</body>
+</html>
+
+INSTRUCTIONS:
+- {{COMPANY_NAME}} : ${data.companyName}
+- {{DATE}} : Date actuelle (format: "Janvier 2024")
+- {{EXECUTIVE_SUMMARY}} : HTML avec <div class="subsection"> contenant un résumé exécutif de 1 page max (professionnel, convaincant)
+- {{COMPANY_DESCRIPTION}} : HTML détaillant l'entreprise, le secteur ${data.sector}, et le marché cible ${data.targetMarket}
+- {{MARKET_ANALYSIS}} : HTML avec TAM/SAM/SOM avec chiffres réalistes, analyse de la concurrence
+- {{MARKETING_STRATEGY}} : HTML avec stratégie Go-To-Market, channels, pricing, marketing
+- {{FINANCIAL_PLAN}} : HTML avec tableaux <table class="financial-table"> pour projections 3 ans${data.fundingNeeded ? ` et besoin de financement ${data.fundingNeeded}€` : ''}
+- {{SWOT_ANALYSIS}} : HTML avec <div class="highlight-box"> pour Forces, Faiblesses, Opportunités, Menaces
+
+Tone: Professionnel, convaincant, data-driven. Génère maintenant le HTML complet avec tous les placeholders remplacés.`
   },
   // --- E-COMMERCE TOOLS ---
   createSimpleTool(
