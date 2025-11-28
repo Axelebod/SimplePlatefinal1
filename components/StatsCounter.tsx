@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Users, Zap } from 'lucide-react';
-import { tools } from '../tools-config';
+import { getSiteStats } from '../services/statsService';
 
 interface StatsCounterProps {
   className?: string;
@@ -10,47 +10,48 @@ export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) =>
   const [stats, setStats] = useState({
     generations: 0,
     users: 0,
-    tools: 0,
+    tools: 50, // Nombre réel d'outils
   });
+  const [loading, setLoading] = useState(true);
 
-  // Simuler des stats réalistes (à remplacer par une vraie API plus tard)
+  // Charger les vraies statistiques depuis Supabase
   useEffect(() => {
-    // Valeurs de base réalistes
-    const baseStats = {
-      generations: 12453,
-      users: 2847,
-      tools: tools.length,
+    const loadStats = async () => {
+      setLoading(true);
+      try {
+        const realStats = await getSiteStats();
+        
+        // Animation au chargement
+        const animate = (target: number, setter: (val: number) => void, duration: number = 2000) => {
+          const start = 0;
+          const increment = target / (duration / 16);
+          let current = start;
+
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              setter(target);
+              clearInterval(timer);
+            } else {
+              setter(Math.floor(current));
+            }
+          }, 16);
+        };
+
+        animate(realStats.generations, (val) => setStats(prev => ({ ...prev, generations: val })));
+        animate(realStats.users, (val) => setStats(prev => ({ ...prev, users: val })));
+        setStats(prev => ({ ...prev, tools: realStats.tools }));
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // Animation au chargement
-    const animate = (target: number, setter: (val: number) => void, duration: number = 2000) => {
-      const start = 0;
-      const increment = target / (duration / 16);
-      let current = start;
+    loadStats();
 
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          setter(target);
-          clearInterval(timer);
-        } else {
-          setter(Math.floor(current));
-        }
-      }, 16);
-    };
-
-    animate(baseStats.generations, (val) => setStats(prev => ({ ...prev, generations: val })));
-    animate(baseStats.users, (val) => setStats(prev => ({ ...prev, users: val })));
-    setStats(prev => ({ ...prev, tools: baseStats.tools }));
-
-    // Mise à jour périodique (simulation)
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        generations: prev.generations + Math.floor(Math.random() * 3),
-        users: prev.users,
-        tools: prev.tools,
-      }));
-    }, 30000); // Toutes les 30 secondes
+    // Rafraîchir les stats toutes les 5 minutes
+    const interval = setInterval(loadStats, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);

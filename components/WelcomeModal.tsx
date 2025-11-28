@@ -4,7 +4,7 @@ import { X, Sparkles, Zap, ArrowRight } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 
 export const WelcomeModal: React.FC = () => {
-  const { user, credits } = useUserStore();
+  const { user, credits, creditsFree } = useUserStore();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -13,7 +13,8 @@ export const WelcomeModal: React.FC = () => {
 
     // Vérifier si l'utilisateur vient de s'inscrire (première visite)
     const hasSeenWelcome = localStorage.getItem('simpleplate_welcome_seen');
-    const isNewUser = !hasSeenWelcome && credits > 0;
+    // Afficher uniquement pour les nouveaux utilisateurs avec 5 crédits gratuits (inscription)
+    const isNewUser = !hasSeenWelcome && creditsFree === 5 && credits === 5;
 
     if (isNewUser) {
       // Petit délai pour une meilleure UX
@@ -23,7 +24,7 @@ export const WelcomeModal: React.FC = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [user, credits]);
+  }, [user, credits, creditsFree]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -63,7 +64,7 @@ export const WelcomeModal: React.FC = () => {
             <div className="flex items-center justify-center gap-2 mb-2">
               <Zap className="w-6 h-6 text-neo-green" />
               <span className="text-2xl font-bold text-neo-green">
-                {credits} crédit{credits > 1 ? 's' : ''} offerts
+                5 crédits offerts
               </span>
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-300">

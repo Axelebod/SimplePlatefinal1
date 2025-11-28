@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Save, CheckCircle, AlertCircle, TrendingUp, Eye, Copy } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, TrendingUp, Eye, Copy, Monitor } from 'lucide-react';
 import { ProductSheetExporter, ParsedProductSheet } from './ProductSheetExporter';
+import { ProductPreview } from './ProductPreview';
 
 interface ProductSheetDisplayProps {
   result: string;
@@ -153,7 +154,10 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
   isSaved = false,
   isSaving = false,
 }) => {
-  const sheet = useMemo(() => parseSheet(result, platform), [result, platform]);
+  const [showPreview, setShowPreview] = useState(true);
+  const [editedSheet, setEditedSheet] = useState<ParsedProductSheet | null>(null);
+  const parsedSheet = useMemo(() => parseSheet(result, platform), [result, platform]);
+  const sheet = editedSheet || parsedSheet;
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
 
   // Calcul de la qualité de la fiche (score SEO)
@@ -173,9 +177,29 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
     setTimeout(() => setCopiedSection(null), 2000);
   };
 
+  const handleTextChange = (field: string, value: string) => {
+    setEditedSheet(prev => {
+      const updated = prev || { ...parsedSheet };
+      if (field === 'title') {
+        updated.title = value;
+      } else if (field === 'shortDescription') {
+        updated.shortDescription = value;
+      } else if (field === 'longDescription') {
+        updated.longDescription = value;
+      } else if (field === 'bulletPoints') {
+        try {
+          updated.bulletPoints = JSON.parse(value);
+        } catch {
+          // Si ce n'est pas du JSON valide, ignorer
+        }
+      }
+      return { ...updated };
+    });
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header avec qualité */}
+      {/* Header avec toggle Preview/Éditeur */}
       <div className="flex items-center justify-between border-b-2 border-gray-200 dark:border-gray-600 pb-4">
         <div className="flex items-center gap-4">
           <h3 className="font-display text-2xl font-bold dark:text-white">Fiche Produit</h3>
@@ -187,6 +211,31 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
           </div>
         </div>
         <div className="flex gap-2">
+          {/* Toggle Preview/Éditeur */}
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1 border border-gray-300 dark:border-gray-600">
+            <button
+              onClick={() => setShowPreview(true)}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-colors flex items-center gap-2 ${
+                showPreview
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-black dark:text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <Monitor className="w-4 h-4" />
+              Preview
+            </button>
+            <button
+              onClick={() => setShowPreview(false)}
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-colors flex items-center gap-2 ${
+                !showPreview
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-black dark:text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              <Eye className="w-4 h-4" />
+              Éditeur
+            </button>
+          </div>
           {onSave && (
             <button
               type="button"
@@ -212,7 +261,15 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-black dark:border-gray-600 rounded-lg p-8 shadow-neo dark:shadow-none">
+      {/* Preview ou Éditeur */}
+      {showPreview ? (
+        <ProductPreview 
+          sheet={sheet} 
+          onTextChange={handleTextChange}
+          editable={true}
+        />
+      ) : (
+        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-black dark:border-gray-600 rounded-lg p-8 shadow-neo dark:shadow-none">
         {/* Titre avec copie */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -422,8 +479,10 @@ export const ProductSheetDisplay: React.FC<ProductSheetDisplayProps> = ({
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
+      {/* Export - Utilise toujours les textes de la preview (editedSheet ou parsedSheet) */}
       <ProductSheetExporter sheet={sheet} />
     </div>
   );

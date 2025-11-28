@@ -19,9 +19,11 @@ interface ProductSheetExporterProps {
 export const ProductSheetExporter: React.FC<ProductSheetExporterProps> = ({ sheet }) => {
   const [copied, setCopied] = useState<string | null>(null);
 
+  // Construire le body HTML pour Shopify en utilisant EXACTEMENT les textes de la preview
   const buildBody = () => {
-    const bullets = sheet.bulletPoints.map(point => `• ${point}`).join('\n');
-    return `${sheet.shortDescription}\n\n${bullets}\n\n${sheet.longDescription}`;
+    // Utiliser les textes exacts de la preview (titre, description, bullets, description longue)
+    const bullets = sheet.bulletPoints.map(point => `<li>${point}</li>`).join('\n');
+    return `<p>${sheet.shortDescription}</p>\n<ul>\n${bullets}\n</ul>\n<div>\n${sheet.longDescription.replace(/\n/g, '<br>')}\n</div>`;
   };
 
   const copyToClipboard = async (text: string, type: string) => {

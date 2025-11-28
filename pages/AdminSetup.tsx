@@ -141,6 +141,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Fonction publique pour récupérer les stats du site (accessible sans auth)
+CREATE OR REPLACE FUNCTION public.get_site_stats()
+RETURNS JSON AS $$
+DECLARE
+  v_generations INTEGER;
+  v_users INTEGER;
+BEGIN
+  -- Compter le nombre total de générations
+  SELECT COUNT(*) INTO v_generations FROM public.tool_results;
+  
+  -- Compter le nombre total d'utilisateurs
+  SELECT COUNT(*) INTO v_users FROM public.profiles;
+  
+  RETURN json_build_object(
+    'generations', COALESCE(v_generations, 0),
+    'users', COALESCE(v_users, 0)
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- 5. AUTOMATISATION (Trigger)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
