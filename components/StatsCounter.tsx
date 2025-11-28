@@ -1,0 +1,104 @@
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Users, Zap } from 'lucide-react';
+import { tools } from '../tools-config';
+
+interface StatsCounterProps {
+  className?: string;
+}
+
+export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) => {
+  const [stats, setStats] = useState({
+    generations: 0,
+    users: 0,
+    tools: 0,
+  });
+
+  // Simuler des stats réalistes (à remplacer par une vraie API plus tard)
+  useEffect(() => {
+    // Valeurs de base réalistes
+    const baseStats = {
+      generations: 12453,
+      users: 2847,
+      tools: tools.length,
+    };
+
+    // Animation au chargement
+    const animate = (target: number, setter: (val: number) => void, duration: number = 2000) => {
+      const start = 0;
+      const increment = target / (duration / 16);
+      let current = start;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          setter(target);
+          clearInterval(timer);
+        } else {
+          setter(Math.floor(current));
+        }
+      }, 16);
+    };
+
+    animate(baseStats.generations, (val) => setStats(prev => ({ ...prev, generations: val })));
+    animate(baseStats.users, (val) => setStats(prev => ({ ...prev, users: val })));
+    setStats(prev => ({ ...prev, tools: baseStats.tools }));
+
+    // Mise à jour périodique (simulation)
+    const interval = setInterval(() => {
+      setStats(prev => ({
+        generations: prev.generations + Math.floor(Math.random() * 3),
+        users: prev.users,
+        tools: prev.tools,
+      }));
+    }, 30000); // Toutes les 30 secondes
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toLocaleString('fr-FR');
+  };
+
+  return (
+    <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}>
+      <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-4 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-neo-green border-2 border-black dark:border-white rounded-md flex items-center justify-center">
+            <Zap className="w-5 h-5 text-black" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold dark:text-white">{formatNumber(stats.generations)}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Générations</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-4 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-neo-violet border-2 border-black dark:border-white rounded-md flex items-center justify-center">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold dark:text-white">{formatNumber(stats.users)}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Utilisateurs</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-4 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-neo-yellow border-2 border-black dark:border-white rounded-md flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-black" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold dark:text-white">{stats.tools}+</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Outils Disponibles</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+

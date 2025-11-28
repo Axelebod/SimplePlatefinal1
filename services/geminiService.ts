@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { handleLocalTool } from './localToolsService';
+import { retry } from '../utils/retry';
 
 // Support both standard React env var and generic API_KEY
 const API_KEY = process.env.REACT_APP_API_KEY || process.env.API_KEY || ''; 
@@ -52,65 +53,81 @@ export const generateToolContent = async (
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   try {
-    // CAS 1 : Génération d'IMAGE (Text -> Image)
-    if (isImageOutput) {
-      const response = await ai.models.generateImages({
-        model: 'imagen-4.0-generate-001',
-        prompt: prompt,
-        config: {
-            numberOfImages: 1,
-            aspectRatio: '1:1',
-            outputMimeType: 'image/jpeg'
-        }
-      });
-      
-      const base64ImageBytes = response.generatedImages?.[0]?.image?.imageBytes;
-      if (!base64ImageBytes) {
-        console.error("Image generation response empty:", response);
-        throw new Error("L'IA n'a pas pu générer l'image (Filtre de sécurité ou erreur interne).");
-      }
-      return `data:image/jpeg;base64,${base64ImageBytes}`;
-    } 
-    
-    // CAS 2 : Analyse d'IMAGE (Image + Text -> Text)
-    else if (inputImageBase64) {
-       // On nettoie le base64 (enlever le préfixe data:image/...)
-       const cleanBase64 = inputImageBase64.split(',')[1];
-       
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { text: prompt },
-              { 
-                inlineData: { 
-                  mimeType: 'image/jpeg', // On suppose du jpeg/png standard
-                  data: cleanBase64 
-                } 
-              }
-            ]
+    // Wrapper avec retry logic pour plus de fiabilité
+    return await retry(async () => {
+      // CAS 1 : Génération d'IMAGE (Text -> Image)
+      if (isImageOutput) {
+        const response = await ai.models.generateImages({
+          model: 'imagen-4.0-generate-001',
+          prompt: prompt,
+          config: {
+              numberOfImages: 1,
+              aspectRatio: '1:1',
+              outputMimeType: 'image/jpeg'
           }
-        ]
-      });
-       return response.text || "Analyse impossible.";
-    }
+        });
+        
+        const base64ImageBytes = response.generatedImages?.[0]?.image?.imageBytes;
+        if (!base64ImageBytes) {
+          console.error("Image generation response empty:", response);
+          throw new Error("L'IA n'a pas pu générer l'image (Filtre de sécurité ou erreur interne).");
+        }
+        return `data:image/jpeg;base64,${base64ImageBytes}`;
+      } 
+      
+      // CAS 2 : Analyse d'IMAGE (Image + Text -> Text)
+      else if (inputImageBase64) {
+         // On nettoie le base64 (enlever le préfixe data:image/...)
+         const cleanBase64 = inputImageBase64.split(',')[1];
+         
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: prompt },
+                { 
+                  inlineData: { 
+                    mimeType: 'image/jpeg', // On suppose du jpeg/png standard
+                    data: cleanBase64 
+                  } 
+                }
+              ]
+            }
+          ]
+        });
+         return response.text || "Analyse impossible.";
+      }
 
-    // CAS 3 : Génération de TEXTE classique (Text -> Text)
-    else {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
-          },
-        ],
-      });
+      // CAS 3 : Génération de TEXTE classique (Text -> Text)
+      else {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: prompt }],
+            },
+          ],
+        });
 
-      return response.text || "Aucune réponse générée.";
-    }
+        return response.text || "Aucune réponse générée.";
+      }
+    }, {
+      maxRetries: 2, // Moins de retries ici car retry déjà dans useToolGeneration
+      initialDelay: 500,
+      retryableErrors: (err: any) => {
+        // Ne pas retry sur erreurs de sécurité ou validation
+        if (err?.message?.includes("SAFETY") || err?.message?.includes("validation")) {
+          return false;
+        }
+        // Retry sur erreurs réseau/timeout
+        return err?.message?.includes("network") || 
+               err?.message?.includes("timeout") ||
+               err?.code === 'NETWORK_ERROR';
+      }
+    });
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
@@ -118,6 +135,9 @@ export const generateToolContent = async (
     if (error.message?.includes("SAFETY")) {
       throw new Error("La requête a été bloquée par le filtre de sécurité (Contenu sensible).");
     }
-    throw new Error("Échec de la génération. Veuillez réessayer.");
+    if (error.message?.includes("network") || error.message?.includes("timeout")) {
+      throw new Error("Problème de connexion. Veuillez vérifier votre connexion Internet et réessayer.");
+    }
+    throw new Error(error.message || "Échec de la génération. Veuillez réessayer.");
   }
 };

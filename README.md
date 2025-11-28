@@ -25,12 +25,17 @@ REACT_APP_API_KEY=your_gemini_key
 REACT_APP_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 REACT_APP_SUPABASE_ANON_KEY=public-anon-key
 
-# Stripe (replace with the checkout/portal links you generate)
+# Stripe Price IDs (pour les paiements via Edge Functions)
+REACT_APP_STRIPE_PRICE_PACK_1=price_1SYTTPFQFV8mWkqudC45gAF1
+REACT_APP_STRIPE_PRICE_PACK_10=price_1SYTTRFQFV8mWkquKfYzhnsv
+REACT_APP_STRIPE_PRICE_PACK_50=price_1SYTTTFQFV8mWkquDy79Jiy2
+REACT_APP_STRIPE_PRICE_PACK_100=price_1SYTTVFQFV8mWkqurcAaW2ms
+REACT_APP_STRIPE_PRICE_PACK_500=price_1SYTTXFQFV8mWkqu97ZnAys4
+REACT_APP_STRIPE_PRICE_PRO_SUBSCRIPTION=price_1SVd0dFQFV8mWkquektosn9X
+
+# Stripe (anciens liens checkout - optionnel si vous utilisez les Price IDs ci-dessus)
 REACT_APP_STRIPE_SUB_LINK=https://buy.stripe.com/...
-REACT_APP_STRIPE_PORTAL=https://billing.stripe.com/p/login/...
-REACT_APP_STRIPE_PACK_50=https://buy.stripe.com/...
-REACT_APP_STRIPE_PACK_100=https://buy.stripe.com/...
-REACT_APP_STRIPE_PACK_500=https://buy.stripe.com/...
+REACT_APP_STRIPE_PORTAL=https://billing.stripe.com/p/login/5kQ28r3JR0Jgg7C7KL0Fi00
 
 # Analytics (optional)
 REACT_APP_GA_ID=G-XXXXXXXXXX
@@ -52,10 +57,12 @@ Pour créditer automatiquement les utilisateurs après paiement Stripe :
      STRIPE_WEBHOOK_SECRET=whsec_xxx \
      SUPABASE_SERVICE_ROLE_KEY=service_role_xxx \
      SUPABASE_URL=https://fwrmziiqzjoqslsolyfh.supabase.co \
-     STRIPE_PRICE_PACK_50=price_xxx \
-     STRIPE_PRICE_PACK_100=price_xxx \
-     STRIPE_PRICE_PACK_500=price_xxx \
-     STRIPE_PRICE_PRO_SUBSCRIPTION=price_xxx
+     STRIPE_PRICE_PACK_1=price_1SYTTPFQFV8mWkqudC45gAF1 \
+     STRIPE_PRICE_PACK_10=price_1SYTTRFQFV8mWkquKfYzhnsv \
+     STRIPE_PRICE_PACK_50=price_1SYTTTFQFV8mWkquDy79Jiy2 \
+     STRIPE_PRICE_PACK_100=price_1SYTTVFQFV8mWkqurcAaW2ms \
+     STRIPE_PRICE_PACK_500=price_1SYTTXFQFV8mWkqu97ZnAys4 \
+     STRIPE_PRICE_PRO_SUBSCRIPTION=price_1SVd0dFQFV8mWkquektosn9X
    ```
    Les `price_xxx` doivent correspondre aux Price IDs utilisés dans vos payment links / abonnements.
 

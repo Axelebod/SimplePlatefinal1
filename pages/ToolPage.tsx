@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { tools } from '../tools-config';
 import { useUserStore } from '../store/userStore';
-import { generateToolContent, isApiReady } from '../services/geminiService';
+import { isApiReady } from '../services/geminiService';
 import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save, Download } from 'lucide-react';
 import { LOADING_MESSAGES } from '../constants';
 import { AdBanner } from '../components/AdBanner';
@@ -21,7 +21,12 @@ import { EnhancedResultDisplay } from '../components/EnhancedResultDisplay';
 import { ToolSuggestions } from '../components/ToolSuggestions';
 import { BusinessPlanDisplay } from '../components/BusinessPlanDisplay';
 import { HexColorDisplay } from '../components/HexColorDisplay';
+import { TextAnalyzerDisplay } from '../components/TextAnalyzerDisplay';
+import { JsonFormatterDisplay } from '../components/JsonFormatterDisplay';
 import { ToolInput } from '../types';
+import { useToolSEO } from '../hooks/useToolSEO';
+import { useToolGeneration } from '../hooks/useToolGeneration';
+import { useDebounce } from '../hooks/useDebounce';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -68,12 +73,26 @@ export const ToolPage: React.FC = () => {
 
   const MAX_CHARS = 3500; // Limite de caractères pour éviter les abus
 
-  // ----------------------------------------------------
-  // PERFECT SEO INJECTION LOGIC
-  // ----------------------------------------------------
+  // Hook SEO (remplace toute la logique SEO)
+  useToolSEO(tool);
+
+  // Hook de génération avec retry logic
+  const { generate, loading: generationLoading, error: generationError, result: generationResult, setResult: setGenerationResult } = useToolGeneration({
+    tool: tool!,
+    onSuccess: (result) => {
+      setResult(result);
+      setTimeout(() => {
+        setShowSuggestions(true);
+      }, 1000);
+    },
+    onError: (error) => {
+      setError(error.message);
+    }
+  });
+
+  // Reset states on tool change
   useEffect(() => {
     if (tool) {
-      // Reset states on tool change
       setInputs({});
       setFileInput(undefined);
       setFileName(null);
@@ -81,152 +100,26 @@ export const ToolPage: React.FC = () => {
       setError(null);
       setShowPreview(true);
       setShowSuggestions(false);
-
-      // 1. Title
-      document.title = tool.seo.title;
-
-      // Helper to update meta tags
-      const updateMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
-        let element = document.querySelector(`meta[${attr}="${name}"]`);
-        if (!element) {
-          element = document.createElement('meta');
-          element.setAttribute(attr, name);
-          document.head.appendChild(element);
-        }
-        element.setAttribute('content', content);
-      };
-
-      // 2. Basic Metas
-      updateMeta('description', tool.seo.description);
-      updateMeta('keywords', tool.seo.keywords.join(', '));
-
-      // 3. Open Graph (Social Media)
-      updateMeta('og:title', tool.seo.title, 'property');
-      updateMeta('og:description', tool.seo.description, 'property');
-      updateMeta('og:type', 'website', 'property');
-      updateMeta('og:url', window.location.href, 'property');
-      updateMeta('og:image', `${window.location.origin}/og-image.png`, 'property');
-      updateMeta('og:locale', 'fr_FR', 'property');
-      updateMeta('og:site_name', 'SimplePlate AI', 'property');
-      
-      // 4. Twitter Card
-      updateMeta('twitter:card', 'summary_large_image', 'name');
-      updateMeta('twitter:title', tool.seo.title, 'name');
-      updateMeta('twitter:description', tool.seo.description, 'name');
-      updateMeta('twitter:image', `${window.location.origin}/og-image.png`, 'name');
-      
-      // 5. Canonical URL
-      let canonical = document.querySelector('link[rel="canonical"]');
-      if (!canonical) {
-        canonical = document.createElement('link');
-        canonical.setAttribute('rel', 'canonical');
-        document.head.appendChild(canonical);
-      }
-      canonical.setAttribute('href', window.location.href);
-
-      const updateFavicon = (href: string) => {
-        let fav = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-        if (!fav) {
-          fav = document.createElement('link');
-          fav.rel = 'icon';
-          document.head.appendChild(fav);
-        }
-        fav.href = href;
-      };
-      updateFavicon(`/icons/${tool.iconName?.toLowerCase() || 'default'}.svg`);
-
-      // 6. JSON-LD Structured Data (The Secret Weapon for SEO)
-      const scriptId = 'json-ld-tool';
-      let script = document.getElementById(scriptId);
-      if (!script) {
-        script = document.createElement('script');
-        script.id = scriptId;
-        script.setAttribute('type', 'application/ld+json');
-        document.head.appendChild(script);
-      }
-
-      const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": tool.title,
-        "description": tool.seo.description,
-        "applicationCategory": "UtilityApplication",
-        "operatingSystem": "Web Browser",
-        "url": window.location.href,
-        "offers": {
-          "@type": "Offer",
-          "price": tool.cost === 0 ? "0" : "0.10",
-          "priceCurrency": "EUR",
-          "availability": "https://schema.org/InStock"
-        },
-        "featureList": tool.seo.keywords.join(', '),
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "150"
-        }
-      };
-
-      script.innerHTML = JSON.stringify(schemaData);
-      
-      // 7. FAQ Schema (pour les featured snippets Google)
-      const faqScriptId = 'json-ld-faq';
-      let faqScript = document.getElementById(faqScriptId);
-      if (!faqScript) {
-        faqScript = document.createElement('script');
-        faqScript.id = faqScriptId;
-        faqScript.setAttribute('type', 'application/ld+json');
-        document.head.appendChild(faqScript);
-      }
-      
-      const faqSchema = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": `Combien coûte l'utilisation de ${tool.title} ?`,
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": tool.cost === 0 
-                ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit.`
-                : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération.`
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Les résultats sont-ils de bonne qualité ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": `Oui, ${tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité.`
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Mes données sont-elles sécurisées ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers."
-            }
-          }
-        ]
-      };
-      
-      faqScript.innerHTML = JSON.stringify(faqSchema);
-
-    } else {
-      document.title = "Outil non trouvé | SimplePlate";
+      setIsResultSaved(false);
     }
+  }, [tool?.id]);
 
-    // Cleanup function to reset generic metas if needed
-    return () => {
-      const defaultIcon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-      if (defaultIcon) {
-        defaultIcon.href = '/favicon.ico';
-      }
-      // Optional: Reset metas when leaving
-    };
-  }, [tool]);
+  // Sync generation state with local state
+  useEffect(() => {
+    setLoading(generationLoading);
+  }, [generationLoading]);
+
+  useEffect(() => {
+    if (generationError) {
+      setError(generationError);
+    }
+  }, [generationError]);
+
+  useEffect(() => {
+    if (generationResult) {
+      setResult(generationResult);
+    }
+  }, [generationResult]);
 
   // Handle loading message cycle
   useEffect(() => {
@@ -261,6 +154,9 @@ export const ToolPage: React.FC = () => {
   // Plus de restrictions PRO - tous les outils sont accessibles
   const isLocked = false;
   const hasCredits = credits >= tool.cost;
+
+  // Debounced input pour les champs texte (optimisation)
+  const debouncedInputs = useDebounce(inputs, 300);
 
   const handleInputChange = (name: string, value: any, options?: { bypassLimit?: boolean }) => {
     if (!options?.bypassLimit && typeof value === 'string' && value.length > MAX_CHARS) {
@@ -333,62 +229,45 @@ export const ToolPage: React.FC = () => {
       }
     }
 
-    setLoading(true);
-    setResult(null);
+    setResult(null); // Clear previous result
+    setShowSuggestions(false); // Hide suggestions when generating new result
+    setIsResultSaved(false); // Reset saved state on new generation
 
-    try {
-      if (!tool.promptGenerator) throw new Error("Config invalide");
-      
-      // Pour l'aide aux devoirs, on doit passer l'info de l'image dans les inputs
-      const inputsWithFile = tool.id === 'homework-helper' && fileInput 
-        ? { ...inputs, image: 'FILE_UPLOADED' }
-        : inputs;
-      
-      const prompt = tool.promptGenerator(inputsWithFile);
-      
-      // Vérifier si le prompt contient une erreur
-      if (prompt.startsWith('ERROR:')) {
-        setError(prompt.replace('ERROR:', '').trim());
-        return;
+    // Vérifier la clé API pour les outils IA
+    if (!tool.promptGenerator) {
+      setError("Config invalide");
+      return;
+    }
+
+    const inputsWithFile = tool.id === 'homework-helper' && fileInput 
+      ? { ...inputs, image: 'FILE_UPLOADED' }
+      : inputs;
+    
+    const prompt = tool.promptGenerator(inputsWithFile);
+    
+    // Vérifier si le prompt contient une erreur
+    if (prompt.startsWith('ERROR:')) {
+      setError(prompt.replace('ERROR:', '').trim());
+      return;
+    }
+    
+    // Les outils locaux ne nécessitent pas de clé API Google
+    if (!prompt.startsWith('LOCAL:') && !isApiReady()) {
+      setError("Clé API manquante.");
+      return;
+    }
+
+    // Générer avec le hook (inclut retry logic)
+    await generate(inputsWithFile, fileInput);
+    
+    // Déduction atomique après génération réussie
+    // Ne pas débiter si l'outil est gratuit (0 crédits)
+    if (tool.cost > 0 && result) {
+      const success = await deductCredits(tool.cost);
+      if (!success) {
+        setError("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+        setResult(null);
       }
-      
-      // Les outils locaux ne nécessitent pas de clé API Google, mais ils passent par generateToolContent qui gère le switch
-      // Pour les outils IA, on vérifie la clé
-      if (!prompt.startsWith('LOCAL:') && !isApiReady()) {
-           throw new Error("Clé API manquante.");
-      }
-
-      // On passe le fileInput (Base64) s'il existe
-      const output = await generateToolContent(
-        tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
-        prompt,
-        tool.outputType === 'image',
-        fileInput
-      );
-      
-      // Déduction atomique (évite les race conditions avec plusieurs onglets)
-      // Ne pas débiter si l'outil est gratuit (0 crédits)
-      if (tool.cost > 0) {
-        const success = await deductCredits(tool.cost);
-        if (!success) {
-          throw new Error("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
-        }
-      }
-
-      setResult(output);
-      setIsResultSaved(false); // Réinitialiser l'état de sauvegarde pour le nouveau résultat
-      
-      // Plus d'enregistrement automatique - l'utilisateur sauvegarde manuellement
-
-      // Afficher les suggestions d'outils complémentaires après génération réussie
-      setTimeout(() => {
-        setShowSuggestions(true);
-      }, 1000); // Délai de 1 seconde pour laisser le résultat s'afficher
-      
-    } catch (err: any) {
-      setError(err.message || "Une erreur est survenue.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -740,32 +619,86 @@ export const ToolPage: React.FC = () => {
                 />
               ) : tool.id === 'website-generator' ? (
                 showPreview ? (
-                    // Website Generator avec iframe preview
+                    // Website Generator avec iframe preview amélioré
                     <div className="flex flex-col h-full animate-in fade-in duration-500">
-                        <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white">
+                        <div className="flex items-center justify-between mb-3 p-2 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className="px-2 py-1 bg-neo-green text-black rounded font-bold">
+                              {result.split('\n').length} lignes
+                            </span>
+                            <span className="px-2 py-1 bg-neo-blue text-white rounded font-bold">
+                              {result.length.toLocaleString()} caractères
+                            </span>
+                            <span className="px-2 py-1 bg-neo-yellow text-black rounded font-bold">
+                              HTML5
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `site-web-${Date.now()}.html`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                            }}
+                            className="px-3 py-1.5 bg-neo-black text-white rounded-md text-xs font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
+                          >
+                            <Download className="w-3 h-3" />
+                            Télécharger HTML
+                          </button>
+                        </div>
+                        <div className="flex-1 border-2 border-black dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white shadow-neo dark:shadow-none">
                             <iframe 
                                 srcDoc={getCleanHtml(result)} 
                                 title="Aperçu du site"
                                 className="w-full h-full absolute inset-0"
-                                sandbox="allow-scripts"
+                                sandbox="allow-scripts allow-same-origin"
                             />
                         </div>
-                        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                            Ceci est une prévisualisation live. Cliquez sur le bouton &lt;/&gt; en haut pour copier le code.
-                        </p>
+                        <div className="flex items-center justify-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                          <span>✅ Code HTML valide</span>
+                          <span>•</span>
+                          <span>📱 Responsive</span>
+                          <span>•</span>
+                          <span>🎨 Tailwind CSS</span>
+                        </div>
                     </div>
                 ) : (
                   <div className="flex flex-col h-full animate-in fade-in duration-500">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span>Lignes: {result.split('\n').length}</span>
+                        <span>•</span>
+                        <span>Caractères: {result.length.toLocaleString()}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `site-web-${Date.now()}.html`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="px-3 py-1.5 bg-neo-green text-black rounded-md text-xs font-bold hover:bg-green-400 transition-colors flex items-center gap-2"
+                      >
+                        <Download className="w-3 h-3" />
+                        Télécharger
+                      </button>
+                    </div>
                     <textarea
                       value={result}
                       onChange={(e) => {
                         setResult(e.target.value);
                         setIsResultSaved(false);
                       }}
-                      className="flex-1 w-full border-2 border-gray-200 dark:border-gray-600 rounded-md p-4 font-mono text-sm bg-gray-900 text-green-200"
+                      className="flex-1 w-full border-2 border-black dark:border-gray-600 rounded-md p-4 font-mono text-sm bg-gray-900 text-green-200 dark:bg-gray-950 dark:text-green-300"
                       spellCheck={false}
                     />
-                    <div className="flex justify-end mt-3">
+                    <div className="flex justify-end gap-2 mt-3">
                       <button
                         type="button"
                         onClick={copyToClipboard}
@@ -937,6 +870,24 @@ export const ToolPage: React.FC = () => {
                             </div>
                           )}
                         </div>
+               ) : tool.id === 'text-analyzer' ? (
+                    <TextAnalyzerDisplay
+                      result={result}
+                      toolId={tool.id}
+                      toolTitle={tool.title}
+                      onSave={isLoggedIn ? handleSaveResult : undefined}
+                      isSaved={isResultSaved}
+                      isSaving={savingResult}
+                    />
+               ) : tool.id === 'json-formatter' ? (
+                    <JsonFormatterDisplay
+                      result={result}
+                      toolId={tool.id}
+                      toolTitle={tool.title}
+                      onSave={isLoggedIn ? handleSaveResult : undefined}
+                      isSaved={isResultSaved}
+                      isSaving={savingResult}
+                    />
                ) : (
                     // Affichage amélioré pour tous les autres outils
                     <EnhancedResultDisplay 

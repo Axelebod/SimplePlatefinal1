@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Layout } from './components/Layout';
 import { CookieConsent } from './components/CookieConsent';
 import { ScrollToTop } from './components/ScrollToTop';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy load des pages pour améliorer les performances (code splitting)
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
@@ -30,33 +31,35 @@ const LoadingFallback = () => (
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <Layout>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/tool/:slug" element={<ToolPage />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/legal" element={<Legal />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Auth />} />
-            <Route path="/signup" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/sitemap" element={<Sitemap />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            
-            {/* 404 Catch-all */}
-            <Route path="/404" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/404" replace />} />
-          </Routes>
-        </Suspense>
-        
-        {/* Global Components */}
-        <CookieConsent />
-      </Layout>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <ScrollToTop />
+        <Layout>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/tool/:slug" element={<ToolPage />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/legal" element={<Legal />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/sitemap" element={<Sitemap />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              
+              {/* 404 Catch-all */}
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Routes>
+          </Suspense>
+          
+          {/* Global Components */}
+          <CookieConsent />
+        </Layout>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

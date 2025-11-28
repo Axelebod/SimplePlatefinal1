@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Download, Save, Palette, Edit3, Eye } from 'lucide-react';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import ReactMarkdown from 'react-markdown';
+import { useExportToPDF } from '../hooks/useExportToPDF';
+import { useExportToPNG } from '../hooks/useExportToPNG';
 
 interface CVDisplayProps {
   result: string;
@@ -31,6 +31,16 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
   const [templateIndex, setTemplateIndex] = useState(0);
   const [accentColor, setAccentColor] = useState(CV_TEMPLATES[0].accent);
 
+  const { exportToPDF } = useExportToPDF({ 
+    filename: 'cv',
+    onError: (err) => alert(`Erreur export PDF: ${err.message}`)
+  });
+  
+  const { exportToPNG } = useExportToPNG({ 
+    filename: 'cv',
+    onError: (err) => alert(`Erreur export PNG: ${err.message}`)
+  });
+
   useEffect(() => {
     setContent(result);
   }, [result]);
@@ -44,61 +54,16 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
     onChange?.(value);
   };
 
-  const exportToPDF = async (e: React.MouseEvent) => {
+  const handleExportPDF = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!cvRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(cvRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`cv-${Date.now()}.pdf`);
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
-    }
+    await exportToPDF(cvRef);
   };
 
-  const exportToPNG = async (e: React.MouseEvent) => {
+  const handleExportPNG = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!cvRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(cvRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `cv-${Date.now()}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
-    } catch (error) {
-      console.error('Erreur export PNG:', error);
-      alert('Erreur lors de l\'export PNG. Veuillez réessayer.');
-    }
+    await exportToPNG(cvRef);
   };
 
   return (
@@ -165,7 +130,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
           )}
           <button
             type="button"
-            onClick={exportToPDF}
+            onClick={handleExportPDF}
             className="px-4 py-2 bg-neo-violet text-white rounded-md text-sm font-bold hover:bg-purple-500 transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
@@ -173,7 +138,7 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
           </button>
           <button
             type="button"
-            onClick={exportToPNG}
+            onClick={handleExportPNG}
             className="px-4 py-2 bg-neo-blue text-white rounded-md text-sm font-bold hover:bg-blue-500 transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
@@ -193,8 +158,12 @@ export const CVDisplay: React.FC<CVDisplayProps> = ({
 
       <div
         ref={cvRef}
-        className={`${CV_TEMPLATES[templateIndex].wrapper} border-2 rounded-lg p-12 max-w-4xl mx-auto shadow-neo print:shadow-none print:p-8`}
-        style={{ minHeight: '297mm' }}
+        className={`${CV_TEMPLATES[templateIndex].wrapper} border-2 rounded-lg p-12 mx-auto shadow-neo print:shadow-none print:p-8`}
+        style={{ 
+          width: '210mm', // Largeur A4 standard
+          minHeight: '297mm', // Hauteur A4 standard
+          maxWidth: '100%' // Responsive sur petits écrans
+        }}
       >
         <div className="prose prose-sm max-w-none markdown-body cv-template">
           <ReactMarkdown

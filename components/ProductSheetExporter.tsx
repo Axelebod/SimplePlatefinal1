@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download, FileText, ShoppingCart } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, FileText, ShoppingCart, CheckCircle, Copy, Share2 } from 'lucide-react';
 
 export interface ParsedProductSheet {
   title: string;
@@ -17,9 +17,17 @@ interface ProductSheetExporterProps {
 }
 
 export const ProductSheetExporter: React.FC<ProductSheetExporterProps> = ({ sheet }) => {
+  const [copied, setCopied] = useState<string | null>(null);
+
   const buildBody = () => {
     const bullets = sheet.bulletPoints.map(point => `• ${point}`).join('\n');
     return `${sheet.shortDescription}\n\n${bullets}\n\n${sheet.longDescription}`;
+  };
+
+  const copyToClipboard = async (text: string, type: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const exportToShopify = () => {
@@ -94,12 +102,33 @@ Généré par SimplePlate AI - ${new Date().toLocaleDateString('fr-FR')}
 
   if (!sheet.rawMarkdown) return null;
 
+  const shareContent = () => {
+    const text = `${sheet.title}\n\n${sheet.shortDescription}\n\n${sheet.bulletPoints.map(b => `• ${b}`).join('\n')}\n\n${sheet.longDescription}`;
+    if (navigator.share) {
+      navigator.share({
+        title: sheet.title,
+        text: text,
+      });
+    } else {
+      copyToClipboard(text, 'share');
+    }
+  };
+
   return (
     <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg">
-      <h4 className="font-bold text-sm mb-3 dark:text-white flex items-center gap-2">
-        <ShoppingCart className="w-4 h-4" />
-        Export Fiche Produit
-      </h4>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="font-bold text-sm dark:text-white flex items-center gap-2">
+          <ShoppingCart className="w-4 h-4" />
+          Export & Partage
+        </h4>
+        <button
+          onClick={shareContent}
+          className="px-3 py-1.5 bg-neo-violet text-white rounded-md text-xs font-bold hover:bg-purple-500 transition-colors flex items-center gap-2"
+        >
+          <Share2 className="w-3 h-3" />
+          Partager
+        </button>
+      </div>
       <div className="flex flex-wrap gap-2">
         {(sheet.platform === 'Shopify' || sheet.platform.includes('Les deux')) && (
           <button
@@ -107,7 +136,7 @@ Généré par SimplePlate AI - ${new Date().toLocaleDateString('fr-FR')}
             className="px-3 py-2 bg-neo-blue text-white rounded-md text-sm font-bold hover:bg-blue-500 transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
-            Export Shopify CSV
+            Shopify CSV
           </button>
         )}
         {(sheet.platform === 'Amazon' || sheet.platform.includes('Les deux')) && (
@@ -116,7 +145,7 @@ Généré par SimplePlate AI - ${new Date().toLocaleDateString('fr-FR')}
             className="px-3 py-2 bg-neo-orange text-white rounded-md text-sm font-bold hover:bg-orange-500 transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
-            Export Amazon TXT
+            Amazon TXT
           </button>
         )}
         <button
@@ -124,7 +153,23 @@ Généré par SimplePlate AI - ${new Date().toLocaleDateString('fr-FR')}
           className="px-3 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-md text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
         >
           <FileText className="w-4 h-4" />
-          Export JSON
+          JSON
+        </button>
+        <button
+          onClick={() => copyToClipboard(buildBody(), 'full')}
+          className="px-3 py-2 bg-neo-green text-black rounded-md text-sm font-bold hover:bg-green-400 transition-colors flex items-center gap-2"
+        >
+          {copied === 'full' ? (
+            <>
+              <CheckCircle className="w-4 h-4" />
+              Copié!
+            </>
+          ) : (
+            <>
+              <Copy className="w-4 h-4" />
+              Copier tout
+            </>
+          )}
         </button>
       </div>
     </div>

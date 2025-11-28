@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Palette, Save, Edit3, Eye } from 'lucide-react';
+import { Download, Palette, Save, Edit3, Eye, FileText, Copy, CheckCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+import { useExportToPDF } from '../hooks/useExportToPDF';
 
 const PLAN_TEMPLATES = [
   { name: 'Classique', border: 'border-black', background: 'bg-white', accent: '#6C47FF' },
@@ -30,6 +29,12 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
   const [accentColor, setAccentColor] = useState(PLAN_TEMPLATES[0].accent);
   const [editableContent, setEditableContent] = useState(result);
   const [isEditing, setIsEditing] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const { exportToPDF } = useExportToPDF({ 
+    filename: 'business-plan',
+    onError: (err) => alert(`Erreur export PDF: ${err.message}`)
+  });
 
   useEffect(() => {
     setEditableContent(result);
@@ -40,15 +45,24 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
     onChange?.(value);
   };
 
-  const exportToPDF = async () => {
-    if (!planRef.current) return;
-    const canvas = await html2canvas(planRef.current, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-    pdf.save(`business-plan-${Date.now()}.pdf`);
+  const handleExportPDF = async () => {
+    await exportToPDF(planRef);
+  };
+
+  const copyToMarkdown = async () => {
+    await navigator.clipboard.writeText(editableContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const exportToMarkdown = () => {
+    const blob = new Blob([editableContent], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `business-plan-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -101,11 +115,27 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={exportToPDF}
+            onClick={copyToMarkdown}
+            className="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+            title="Copier en Markdown"
+          >
+            {copied ? <CheckCircle className="w-4 h-4 text-neo-green" /> : <Copy className="w-4 h-4" />}
+            {copied ? 'Copié!' : 'Copier'}
+          </button>
+          <button
+            onClick={exportToMarkdown}
+            className="px-3 py-2 bg-gray-600 text-white rounded-md text-sm font-bold hover:bg-gray-700 transition-colors flex items-center gap-2"
+            title="Télécharger en Markdown"
+          >
+            <FileText className="w-4 h-4" />
+            MD
+          </button>
+          <button
+            onClick={handleExportPDF}
             className="px-3 py-2 bg-neo-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
-            Export PDF
+            PDF
           </button>
           {onSave && (
             <button

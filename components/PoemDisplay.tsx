@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Download, Palette, Sparkles, Save, Edit3, Eye } from 'lucide-react';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import { useExportToPDF } from '../hooks/useExportToPDF';
+import { useExportToPNG } from '../hooks/useExportToPNG';
 
 interface PoemDisplayProps {
   result: string;
@@ -29,7 +29,17 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
   const [textColor, setTextColor] = useState(POEM_STYLES[0].textHex);
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(result);
-  const poemRef = React.useRef<HTMLDivElement>(null);
+  const poemRef = useRef<HTMLDivElement>(null);
+
+  const { exportToPDF } = useExportToPDF({ 
+    filename: 'poeme',
+    onError: (err) => alert(`Erreur export PDF: ${err.message}`)
+  });
+  
+  const { exportToPNG } = useExportToPNG({ 
+    filename: 'poeme',
+    onError: (err) => alert(`Erreur export PNG: ${err.message}`)
+  });
 
   useEffect(() => {
     setContent(result);
@@ -49,61 +59,16 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
     onChange?.(value);
   };
 
-  const exportToPDF = async (e: React.MouseEvent) => {
+  const handleExportPDF = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!poemRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(poemRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`poeme-${Date.now()}.pdf`);
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
-    }
+    await exportToPDF(poemRef);
   };
 
-  const exportToPNG = async (e: React.MouseEvent) => {
+  const handleExportPNG = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!poemRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(poemRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `poeme-${Date.now()}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
-    } catch (error) {
-      console.error('Erreur export PNG:', error);
-      alert('Erreur lors de l\'export PNG. Veuillez réessayer.');
-    }
+    await exportToPNG(poemRef);
   };
 
   const style = POEM_STYLES[selectedStyle];
@@ -184,7 +149,7 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
           )}
           <button
             type="button"
-            onClick={exportToPDF}
+            onClick={handleExportPDF}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -202,7 +167,7 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
           </button>
           <button
             type="button"
-            onClick={exportToPNG}
+            onClick={handleExportPNG}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -233,7 +198,12 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
       {/* Poème stylisé */}
       <div
         ref={poemRef}
-        className={`${style.bg} ${style.border} border-4 rounded-lg p-12 max-w-3xl mx-auto shadow-neo dark:shadow-none`}
+        className={`${style.bg} ${style.border} border-4 rounded-lg p-12 mx-auto shadow-neo dark:shadow-none`}
+        style={{ 
+          width: '210mm', // Largeur A4 standard
+          minHeight: '297mm', // Hauteur A4 standard
+          maxWidth: '100%' // Responsive sur petits écrans
+        }}
       >
         <div className="text-center space-y-4" style={{ color: textColor }}>
           {lines.map((line, idx) => {

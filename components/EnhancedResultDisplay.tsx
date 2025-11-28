@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download, Copy, Save } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Download, Copy, Save, FileText, Share2, CheckCircle, TrendingUp, FileJson, FileCode } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface EnhancedResultDisplayProps {
@@ -19,6 +19,29 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
   isSaved = false,
   isSaving = false
 }) => {
+  const [copied, setCopied] = useState(false);
+  const [exported, setExported] = useState<string | null>(null);
+
+  // Statistiques du texte
+  const stats = useMemo(() => {
+    const text = result.replace(/[#*`\[\]()]/g, '').trim();
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    const chars = text.length;
+    const charsNoSpaces = text.replace(/\s/g, '').length;
+    const readingTime = Math.ceil(words.length / 200); // 200 mots/min
+    const paragraphs = text.split(/\n\n/).filter(p => p.trim().length > 0).length;
+    const lines = text.split('\n').filter(l => l.trim().length > 0).length;
+    
+    return {
+      words: words.length,
+      chars,
+      charsNoSpaces,
+      readingTime,
+      paragraphs,
+      lines
+    };
+  }, [result]);
+
   const copyToClipboard = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -27,7 +50,8 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
       // Méthode moderne avec Clipboard API
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(result);
-        alert('✅ Copié dans le presse-papiers !');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
         return;
       }
       
@@ -44,7 +68,8 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
       try {
         const successful = document.execCommand('copy');
         if (successful) {
-          alert('✅ Copié dans le presse-papiers !');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
         } else {
           throw new Error('execCommand failed');
         }
@@ -59,27 +84,93 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
     }
   };
 
-  const exportToTxt = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const exportToFile = (format: 'txt' | 'md' | 'json') => {
     try {
-      const blob = new Blob([result], { type: 'text/plain;charset=utf-8' });
+      let content = result;
+      let mimeType = 'text/plain';
+      let extension = 'txt';
+      
+      if (format === 'md') {
+        mimeType = 'text/markdown';
+        extension = 'md';
+      } else if (format === 'json') {
+        content = JSON.stringify({ toolId, toolTitle, result, stats, generatedAt: new Date().toISOString() }, null, 2);
+        mimeType = 'application/json';
+        extension = 'json';
+      }
+      
+      const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${toolId}-${Date.now()}.txt`;
+      a.download = `${toolId}-${Date.now()}.${extension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setExported(format);
+      setTimeout(() => setExported(null), 2000);
     } catch (err) {
       console.error('Erreur lors de l\'export:', err);
       alert('Erreur lors du téléchargement. Veuillez réessayer.');
     }
   };
 
+  const shareContent = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: toolTitle,
+          text: result.substring(0, 200) + (result.length > 200 ? '...' : ''),
+          url: window.location.href
+        });
+      } catch (err) {
+        // User cancelled
+      }
+    } else {
+      // Fallback: copier le lien
+      await copyToClipboard({ preventDefault: () => {}, stopPropagation: () => {} } as any);
+    }
+  };
+
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
+      {/* Statistiques */}
+      {(stats.words > 0 || stats.lines > 0) && (
+        <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg">
+          {stats.words > 0 && (
+            <div className="flex items-center gap-2 px-2 py-1 bg-neo-blue/20 rounded">
+              <TrendingUp className="w-3 h-3 text-neo-blue" />
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                {stats.words.toLocaleString()} mots
+              </span>
+            </div>
+          )}
+          {stats.chars > 0 && (
+            <div className="flex items-center gap-2 px-2 py-1 bg-neo-green/20 rounded">
+              <FileText className="w-3 h-3 text-neo-green" />
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                {stats.chars.toLocaleString()} caractères
+              </span>
+            </div>
+          )}
+          {stats.readingTime > 0 && (
+            <div className="flex items-center gap-2 px-2 py-1 bg-neo-yellow/20 rounded">
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                ⏱️ {stats.readingTime} min de lecture
+              </span>
+            </div>
+          )}
+          {stats.paragraphs > 0 && (
+            <div className="flex items-center gap-2 px-2 py-1 bg-neo-violet/20 rounded">
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                📄 {stats.paragraphs} paragraphe{stats.paragraphs > 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Actions bar */}
       <div className="flex items-center justify-between border-b-2 border-gray-200 dark:border-gray-600 pb-3">
         <h3 className="font-display text-xl font-bold dark:text-white">{toolTitle}</h3>
@@ -119,7 +210,7 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
           )}
           <button
             type="button"
-            onClick={copyToClipboard}
+            onClick={(e) => copyToClipboard(e)}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -132,27 +223,74 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
             style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
             title="Copier"
           >
-            <Copy className="w-4 h-4 pointer-events-none" />
-            <span className="pointer-events-none">Copier</span>
+            {copied ? (
+              <>
+                <CheckCircle className="w-4 h-4 pointer-events-none text-neo-green" />
+                <span className="pointer-events-none">Copié!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 pointer-events-none" />
+                <span className="pointer-events-none">Copier</span>
+              </>
+            )}
           </button>
           <button
             type="button"
-            onClick={exportToTxt}
+            onClick={shareContent}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            className="px-3 py-2 bg-neo-green text-white rounded-md text-sm font-bold hover:bg-green-500 transition-colors flex items-center gap-2 select-none cursor-pointer user-select-none"
+            className="px-3 py-2 bg-neo-violet text-white rounded-md text-sm font-bold hover:bg-purple-500 transition-colors flex items-center gap-2 select-none cursor-pointer user-select-none"
             style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-            title="Télécharger"
+            title="Partager"
           >
-            <Download className="w-4 h-4 pointer-events-none" />
-            <span className="pointer-events-none">TXT</span>
+            <Share2 className="w-4 h-4 pointer-events-none" />
+            <span className="pointer-events-none hidden sm:inline">Partager</span>
           </button>
+          <div className="relative group">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="px-3 py-2 bg-neo-green text-white rounded-md text-sm font-bold hover:bg-green-500 transition-colors flex items-center gap-2 select-none cursor-pointer user-select-none"
+              style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+              title="Exporter"
+            >
+              <Download className="w-4 h-4 pointer-events-none" />
+              <span className="pointer-events-none">Export</span>
+            </button>
+            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg shadow-neo dark:shadow-none p-2 min-w-[120px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+              <button
+                onClick={() => exportToFile('txt')}
+                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-bold flex items-center gap-2"
+              >
+                <FileText className="w-4 h-4" />
+                {exported === 'txt' ? '✓ TXT' : 'TXT'}
+              </button>
+              <button
+                onClick={() => exportToFile('md')}
+                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-bold flex items-center gap-2"
+              >
+                <FileCode className="w-4 h-4" />
+                {exported === 'md' ? '✓ MD' : 'Markdown'}
+              </button>
+              <button
+                onClick={() => exportToFile('json')}
+                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-bold flex items-center gap-2"
+              >
+                <FileJson className="w-4 h-4" />
+                {exported === 'json' ? '✓ JSON' : 'JSON'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -6,6 +6,10 @@ import { CATEGORIES, CATEGORY_LABELS } from '../constants';
 import { Search, Plus } from 'lucide-react';
 import { AdBanner } from '../components/AdBanner';
 import { Link } from 'react-router-dom';
+import { StatsCounter } from '../components/StatsCounter';
+import { HomeCTA } from '../components/HomeCTA';
+import { TrustBadges } from '../components/TrustBadges';
+import { WelcomeModal } from '../components/WelcomeModal';
 
 export const Home: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -76,6 +80,8 @@ export const Home: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      <WelcomeModal />
+      
       {/* Header */}
       <header className="text-center space-y-4 py-8 animate-in fade-in slide-in-from-top-4 duration-700">
         <h1 className="font-display text-4xl md:text-6xl font-bold dark:text-white">
@@ -89,6 +95,15 @@ export const Home: React.FC = () => {
           <span className="font-bold text-black dark:text-white">Rapide. Professionnel. Français. 🇫🇷</span>
         </p>
       </header>
+
+      {/* CTA pour non-connectés */}
+      <HomeCTA />
+
+      {/* Stats Counter */}
+      <StatsCounter className="max-w-4xl mx-auto" />
+
+      {/* Trust Badges */}
+      <TrustBadges />
 
       {/* Controls */}
       <div className="sticky top-20 z-40 bg-neo-white/90 dark:bg-gray-700/90 backdrop-blur-sm py-4 space-y-4 transition-colors">
