@@ -24,6 +24,7 @@ import { BusinessPlanDisplay } from '../components/BusinessPlanDisplay';
 import { HexColorDisplay } from '../components/HexColorDisplay';
 import { TextAnalyzerDisplay } from '../components/TextAnalyzerDisplay';
 import { JsonFormatterDisplay } from '../components/JsonFormatterDisplay';
+import { DecisionWheel } from '../components/DecisionWheel';
 import { ToolInput } from '../types';
 import { useToolSEO } from '../hooks/useToolSEO';
 import { useToolGeneration } from '../hooks/useToolGeneration';
@@ -423,16 +424,16 @@ export const ToolPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {tool.inputs.map((input) => (
                 <div key={input.name}>
-                  <div className="flex justify-between items-end mb-2">
-                      <label className="block text-sm font-bold text-gray-800 dark:text-gray-200">
-                        {input.label} {input.required && <span className="text-neo-red">*</span>}
-                      </label>
-                      {(input.type === 'textarea' || input.type === 'text') && (
-                          <span className={`text-[10px] font-mono font-bold ${(inputs[input.name]?.length || 0) > MAX_CHARS * 0.9 ? 'text-red-500' : 'text-gray-400'}`}>
-                              {inputs[input.name]?.length || 0}/{MAX_CHARS}
-                          </span>
-                      )}
-                  </div>
+                            <div className="flex justify-between items-end mb-2">
+                                <label className="block text-sm font-bold text-gray-800 dark:text-gray-200">
+                                  {input.label} {input.required && <span className="text-neo-red">*</span>}
+                                </label>
+                                {input.type === 'textarea' && (
+                                    <span className={`text-[10px] font-mono font-bold ${(inputs[input.name]?.length || 0) > MAX_CHARS * 0.9 ? 'text-red-500' : 'text-gray-400'}`}>
+                                        {inputs[input.name]?.length || 0}/{MAX_CHARS}
+                                    </span>
+                                )}
+                            </div>
                   
                   {input.type === 'richtext' || input.useEditor ? (
                     <RichTextEditor
@@ -849,17 +850,47 @@ export const ToolPage: React.FC = () => {
                         <HexColorDisplay result={result} inputValue={inputs.hex}
                         />
                ) : tool.id === 'invoice-generator' ? (
-                        // Facture avec template et export PDF/PNG
-                        <InvoiceDisplay 
-                          result={result}
-                          onSave={isLoggedIn ? handleSaveResult : undefined}
-                          isSaved={isResultSaved}
-                          isSaving={savingResult}
-                          onChange={(value) => {
-                            setResult(value);
-                            setIsResultSaved(false);
-                          }}
-                        />
+                        <div className="animate-in fade-in duration-500">
+                          <iframe 
+                            srcDoc={result} 
+                            title="Facture Générée"
+                            className="w-full h-[800px] border-2 border-black dark:border-gray-600 rounded-md"
+                            sandbox="allow-same-origin allow-scripts"
+                          />
+                          <div className="mt-4 flex gap-2 justify-end">
+                            <button
+                              onClick={() => {
+                                const blob = new Blob([result], { type: 'text/html;charset=utf-8' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `facture-${Date.now()}.html`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                              className="px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Télécharger HTML
+                            </button>
+                            {isLoggedIn && (
+                              <button
+                                onClick={handleSaveResult}
+                                disabled={isResultSaved || savingResult}
+                                className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${
+                                  isResultSaved
+                                    ? 'bg-neo-green text-black cursor-not-allowed'
+                                    : savingResult
+                                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
+                                    : 'bg-neo-violet text-white hover:bg-purple-500'
+                                }`}
+                              >
+                                <Save className={`w-4 h-4 ${isResultSaved ? 'fill-current' : ''}`} />
+                                {savingResult ? 'Sauvegarde...' : isResultSaved ? 'Sauvegardé' : 'Sauvegarder'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                ) : tool.id === 'cv-generator' ? (
                         <div className="animate-in fade-in duration-500">
                           <iframe 
@@ -951,6 +982,18 @@ export const ToolPage: React.FC = () => {
                       isSaved={isResultSaved}
                       isSaving={savingResult}
                     />
+               ) : tool.id === 'decision-maker' ? (
+                    (() => {
+                      try {
+                        const parsed = JSON.parse(result);
+                        if (parsed.type === 'wheel' && parsed.choices) {
+                          return <DecisionWheel choices={parsed.choices} />;
+                        }
+                      } catch (e) {
+                        // Fallback si ce n'est pas du JSON
+                      }
+                      return <EnhancedResultDisplay result={result} toolId={tool.id} toolTitle={tool.title} />;
+                    })()
                ) : (
                     // Affichage amélioré pour tous les autres outils
                     <EnhancedResultDisplay 

@@ -22,26 +22,6 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
   const [copied, setCopied] = useState(false);
   const [exported, setExported] = useState<string | null>(null);
 
-  // Statistiques du texte
-  const stats = useMemo(() => {
-    const text = result.replace(/[#*`\[\]()]/g, '').trim();
-    const words = text.split(/\s+/).filter(w => w.length > 0);
-    const chars = text.length;
-    const charsNoSpaces = text.replace(/\s/g, '').length;
-    const readingTime = Math.ceil(words.length / 200); // 200 mots/min
-    const paragraphs = text.split(/\n\n/).filter(p => p.trim().length > 0).length;
-    const lines = text.split('\n').filter(l => l.trim().length > 0).length;
-    
-    return {
-      words: words.length,
-      chars,
-      charsNoSpaces,
-      readingTime,
-      paragraphs,
-      lines
-    };
-  }, [result]);
-
   const copyToClipboard = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -94,7 +74,7 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
         mimeType = 'text/markdown';
         extension = 'md';
       } else if (format === 'json') {
-        content = JSON.stringify({ toolId, toolTitle, result, stats, generatedAt: new Date().toISOString() }, null, 2);
+        content = JSON.stringify({ toolId, toolTitle, result, generatedAt: new Date().toISOString() }, null, 2);
         mimeType = 'application/json';
         extension = 'json';
       }
@@ -135,42 +115,6 @@ export const EnhancedResultDisplay: React.FC<EnhancedResultDisplayProps> = ({
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      {/* Statistiques */}
-      {(stats.words > 0 || stats.lines > 0) && (
-        <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg">
-          {stats.words > 0 && (
-            <div className="flex items-center gap-2 px-2 py-1 bg-neo-blue/20 rounded">
-              <TrendingUp className="w-3 h-3 text-neo-blue" />
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                {stats.words.toLocaleString()} mots
-              </span>
-            </div>
-          )}
-          {stats.chars > 0 && (
-            <div className="flex items-center gap-2 px-2 py-1 bg-neo-green/20 rounded">
-              <FileText className="w-3 h-3 text-neo-green" />
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                {stats.chars.toLocaleString()} caractères
-              </span>
-            </div>
-          )}
-          {stats.readingTime > 0 && (
-            <div className="flex items-center gap-2 px-2 py-1 bg-neo-yellow/20 rounded">
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                ⏱️ {stats.readingTime} min de lecture
-              </span>
-            </div>
-          )}
-          {stats.paragraphs > 0 && (
-            <div className="flex items-center gap-2 px-2 py-1 bg-neo-violet/20 rounded">
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                📄 {stats.paragraphs} paragraphe{stats.paragraphs > 1 ? 's' : ''}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Actions bar */}
       <div className="flex items-center justify-between border-b-2 border-gray-200 dark:border-gray-600 pb-3">
         <h3 className="font-display text-xl font-bold dark:text-white">{toolTitle}</h3>

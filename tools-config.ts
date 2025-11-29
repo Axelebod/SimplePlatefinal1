@@ -1430,7 +1430,15 @@ FORMAT DE SORTIE :
       description: 'Indécis ? Entrez vos options et laissez l\'algorithme choisir pour vous. Pile ou face avancé.', 
       keywords: ['faire un choix', 'random picker', 'roulette décision', 'hasard', 'choisir pour moi'] 
     },
-    inputs: [{ name: 'choices', label: 'Choix (séparés par des virgules)', type: 'text', placeholder: 'Pizza, Sushi, Burger', required: true }],
+    inputs: [{ 
+      name: 'choices', 
+      label: 'Choix (séparés par des virgules, max 20)', 
+      type: 'textarea', 
+      rows: 5,
+      placeholder: 'Pizza, Sushi, Burger, Tacos, Pâtes, Salade...', 
+      required: true,
+      helpText: 'Entrez jusqu\'à 20 choix séparés par des virgules'
+    }],
     promptGenerator: (data) => `LOCAL:DECISION_MAKER;;;${data.choices}`
   },
   {
@@ -1674,66 +1682,337 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
       }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Génère un CV professionnel complet et optimisé au format Markdown.
+TÂCHE: Génère un CV professionnel complet en HTML/CSS avec le template fourni.
 
 POSTE VISÉ: "${data.poste}"
 EXPÉRIENCES: "${data.experiences}"
 FORMATIONS: ${data.formations ? `"${data.formations}"` : 'Non spécifiées'}
 COMPÉTENCES: ${data.competences ? `"${data.competences}"` : 'À déterminer selon les expériences'}
 
-FORMAT ATTENDU (Markdown structuré):
-# CURRICULUM VITAE
+SORTIE ATTENDUE: Génère le template HTML complet ci-dessous avec tous les placeholders {{...}} remplacés par les vraies données.
 
-## [Nom Prénom]
-[Email] | [Téléphone] | [Localisation] | [LinkedIn/Portfolio]
+TEMPLATE HTML à utiliser (remplis les placeholders) :
 
----
-
-## PROFIL PROFESSIONNEL
-[2-3 phrases accrocheuses résumant le profil et l'objectif professionnel]
-
----
-
-## EXPÉRIENCES PROFESSIONNELLES
-
-### [Poste] - [Entreprise]
-**[Période]**
-- [Mission 1]
-- [Mission 2]
-- [Mission 3]
-
-[Format identique pour chaque expérience]
-
----
-
-## FORMATIONS
-
-### [Diplôme] - [Établissement]
-**[Années]**
-[Détails pertinents]
-
----
-
-## COMPÉTENCES
-
-**Techniques:** [Liste des compétences techniques]
-**Transversales:** [Soft skills]
-
----
-
-## LANGUES / CERTIFICATIONS (si applicable)
-
-[Langues avec niveau] | [Certifications]
-
----
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Professionnel</title>
+  <style>
+    body { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      padding: 2% 3%;
+      width: 100%;
+    }
+    .cv-wrapper {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      min-height: 297mm;
+      width: 100%;
+      display: flex;
+      overflow: hidden;
+      border-radius: 0;
+    }
+    .sidebar {
+      width: 38%;
+      background: linear-gradient(180deg, #2d3561 0%, #1a1f3a 100%);
+      padding: 8% 6%;
+      color: white;
+      position: relative;
+    }
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .main-content {
+      width: 62%;
+      padding: 8% 7%;
+      background: #fafbfc;
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 12%;
+      position: relative;
+      z-index: 1;
+    }
+    .profile-photo {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0 auto 8%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5em;
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .profile-photo::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      padding: 5px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .profile-header h1 {
+      font-size: 1.6em;
+      margin-bottom: 0.4em;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+    }
+    .profile-header .job-title {
+      font-size: 0.95em;
+      color: #a3b3ff;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .sidebar-section {
+      margin-bottom: 10%;
+      position: relative;
+      z-index: 1;
+    }
+    .sidebar-section h3 {
+      font-size: 1em;
+      margin-bottom: 6%;
+      padding-bottom: 3%;
+      border-bottom: 2px solid rgba(163, 179, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: #a3b3ff;
+    }
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 5%;
+      font-size: 0.85em;
+      line-height: 1.7;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3% 4%;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .contact-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+    .contact-icon {
+      margin-right: 4%;
+      font-size: 1.3em;
+      min-width: 25px;
+    }
+    .skill-item, .language-item {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+      padding: 4% 5%;
+      margin-bottom: 4%;
+      border-radius: 8px;
+      font-size: 0.85em;
+      line-height: 1.6;
+      border-left: 3px solid #a3b3ff;
+      transition: all 0.3s ease;
+    }
+    .skill-item:hover, .language-item:hover {
+      transform: translateX(5px);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+    }
+    .main-section {
+      margin-bottom: 9%;
+      background: white;
+      padding: 6%;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    .main-section h2 {
+      font-size: 1.5em;
+      color: #2d3561;
+      margin-bottom: 6%;
+      padding-bottom: 3%;
+      border-bottom: 3px solid transparent;
+      background: linear-gradient(to right, #667eea, #764ba2) left bottom no-repeat;
+      background-size: 80px 3px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 800;
+    }
+    .profile-text {
+      color: #4a5568;
+      line-height: 1.9;
+      font-size: 0.95em;
+    }
+    .experience-item, .education-item {
+      margin-bottom: 7%;
+      position: relative;
+      padding-left: 6%;
+      padding-bottom: 6%;
+      border-left: 2px solid #e2e8f0;
+    }
+    .experience-item:last-child, .education-item:last-child {
+      border-left-color: transparent;
+      padding-bottom: 0;
+    }
+    .experience-item::before, .education-item::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px white, 0 0 0 5px #667eea;
+    }
+    .experience-title, .education-degree {
+      font-size: 1.15em;
+      color: #2d3561;
+      font-weight: 700;
+      margin-bottom: 0.4em;
+      line-height: 1.3;
+    }
+    .experience-company, .education-school {
+      color: #667eea;
+      font-size: 0.9em;
+      margin-bottom: 0.7em;
+      font-weight: 600;
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      padding: 2% 4%;
+      border-radius: 6px;
+    }
+    .experience-desc {
+      color: #4a5568;
+      line-height: 1.8;
+      font-size: 0.9em;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .cv-wrapper { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="cv-wrapper">
+   <aside class="sidebar">
+    <div class="profile-header">
+     <div class="profile-photo">👤</div>
+     <h1 id="full-name">{{FULL_NAME}}</h1>
+     <p class="job-title" id="job-title">{{JOB_TITLE}}</p>
+    </div>
+    <section class="sidebar-section">
+     <h3>Contact</h3>
+     <div class="contact-item"><span class="contact-icon">📧</span> <span id="email">{{EMAIL}}</span></div>
+     <div class="contact-item"><span class="contact-icon">📱</span> <span id="phone">{{PHONE}}</span></div>
+     <div class="contact-item"><span class="contact-icon">📍</span> <span id="location">{{LOCATION}}</span></div>
+    </section>
+    <section class="sidebar-section">
+     <h3>Compétences</h3>
+     {{SKILLS_ITEMS}}
+    </section>
+    <section class="sidebar-section">
+     <h3>Langues</h3>
+     {{LANGUAGES_ITEMS}}
+    </section>
+   </aside>
+   <div class="main-content">
+    <section class="main-section">
+     <h2>Profil</h2>
+     <p class="profile-text" id="profile-text">{{PROFILE_TEXT}}</p>
+    </section>
+    <section class="main-section">
+     <h2>Expérience</h2>
+     {{EXPERIENCES_ITEMS}}
+    </section>
+    <section class="main-section">
+     <h2>Formation</h2>
+     {{EDUCATION_ITEMS}}
+    </section>
+   </div>
+  </main>
+  <script>
+    const defaultConfig = {
+      full_name: "{{FULL_NAME}}",
+      job_title: "{{JOB_TITLE}}",
+      email: "{{EMAIL}}",
+      phone: "{{PHONE}}",
+      location: "{{LOCATION}}",
+      profile_text: "{{PROFILE_TEXT}}",
+      sidebar_color: "#1e3a5f",
+      accent_color: "#5a8fd6",
+      background_color: "#e8eef3",
+      surface_color: "#ffffff",
+      text_color: "#4a5568"
+    };
+    
+    function onConfigChange(config) {
+      document.getElementById('full-name').textContent = config.full_name || defaultConfig.full_name;
+      document.getElementById('job-title').textContent = config.job_title || defaultConfig.job_title;
+      document.getElementById('email').textContent = config.email || defaultConfig.email;
+      document.getElementById('phone').textContent = config.phone || defaultConfig.phone;
+      document.getElementById('location').textContent = config.location || defaultConfig.location;
+      document.getElementById('profile-text').textContent = config.profile_text || defaultConfig.profile_text;
+    }
+    
+    // Rendre les champs éditables
+    document.addEventListener('DOMContentLoaded', () => {
+      const editableElements = document.querySelectorAll('#full-name, #job-title, #email, #phone, #location, #profile-text, .experience-title, .experience-company, .experience-desc, .education-degree, .education-school, .skill-item, .language-item');
+      editableElements.forEach(el => {
+        el.contentEditable = 'true';
+        el.style.outline = '2px dashed transparent';
+        el.style.outlineOffset = '2px';
+        el.addEventListener('focus', () => {
+          el.style.outline = '2px dashed #667eea';
+          el.style.backgroundColor = '#f0f4f8';
+        });
+        el.addEventListener('blur', () => {
+          el.style.outline = '2px dashed transparent';
+          el.style.backgroundColor = 'transparent';
+        });
+      });
+      
+      onConfigChange(defaultConfig);
+    });
+  </script>
+</body>
+</html>
 
 INSTRUCTIONS:
-- Structure claire et professionnelle
-- Mise en avant des réalisations concrètes
-- Adaptation au poste visé
-- Format prêt à être copié dans Word/PDF
-- Utilise des puces pour les missions
-- Sois précis et concis`
+- Parse "${data.experiences}" pour extraire les expériences (poste, entreprise, dates, missions)
+- Parse "${data.formations}" pour extraire les formations (diplôme, établissement, dates)
+- Parse "${data.competences}" pour extraire les compétences (séparées par virgules)
+- {{FULL_NAME}} : Génère un nom réaliste basé sur le poste "${data.poste}"
+- {{JOB_TITLE}} : "${data.poste}"
+- {{EMAIL}} : Génère un email professionnel réaliste
+- {{PHONE}} : Génère un numéro français réaliste (ex: +33 6 12 34 56 78)
+- {{LOCATION}} : Génère une ville française réaliste
+- {{PROFILE_TEXT}} : 2-3 phrases accrocheuses résumant le profil professionnel basé sur "${data.experiences}"
+- {{SKILLS_ITEMS}} : HTML avec <div class="skill-item"> pour chaque compétence (parse "${data.competences || 'À déterminer'}")
+- {{LANGUAGES_ITEMS}} : HTML avec <div class="language-item"> (génère français natif + anglais si pertinent)
+- {{EXPERIENCES_ITEMS}} : HTML avec <article class="experience-item"> pour chaque expérience (parse "${data.experiences}")
+- {{EDUCATION_ITEMS}} : HTML avec <article class="education-item"> pour chaque formation (parse "${data.formations || 'Non spécifiées'}")
+
+Génère maintenant le HTML complet avec tous les placeholders remplacés.`
   },
   // --- GÉNÉRATEUR DE FACTURE ---
   {
@@ -1801,7 +2080,7 @@ INSTRUCTIONS:
       }
     ],
     promptGenerator: (data) => `${SYSTEM_PROMPT}
-TÂCHE: Génère une facture professionnelle complète et conforme au format Markdown.
+TÂCHE: Génère une facture professionnelle complète en HTML/CSS avec le template fourni.
 
 ÉMETTEUR:
 ${data.emetteur}
@@ -1812,69 +2091,338 @@ ${data.client}
 SERVICES/PRESTATIONS:
 ${data.services}
 
-NUMÉRO FACTURE: ${data.numero || 'À générer automatiquement'}
-DATE: ${data.date || new Date().toLocaleDateString('fr-FR')}
-TVA: ${data.tva || 'Non applicable'}
+NUMÉRO FACTURE: ${data.numero || 'F-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0')}
+DATE: ${data.date || new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+TVA: ${data.tva || '20%'}
 
-FORMAT ATTENDU (Markdown structuré):
-# FACTURE
+SORTIE ATTENDUE: Génère le template HTML complet ci-dessous avec tous les placeholders {{...}} remplacés par les vraies données.
 
-**Numéro:** [NUMÉRO]
-**Date:** [DATE]
-**Date d'échéance:** [DATE + 30 jours]
+TEMPLATE HTML à utiliser (remplis les placeholders) :
 
----
-
-## ÉMETTEUR
-[Nom/Raison sociale]
-[Adresse complète]
-SIRET: [SIRET]
-Email: [Email]
-Téléphone: [Téléphone]
-
----
-
-## CLIENT
-[Nom/Raison sociale]
-[Adresse]
-Email: [Email]
-
----
-
-## DÉTAIL DES PRESTATIONS
-
-| Description | Quantité | Prix unitaire HT | Total HT |
-|-------------|----------|------------------|----------|
-| [Service 1] | [Qty] | [Prix] € | [Total] € |
-| [Service 2] | [Qty] | [Prix] € | [Total] € |
-
----
-
-## TOTAL
-
-**Sous-total HT:** [Total HT] €
-${data.tva ? `**TVA (${data.tva}):** [Montant TVA] €` : ''}
-**TOTAL TTC:** [Total TTC] €
-
----
-
-## CONDITIONS DE PAIEMENT
-
-**Mode de paiement:** [Virement bancaire / Chèque / ...]
-**Date d'échéance:** [Date]
-**IBAN:** [À compléter]
-
----
-
-**Merci de votre confiance !**
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facture</title>
+  <style>
+    body { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      min-height: 100%;
+      padding: 2% 3%;
+      width: 100%;
+    }
+    .invoice-wrapper {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      min-height: 297mm;
+      width: 100%;
+    }
+    .invoice-container { padding: 8% 10%; width: 100%; }
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6%;
+      padding-bottom: 3%;
+      border-bottom: 3px solid #2c5aa0;
+    }
+    .company-info h1 {
+      font-size: 1.8em;
+      color: #2c5aa0;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+    }
+    .company-info p {
+      color: #4a5568;
+      line-height: 1.6;
+      font-size: 0.9em;
+    }
+    .invoice-title { text-align: right; }
+    .invoice-title h2 {
+      font-size: 2.2em;
+      color: #2c5aa0;
+      font-weight: 700;
+      margin-bottom: 0.2em;
+    }
+    .invoice-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6%;
+    }
+    .client-info, .invoice-info { width: 48%; }
+    .section-label {
+      font-weight: 600;
+      color: #2c5aa0;
+      margin-bottom: 0.8em;
+      font-size: 1.1em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-content {
+      background: #f7fafc;
+      padding: 5%;
+      border-radius: 8px;
+      border-left: 4px solid #5a8fd6;
+    }
+    .info-content p {
+      color: #4a5568;
+      line-height: 1.8;
+      font-size: 0.95em;
+    }
+    .invoice-info .info-content { border-left-color: #48bb78; }
+    .items-table {
+      width: 100%;
+      margin-bottom: 5%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    .items-table thead { background: #2c5aa0; color: white; }
+    .items-table th {
+      padding: 4% 3%;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .items-table th:last-child,
+    .items-table td:last-child { text-align: right; }
+    .items-table tbody tr { border-bottom: 1px solid #e2e8f0; }
+    .items-table td {
+      padding: 3% 3%;
+      color: #4a5568;
+      font-size: 0.9em;
+    }
+    .totals-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6%;
+    }
+    .totals-box {
+      width: 45%;
+      background: #f7fafc;
+      padding: 5%;
+      border-radius: 8px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2.5% 0;
+      font-size: 0.95em;
+      color: #4a5568;
+    }
+    .total-row.grand-total {
+      border-top: 2px solid #2c5aa0;
+      margin-top: 3%;
+      padding-top: 4%;
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #2c5aa0;
+    }
+    .footer-section {
+      margin-top: 8%;
+      padding-top: 4%;
+      border-top: 2px solid #e2e8f0;
+    }
+    .footer-section p {
+      color: #718096;
+      font-size: 0.85em;
+      line-height: 1.8;
+      margin-bottom: 1em;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .invoice-wrapper { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="invoice-wrapper">
+   <div class="invoice-container">
+    <header class="header-section">
+     <div class="company-info">
+      <h1 id="company-name">{{COMPANY_NAME}}</h1>
+      <p id="company-address">{{COMPANY_ADDRESS}}</p>
+      <p id="company-contact">{{COMPANY_CONTACT}}</p>
+     </div>
+     <div class="invoice-title">
+      <h2>FACTURE</h2>
+     </div>
+    </header>
+    <section class="invoice-details">
+     <div class="client-info">
+      <div class="section-label">Facturé à</div>
+      <div class="info-content">
+       <p id="client-name" style="font-weight: 600; margin-bottom: 0.5em;">{{CLIENT_NAME}}</p>
+       <p id="client-address">{{CLIENT_ADDRESS}}</p>
+      </div>
+     </div>
+     <div class="invoice-info">
+      <div class="section-label">Détails</div>
+      <div class="info-content">
+       <p><strong>N° Facture:</strong> <span id="invoice-number">{{INVOICE_NUMBER}}</span></p>
+       <p><strong>Date:</strong> <span id="invoice-date">{{INVOICE_DATE}}</span></p>
+       <p><strong>Échéance:</strong> <span id="due-date">{{DUE_DATE}}</span></p>
+      </div>
+     </div>
+    </section>
+    <table class="items-table">
+     <thead>
+      <tr>
+       <th style="width: 45%;">Description</th>
+       <th style="width: 15%;">Quantité</th>
+       <th style="width: 20%;">Prix unitaire</th>
+       <th style="width: 20%;">Total</th>
+      </tr>
+     </thead>
+     <tbody>
+      {{ITEMS_ROWS}}
+     </tbody>
+    </table>
+    <div class="totals-section">
+     <div class="totals-box">
+      <div class="total-row"><span>Sous-total:</span> <span id="subtotal">{{SUBTOTAL}}</span></div>
+      <div class="total-row"><span>TVA ({{TVA_RATE}}):</span> <span id="tax">{{TAX}}</span></div>
+      <div class="total-row grand-total"><span>TOTAL:</span> <span id="grand-total">{{GRAND_TOTAL}}</span></div>
+     </div>
+    </div>
+    <footer class="footer-section">
+     <p id="footer-text"><strong>Mentions légales:</strong> {{FOOTER_TEXT}}</p>
+     <p id="payment-terms"><strong>Conditions de paiement:</strong> {{PAYMENT_TERMS}}</p>
+    </footer>
+   </div>
+  </main>
+  <script>
+    const defaultConfig = {
+      company_name: "{{COMPANY_NAME}}",
+      company_address: "{{COMPANY_ADDRESS}}",
+      company_contact: "{{COMPANY_CONTACT}}",
+      client_name: "{{CLIENT_NAME}}",
+      client_address: "{{CLIENT_ADDRESS}}",
+      invoice_number: "{{INVOICE_NUMBER}}",
+      invoice_date: "{{INVOICE_DATE}}",
+      due_date: "{{DUE_DATE}}",
+      item1_desc: "{{ITEM1_DESC}}",
+      item1_qty: "{{ITEM1_QTY}}",
+      item1_price: "{{ITEM1_PRICE}}",
+      item2_desc: "{{ITEM2_DESC}}",
+      item2_qty: "{{ITEM2_QTY}}",
+      item2_price: "{{ITEM2_PRICE}}",
+      item3_desc: "{{ITEM3_DESC}}",
+      item3_qty: "{{ITEM3_QTY}}",
+      item3_price: "{{ITEM3_PRICE}}",
+      footer_text: "{{FOOTER_TEXT}}",
+      payment_terms: "{{PAYMENT_TERMS}}",
+      background_color: "#f0f4f8",
+      primary_color: "#2c5aa0",
+      accent_color: "#5a8fd6",
+      surface_color: "#ffffff",
+      text_color: "#4a5568"
+    };
+    
+    function calculateTotal(qty, price) {
+      const q = parseFloat(qty) || 0;
+      const p = parseFloat(price) || 0;
+      return (q * p).toFixed(2);
+    }
+    
+    function formatPrice(value) {
+      const num = parseFloat(value) || 0;
+      return num.toFixed(2) + ' €';
+    }
+    
+    function updateTotals(config) {
+      const item1Total = calculateTotal(config.item1_qty, config.item1_price);
+      const item2Total = calculateTotal(config.item2_qty, config.item2_price);
+      const item3Total = calculateTotal(config.item3_qty, config.item3_price);
+      
+      document.getElementById('item1-total').textContent = formatPrice(item1Total);
+      document.getElementById('item2-total').textContent = formatPrice(item2Total);
+      document.getElementById('item3-total').textContent = formatPrice(item3Total);
+      
+      const subtotal = parseFloat(item1Total) + parseFloat(item2Total) + parseFloat(item3Total);
+      const taxRate = parseFloat("{{TVA_RATE}}".replace('%', '')) || 20;
+      const tax = subtotal * (taxRate / 100);
+      const grandTotal = subtotal + tax;
+      
+      document.getElementById('subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('tax').textContent = formatPrice(tax);
+      document.getElementById('grand-total').textContent = formatPrice(grandTotal);
+    }
+    
+    function onConfigChange(config) {
+      document.getElementById('company-name').textContent = config.company_name || defaultConfig.company_name;
+      document.getElementById('company-address').textContent = config.company_address || defaultConfig.company_address;
+      document.getElementById('company-contact').textContent = config.company_contact || defaultConfig.company_contact;
+      document.getElementById('client-name').textContent = config.client_name || defaultConfig.client_name;
+      document.getElementById('client-address').textContent = config.client_address || defaultConfig.client_address;
+      document.getElementById('invoice-number').textContent = config.invoice_number || defaultConfig.invoice_number;
+      document.getElementById('invoice-date').textContent = config.invoice_date || defaultConfig.invoice_date;
+      document.getElementById('due-date').textContent = config.due_date || defaultConfig.due_date;
+      
+      document.getElementById('item1-desc').textContent = config.item1_desc || defaultConfig.item1_desc;
+      document.getElementById('item1-qty').textContent = config.item1_qty || defaultConfig.item1_qty;
+      document.getElementById('item1-price').textContent = formatPrice(config.item1_price || defaultConfig.item1_price);
+      
+      document.getElementById('item2-desc').textContent = config.item2_desc || defaultConfig.item2_desc;
+      document.getElementById('item2-qty').textContent = config.item2_qty || defaultConfig.item2_qty;
+      document.getElementById('item2-price').textContent = formatPrice(config.item2_price || defaultConfig.item2_price);
+      
+      document.getElementById('item3-desc').textContent = config.item3_desc || defaultConfig.item3_desc;
+      document.getElementById('item3-qty').textContent = config.item3_qty || defaultConfig.item3_qty;
+      document.getElementById('item3-price').textContent = formatPrice(config.item3_price || defaultConfig.item3_price);
+      
+      updateTotals(config);
+      
+      document.getElementById('footer-text').innerHTML = '<strong>Mentions légales:</strong> ' + (config.footer_text || defaultConfig.footer_text);
+      document.getElementById('payment-terms').innerHTML = '<strong>Conditions de paiement:</strong> ' + (config.payment_terms || defaultConfig.payment_terms);
+    }
+    
+    // Rendre les champs éditables
+    document.addEventListener('DOMContentLoaded', () => {
+      const editableElements = document.querySelectorAll('#company-name, #company-address, #company-contact, #client-name, #client-address, #invoice-number, #invoice-date, #due-date, #item1-desc, #item1-qty, #item1-price, #item2-desc, #item2-qty, #item2-price, #item3-desc, #item3-qty, #item3-price');
+      editableElements.forEach(el => {
+        el.contentEditable = 'true';
+        el.style.outline = '2px dashed transparent';
+        el.style.outlineOffset = '2px';
+        el.addEventListener('focus', () => {
+          el.style.outline = '2px dashed #2c5aa0';
+          el.style.backgroundColor = '#f0f4f8';
+        });
+        el.addEventListener('blur', () => {
+          el.style.outline = '2px dashed transparent';
+          el.style.backgroundColor = 'transparent';
+          updateTotals(defaultConfig);
+        });
+      });
+      
+      // Initialiser avec les valeurs par défaut
+      onConfigChange(defaultConfig);
+    });
+  </script>
+</body>
+</html>
 
 INSTRUCTIONS:
-- Format professionnel et lisible
-- Calculs automatiques (Total HT, TVA si applicable, Total TTC)
-- Tableau clair pour les prestations
-- Conforme aux standards français
-- Prêt à être copié dans Word/PDF
-- Inclure toutes les mentions légales nécessaires`
+- Parse "${data.emetteur}" pour extraire: {{COMPANY_NAME}}, {{COMPANY_ADDRESS}}, {{COMPANY_CONTACT}}
+- Parse "${data.client}" pour extraire: {{CLIENT_NAME}}, {{CLIENT_ADDRESS}}
+- {{INVOICE_NUMBER}} : ${data.numero || 'F-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0')}
+- {{INVOICE_DATE}} : ${data.date || new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+- {{DUE_DATE}} : Date + 30 jours
+- Parse "${data.services}" pour générer {{ITEMS_ROWS}} : <tr><td>{{DESC}}</td><td data-qty>{{QTY}}</td><td data-price>{{PRICE}} €</td><td data-total>{{TOTAL}} €</td></tr>
+- Calculer {{SUBTOTAL}}, {{TAX}} (TVA ${data.tva || '20%'}), {{GRAND_TOTAL}}
+- {{TVA_RATE}} : ${data.tva || '20%'}
+- {{FOOTER_TEXT}} : Extraire SIRET/TVA de "${data.emetteur}" ou générer un exemple
+- {{PAYMENT_TERMS}} : "Paiement à 30 jours. Pénalités de retard: 10% par mois."
+
+Génère maintenant le HTML complet avec tous les placeholders remplacés.`
   },
 
   // --- NOUVEAUX OUTILS COOL ---

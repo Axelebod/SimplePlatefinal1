@@ -54,8 +54,8 @@ export const handleLocalTool = async (command: string): Promise<string> => {
     case 'DECISION_MAKER':
         const choices = input.split(',').map(s => s.trim()).filter(s => s);
         if (choices.length < 2) return Promise.resolve("❌ Il faut au moins 2 choix séparés par des virgules.");
-        const winner = choices[Math.floor(Math.random() * choices.length)];
-        return Promise.resolve(`### 🎲 Le sort a décidé :\n\n# **${winner}**`);
+        // Retourner les choix en JSON pour la roue
+        return Promise.resolve(JSON.stringify({ choices, type: 'wheel' }));
 
     case 'SLUG_GEN':
         const slug = input.toString().toLowerCase()
