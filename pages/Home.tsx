@@ -106,7 +106,7 @@ export const Home: React.FC = () => {
       <TrustBadges />
 
       {/* Controls */}
-      <div className="sticky top-20 z-40 bg-neo-white/90 dark:bg-gray-700/90 backdrop-blur-sm py-4 space-y-4 transition-colors">
+      <div className="sticky top-0 md:top-20 z-40 bg-neo-white dark:bg-gray-700 border-b-2 border-black dark:border-white md:border-0 md:bg-neo-white/90 md:dark:bg-gray-700/90 backdrop-blur-sm py-4 space-y-4 transition-colors shadow-neo-sm md:shadow-none">
         {/* Search */}
         <div className="relative max-w-md mx-auto">
           <input

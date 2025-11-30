@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Download, Edit3, Eye, Code, Save, Maximize, Minimize } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Download, Edit3, Eye, Code, Save, Maximize, Minimize, FileImage, FileText } from 'lucide-react';
+import { useExportToPDF } from '../hooks/useExportToPDF';
+import { useExportToPNG } from '../hooks/useExportToPNG';
 
 interface HtmlResultDisplayProps {
   result: string;
@@ -25,10 +27,91 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
   const [viewMode, setViewMode] = useState<'preview' | 'code'>('preview');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [htmlContent, setHtmlContent] = useState(result);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+
+  const { exportToPDF } = useExportToPDF({ 
+    filename,
+    onError: (err) => alert(`Erreur export PDF: ${err.message}`)
+  });
+  
+  const { exportToPNG } = useExportToPNG({ 
+    filename,
+    onError: (err) => alert(`Erreur export PNG: ${err.message}`)
+  });
 
   React.useEffect(() => {
     setHtmlContent(result);
   }, [result]);
+
+  // Synchroniser les modifications depuis l'iframe
+  React.useEffect(() => {
+    if (!iframeRef.current || !editable || viewMode !== 'preview') return;
+
+    const iframe = iframeRef.current;
+    
+    // Debounce pour éviter trop de mises à jour
+    let updateTimeout: NodeJS.Timeout;
+    
+    const syncContent = () => {
+      clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(() => {
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (!iframeDoc) return;
+          
+          // Récupérer le HTML complet de l'iframe
+          const updatedHtml = iframeDoc.documentElement.outerHTML;
+          if (updatedHtml && updatedHtml !== htmlContent) {
+            handleContentChange(updatedHtml);
+          }
+        } catch (e) {
+          // Ignorer les erreurs CORS si nécessaire
+          console.log('Sync content:', e);
+        }
+      }, 500); // Debounce de 500ms
+    };
+
+    const handleLoad = () => {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!iframeDoc) return;
+
+        // Ajouter des listeners sur tous les éléments contentEditable
+        const editableElements = iframeDoc.querySelectorAll('[contenteditable="true"]');
+        
+        editableElements.forEach((el) => {
+          el.addEventListener('input', syncContent);
+          el.addEventListener('blur', syncContent);
+        });
+
+        // Écouter aussi les changements sur le document entier
+        iframeDoc.addEventListener('input', syncContent);
+        iframeDoc.addEventListener('blur', syncContent, true);
+      } catch (e) {
+        console.log('Setup editable listeners:', e);
+      }
+    };
+
+    iframe.addEventListener('load', handleLoad);
+    
+    // Si déjà chargé
+    setTimeout(() => {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc && iframeDoc.readyState === 'complete') {
+          handleLoad();
+        }
+      } catch (e) {
+        // Ignorer
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(updateTimeout);
+      iframe.removeEventListener('load', handleLoad);
+    };
+  }, [htmlContent, editable, viewMode, handleContentChange]);
 
   const handleContentChange = (newContent: string) => {
     setHtmlContent(newContent);
@@ -43,6 +126,86 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
     a.download = `${filename}-${Date.now()}.html`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (viewMode === 'preview' && iframeRef.current) {
+      try {
+        const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
+        if (!iframeDoc) {
+          alert('Impossible d\'accéder au contenu de l\'iframe');
+          return;
+        }
+
+        // Créer un élément temporaire avec le contenu de l'iframe
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = iframeDoc.body.innerHTML;
+        // Copier les styles du body
+        const bodyStyles = window.getComputedStyle(iframeDoc.body);
+        tempDiv.style.width = bodyStyles.width || '210mm';
+        tempDiv.style.minHeight = bodyStyles.minHeight || '297mm';
+        tempDiv.style.backgroundColor = bodyStyles.backgroundColor || '#ffffff';
+        tempDiv.style.padding = bodyStyles.padding || '0';
+        tempDiv.style.margin = '0';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
+        document.body.appendChild(tempDiv);
+        
+        await exportToPDF({ current: tempDiv } as React.RefObject<HTMLDivElement>);
+        document.body.removeChild(tempDiv);
+      } catch (error) {
+        console.error('Erreur export PDF:', error);
+        alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
+      }
+    } else if (previewRef.current) {
+      await exportToPDF(previewRef);
+    }
+  };
+
+  const handleExportPNG = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (viewMode === 'preview' && iframeRef.current) {
+      try {
+        const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
+        if (!iframeDoc) {
+          alert('Impossible d\'accéder au contenu de l\'iframe');
+          return;
+        }
+
+        // Créer un élément temporaire avec le contenu de l'iframe
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = iframeDoc.body.innerHTML;
+        // Copier les styles du body
+        const bodyStyles = window.getComputedStyle(iframeDoc.body);
+        tempDiv.style.width = bodyStyles.width || '210mm';
+        tempDiv.style.minHeight = bodyStyles.minHeight || '297mm';
+        tempDiv.style.backgroundColor = bodyStyles.backgroundColor || '#ffffff';
+        tempDiv.style.padding = bodyStyles.padding || '0';
+        tempDiv.style.margin = '0';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
+        document.body.appendChild(tempDiv);
+        
+        await exportToPNG({ current: tempDiv } as React.RefObject<HTMLDivElement>);
+        document.body.removeChild(tempDiv);
+      } catch (error) {
+        console.error('Erreur export PNG:', error);
+        alert('Erreur lors de l\'export PNG. Veuillez réessayer.');
+      }
+    } else if (previewRef.current) {
+      await exportToPNG(previewRef);
+    }
   };
 
   const toggleFullscreen = () => {
@@ -114,13 +277,34 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
           </button>
 
-          {/* Download */}
+          {/* Download HTML */}
           <button
             onClick={handleDownload}
-            className="px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2"
+            className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+            title="Télécharger HTML"
           >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Télécharger</span>
+            <Code className="w-4 h-4" />
+            <span className="hidden sm:inline">HTML</span>
+          </button>
+
+          {/* Download PDF */}
+          <button
+            onClick={handleExportPDF}
+            className="px-3 py-2 bg-neo-red text-white rounded-md text-xs font-bold hover:bg-red-500 transition-colors flex items-center gap-2"
+            title="Télécharger PDF"
+          >
+            <FileText className="w-4 h-4" />
+            <span className="hidden sm:inline">PDF</span>
+          </button>
+
+          {/* Download PNG */}
+          <button
+            onClick={handleExportPNG}
+            className="px-3 py-2 bg-neo-blue text-white rounded-md text-xs font-bold hover:bg-blue-500 transition-colors flex items-center gap-2"
+            title="Télécharger PNG"
+          >
+            <FileImage className="w-4 h-4" />
+            <span className="hidden sm:inline">PNG</span>
           </button>
 
           {/* Save */}
@@ -148,17 +332,20 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
 
       {/* Content */}
       {viewMode === 'preview' ? (
-        <div className="relative border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden bg-white shadow-neo dark:shadow-none">
-          <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 300px)', minHeight: '400px' }}>
+        <div ref={previewRef} className="relative border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden bg-white shadow-neo dark:shadow-none">
+          <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)', minHeight: '600px' }}>
             <iframe
+              ref={iframeRef}
               srcDoc={htmlContent}
               title={title}
               className="w-full border-0"
               sandbox="allow-same-origin allow-scripts"
               style={{ 
-                minHeight: '600px',
+                minHeight: '800px',
                 height: 'auto',
-                width: '100%'
+                width: '100%',
+                transform: 'scale(1)',
+                transformOrigin: 'top left'
               }}
             />
           </div>
@@ -171,17 +358,17 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
         </div>
       ) : (
         <div className="border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden">
-          <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 300px)', minHeight: '400px' }}>
+          <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)', minHeight: '600px' }}>
             <textarea
               value={htmlContent}
               onChange={(e) => handleContentChange(e.target.value)}
-              className="w-full p-4 font-mono text-sm bg-gray-900 text-green-200 dark:bg-gray-950 dark:text-green-300 border-0 focus:outline-none resize-none"
+              className="w-full p-6 font-mono text-base bg-gray-900 text-green-200 dark:bg-gray-950 dark:text-green-300 border-0 focus:outline-none resize-none"
               spellCheck={false}
-              style={{ minHeight: '600px', height: 'auto' }}
+              style={{ minHeight: '800px', height: 'auto' }}
             />
           </div>
-          <div className="p-3 bg-gray-800 dark:bg-gray-900 border-t border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
-            <span>Modifiez le code HTML directement</span>
+          <div className="p-4 bg-gray-800 dark:bg-gray-900 border-t-2 border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400 font-bold">
+            <span>✏️ Modifiez le code HTML directement</span>
             <span>{htmlContent.length.toLocaleString()} caractères • {htmlContent.split('\n').length} lignes</span>
           </div>
         </div>

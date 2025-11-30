@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Générateur de Favicons</title>
+</head>
+<body>
+  <h1>Générateur de Favicons pour SimplePlate</h1>
+  <p>Utilisez <a href="https://realfavicongenerator.net/" target="_blank">RealFaviconGenerator</a> pour générer tous les formats de favicon à partir du fichier favicon.svg</p>
+  <p>Ou utilisez ce canvas pour générer les PNG :</p>
+  <canvas id="canvas" width="512" height="512" style="border: 1px solid #000;"></canvas>
+  <br><br>
+  <button onclick="generateFavicons()">Générer les favicons</button>
+  <div id="downloads"></div>
+
+  <script>
+    function generateFavicons() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Fond noir
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Texte SP en jaune
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 350px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SP', 256, 256);
+      
+      // Générer les différentes tailles
+      const sizes = [16, 32, 180, 192, 512];
+      const downloads = document.getElementById('downloads');
+      downloads.innerHTML = '';
+      
+      sizes.forEach(size => {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = size;
+        tempCanvas.height = size;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Fond
+        tempCtx.fillStyle = '#050505';
+        tempCtx.fillRect(0, 0, size, size);
+        
+        // Texte
+        tempCtx.fillStyle = '#fde047';
+        tempCtx.font = `bold ${size * 0.7}px sans-serif`;
+        tempCtx.textAlign = 'center';
+        tempCtx.textBaseline = 'middle';
+        tempCtx.fillText('SP', size / 2, size / 2);
+        
+        // Télécharger
+        tempCanvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = size === 180 ? 'apple-touch-icon.png' : size === 192 ? 'favicon-192x192.png' : size === 512 ? 'favicon-512x512.png' : `favicon-${size}x${size}.png`;
+          a.textContent = `Télécharger ${a.download}`;
+          a.style.display = 'block';
+          a.style.margin = '10px 0';
+          downloads.appendChild(a);
+        });
+      });
+    }
+    
+    // Générer automatiquement au chargement
+    window.onload = generateFavicons;
+  </script>
+</body>
+</html>
+

@@ -230,6 +230,21 @@ export const ToolPage: React.FC = () => {
       return;
     }
 
+    // Cas spécial pour l'outil couleur : afficher directement le résultat
+    if (tool.id === 'hex-to-rgb' && inputs.hex) {
+      const hex = inputs.hex.replace('#', '');
+      if (hex.length === 6 && /^[0-9A-Fa-f]{6}$/.test(hex)) {
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        setResult(`HEX: #${hex.toUpperCase()}\nRGB: rgb(${r}, ${g}, ${b})`);
+        return;
+      } else {
+        setError('Code Hex invalide (doit être 6 caractères, ex: #FF0000)');
+        return;
+      }
+    }
+
     // Validation spéciale pour l'aide aux devoirs (au moins image OU question)
     if (tool.id === 'homework-helper') {
       const hasImage = fileInput !== undefined;
@@ -495,6 +510,51 @@ export const ToolPage: React.FC = () => {
                                 disabled={loading || isLocked}
                             />
                         </label>
+                    </div>
+                  ) : input.type === 'color' ? (
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="color"
+                        value={inputs[input.name] || '#000000'}
+                        onChange={(e) => {
+                          handleInputChange(input.name, e.target.value);
+                          // Pour l'outil couleur, mettre à jour le résultat automatiquement
+                          if (tool.id === 'hex-to-rgb') {
+                            const hex = e.target.value.replace('#', '');
+                            if (hex.length === 6 && /^[0-9A-Fa-f]{6}$/.test(hex)) {
+                              const r = parseInt(hex.substring(0, 2), 16);
+                              const g = parseInt(hex.substring(2, 4), 16);
+                              const b = parseInt(hex.substring(4, 6), 16);
+                              setResult(`HEX: #${hex.toUpperCase()}\nRGB: rgb(${r}, ${g}, ${b})`);
+                            }
+                          }
+                        }}
+                        disabled={loading || isLocked}
+                        className="w-24 h-24 rounded-lg border-4 border-black dark:border-white cursor-pointer shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]"
+                      />
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={inputs[input.name] || '#000000'}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (/^#[0-9A-Fa-f]{6}$/i.test(val)) {
+                              handleInputChange(input.name, val.toUpperCase());
+                              // Pour l'outil couleur, mettre à jour le résultat automatiquement
+                              if (tool.id === 'hex-to-rgb') {
+                                const hex = val.replace('#', '').toUpperCase();
+                                const r = parseInt(hex.substring(0, 2), 16);
+                                const g = parseInt(hex.substring(2, 4), 16);
+                                const b = parseInt(hex.substring(4, 6), 16);
+                                setResult(`HEX: #${hex}\nRGB: rgb(${r}, ${g}, ${b})`);
+                              }
+                            }
+                          }}
+                          className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white font-mono font-bold ${input.className || ''}`}
+                          placeholder="#000000"
+                          disabled={loading || isLocked}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <input

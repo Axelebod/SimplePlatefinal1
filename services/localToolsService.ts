@@ -128,12 +128,30 @@ export const handleLocalTool = async (command: string): Promise<string> => {
         }
 
     case 'HEX_RGB':
-        const hex = input.replace('#', '');
-        if (hex.length !== 6) return Promise.resolve("❌ Code Hex invalide (doit être 6 caractères, ex: FFFFFF)");
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        return Promise.resolve(`### Conversion Couleur 🎨\n\n**HEX :** #${hex.toUpperCase()}\n**RGB :** rgb(${r}, ${g}, ${b})\n\n<div style="width:100%; height:50px; background-color:#${hex}; border:2px solid #000; border-radius:8px;"></div>`);
+        // Détecter si c'est un code Hex ou RGB
+        const hexMatch = input.match(/^#?([0-9A-Fa-f]{6})$/);
+        const rgbMatch = input.match(/rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)/i);
+        
+        if (hexMatch) {
+            // Conversion Hex -> RGB
+            const hex = hexMatch[1];
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            return Promise.resolve(`HEX: #${hex.toUpperCase()}\nRGB: rgb(${r}, ${g}, ${b})`);
+        } else if (rgbMatch) {
+            // Conversion RGB -> Hex
+            const r = parseInt(rgbMatch[1]);
+            const g = parseInt(rgbMatch[2]);
+            const b = parseInt(rgbMatch[3]);
+            if (r > 255 || g > 255 || b > 255 || r < 0 || g < 0 || b < 0) {
+                return Promise.resolve("❌ Valeurs RGB invalides (doivent être entre 0 et 255)");
+            }
+            const hex = ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            return Promise.resolve(`HEX: #${hex}\nRGB: rgb(${r}, ${g}, ${b})`);
+        } else {
+            return Promise.resolve("❌ Format invalide. Utilisez un code Hex (ex: #FF0000) ou RGB (ex: rgb(255, 0, 0))");
+        }
 
     case 'MORSE_ENCODE':
         const morseCode: Record<string, string> = {

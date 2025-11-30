@@ -1173,20 +1173,20 @@ FORMAT DE SORTIE :
   },
   {
     id: 'hex-to-rgb',
-    slug: 'couleur-hex-rgb',
-    title: 'Couleur Hex ↔ RGB',
-    description: 'Vous travaillez sur un design ? Convertissez vos codes couleurs Hex en RGB (et vice-versa) en un instant. Avec aperçu visuel en bonus !',
+    slug: 'selecteur-couleur',
+    title: 'Sélecteur de Couleur Pro',
+    description: 'Outil complet de sélection et conversion de couleurs. HEX, RGB, HSL, CMJN, Pantone, Decimal et plus encore. Avec aperçu visuel et export instantané !',
     category: 'Image',
     cost: 0,
     isPremium: false,
     iconName: 'Palette',
     outputType: 'text',
     seo: { 
-      title: 'Convertisseur Hex vers RGB - Outil Couleur CSS Professionnel', 
-      description: 'Convertir code couleur Hexadécimal en RGB et vice-versa. Visualisation de la couleur en direct pour webdesigners.', 
-      keywords: ['hex to rgb', 'convertisseur couleur', 'code couleur css', 'webdesign', 'color picker'] 
+      title: 'Sélecteur de Couleur Pro - Convertisseur HEX RGB HSL CMJN Pantone', 
+      description: 'Sélecteur de couleur professionnel avec conversion instantanée entre tous les formats : HEX, RGB, HSL, CMJN, Pantone, Decimal. Aperçu visuel et export gratuit.', 
+      keywords: ['sélecteur couleur', 'color picker', 'convertisseur couleur', 'hex rgb hsl', 'cmyk pantone', 'code couleur css', 'webdesign', 'palette couleur', 'convertisseur hex rgb', 'outil couleur professionnel'] 
     },
-    inputs: [{ name: 'hex', label: 'Code Hex (ex: #FF0000)', type: 'text', placeholder: '#FF0000', required: true }],
+    inputs: [{ name: 'hex', label: 'Sélecteur de couleur', type: 'color', required: true }],
     promptGenerator: (data) => `LOCAL:HEX_RGB;;;${data.hex}`
   },
   {

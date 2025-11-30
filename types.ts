@@ -6,7 +6,7 @@ export type ToolCategory = 'Text' | 'Image' | 'Dev' | 'Life' | 'Business' | 'Sec
 export interface ToolInput {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'file' | 'richtext';
+  type: 'text' | 'textarea' | 'select' | 'number' | 'file' | 'richtext' | 'color';
   placeholder?: string;
   options?: string[]; // For select inputs
   required?: boolean;
