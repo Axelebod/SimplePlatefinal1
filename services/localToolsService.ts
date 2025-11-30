@@ -66,11 +66,132 @@ export const handleLocalTool = async (command: string): Promise<string> => {
             .replace(/-+$/, '');            // Trim - from end of text
         return Promise.resolve(`### Slug URL optimisé :\n\n\`${slug}\``);
 
-    case 'PX_TO_REM':
-        const px = parseFloat(input);
-        if (isNaN(px)) return Promise.resolve("❌ Entrez un nombre valide.");
-        const rem = px / 16;
-        return Promise.resolve(`### Conversion :\n\n**${px}px** = \`${rem}rem\`\n\n*(Basé sur une racine de 16px)*`);
+    case 'PX_TO_REM_EMPTY': {
+        const baseSize = parseFloat(params[0] || '16') || 16;
+        return Promise.resolve(`### Conversions (Base: ${baseSize}px)\n\n| Original | Pixels | REM | EM |\n|---------|--------|-----|-----|\n\n*Utilisez l'interface graphique ci-dessous pour ajouter des conversions.*`);
+    }
+    
+    case 'PX_TO_REM': {
+        const [valuesInput, baseSizeInput, showTableInput] = params;
+        const baseSize = parseFloat(baseSizeInput || '16') || 16;
+        const showTable = showTableInput === 'true' || showTableInput === 'Oui';
+        
+        if (!valuesInput || !valuesInput.trim()) {
+            return Promise.resolve("❌ Entrez au moins une valeur à convertir.");
+        }
+        
+        // Parser les valeurs (séparées par virgules, lignes, ou espaces)
+        const values = valuesInput
+            .split(/[,\n\r]+/)
+            .map(v => v.trim())
+            .filter(v => v.length > 0);
+        
+        if (values.length === 0) {
+            return Promise.resolve("❌ Aucune valeur valide trouvée.");
+        }
+        
+        let result = `### Conversions (Base: ${baseSize}px)\n\n`;
+        const conversions: Array<{ original: string; px: number; rem: number; em: number }> = [];
+        
+        // Traiter chaque valeur
+        for (const value of values) {
+            const pxMatch = value.match(/^([\d.]+)\s*px$/i);
+            const remMatch = value.match(/^([\d.]+)\s*rem$/i);
+            const emMatch = value.match(/^([\d.]+)\s*em$/i);
+            const numMatch = value.match(/^([\d.]+)$/);
+            
+            let px: number;
+            let rem: number;
+            let em: number;
+            let original = value;
+            
+            if (pxMatch) {
+                // Conversion px → rem
+                px = parseFloat(pxMatch[1]);
+                rem = px / baseSize;
+                em = rem; // em = rem si parent = root
+                original = `${px}px`;
+            } else if (remMatch) {
+                // Conversion rem → px
+                rem = parseFloat(remMatch[1]);
+                px = rem * baseSize;
+                em = rem;
+                original = `${rem}rem`;
+            } else if (emMatch) {
+                // Conversion em → px (en supposant parent = root)
+                em = parseFloat(emMatch[1]);
+                rem = em;
+                px = em * baseSize;
+                original = `${em}em`;
+            } else if (numMatch) {
+                // Nombre seul → on assume px
+                px = parseFloat(numMatch[1]);
+                rem = px / baseSize;
+                em = rem;
+                original = `${px}px`;
+            } else {
+                continue; // Ignorer les valeurs invalides
+            }
+            
+            if (isNaN(px) || isNaN(rem)) continue;
+            
+            conversions.push({ original, px, rem, em });
+        }
+        
+        if (conversions.length === 0) {
+            return Promise.resolve("❌ Aucune valeur valide trouvée. Format attendu : 16px, 1rem, 24px, etc.");
+        }
+        
+        // Afficher les conversions
+        result += '| Original | Pixels | REM | EM |\n';
+        result += '|---------|--------|-----|-----|\n';
+        
+        for (const conv of conversions) {
+            const pxRounded = Math.round(conv.px * 100) / 100;
+            const remRounded = Math.round(conv.rem * 1000) / 1000;
+            const emRounded = Math.round(conv.em * 1000) / 1000;
+            result += `| \`${conv.original}\` | \`${pxRounded}px\` | \`${remRounded}rem\` | \`${emRounded}em\` |\n`;
+        }
+        
+        // Code CSS prêt à copier
+        result += '\n### Code CSS prêt à copier :\n\n```css\n';
+        for (const conv of conversions) {
+            const remRounded = Math.round(conv.rem * 1000) / 1000;
+            result += `font-size: ${remRounded}rem; /* ${conv.px}px */\n`;
+        }
+        result += '```\n';
+        
+        // Tableau de références courantes
+        if (showTable) {
+            result += '\n### 📊 Tableau de références courantes :\n\n';
+            result += '| Pixels | REM (base 16px) | Usage courant |\n';
+            result += '|--------|-----------------|---------------|\n';
+            
+            const commonSizes = [
+                { px: 8, usage: 'Très petit (spacing)' },
+                { px: 10, usage: 'Petit texte' },
+                { px: 12, usage: 'Texte secondaire' },
+                { px: 14, usage: 'Texte standard mobile' },
+                { px: 16, usage: 'Texte de base (root)' },
+                { px: 18, usage: 'Texte légèrement plus grand' },
+                { px: 20, usage: 'Sous-titres' },
+                { px: 24, usage: 'Titres H4' },
+                { px: 32, usage: 'Titres H3' },
+                { px: 40, usage: 'Titres H2' },
+                { px: 48, usage: 'Titres H1' },
+                { px: 64, usage: 'Titres hero' },
+            ];
+            
+            for (const size of commonSizes) {
+                const rem = Math.round((size.px / baseSize) * 1000) / 1000;
+                result += `| \`${size.px}px\` | \`${rem}rem\` | ${size.usage} |\n`;
+            }
+        }
+        
+        result += `\n*💡 Astuce : La taille de base par défaut est 16px. Vous pouvez la modifier dans les paramètres.*`;
+        
+        return Promise.resolve(result);
+    }
 
     case 'BASE64':
         try {

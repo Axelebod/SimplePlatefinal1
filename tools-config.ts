@@ -1325,20 +1325,20 @@ FORMAT DE SORTIE :
   {
     id: 'px-to-rem',
     slug: 'pixel-vers-rem',
-    title: 'Pixel vers REM',
-    description: 'Vous travaillez en CSS ? Convertissez vos pixels en REM facilement. Indispensable pour un design responsive et accessible !',
+    title: 'Convertisseur PX ↔ REM',
+    description: 'Convertisseur CSS avancé : PX ↔ REM avec taille de base personnalisable, conversions multiples, et tableau de références. Parfait pour le responsive design !',
     category: 'Dev',
     cost: 0,
     isPremium: false,
     iconName: 'Ruler',
     outputType: 'text',
     seo: { 
-      title: 'Convertisseur PX vers REM (CSS) - Calculateur Web', 
-      description: 'Outil pour convertir les pixels en REM. Indispensable pour l\'intégration web responsive et accessible.', 
-      keywords: ['px to rem', 'convertisseur css', 'unités css', 'web dev', 'calculateur rem'] 
+      title: 'Convertisseur PX vers REM (CSS) - Calculateur Web Avancé', 
+      description: 'Convertisseur CSS professionnel : pixels vers REM avec taille de base personnalisable, conversions multiples, et références courantes.', 
+      keywords: ['px to rem', 'convertisseur css', 'unités css', 'web dev', 'calculateur rem', 'responsive design'] 
     },
-    inputs: [{ name: 'px', label: 'Valeur en Pixels (px)', type: 'number', placeholder: '16', required: true }],
-    promptGenerator: (data) => `LOCAL:PX_TO_REM;;;${data.px}`
+    inputs: [],
+    promptGenerator: () => `LOCAL:PX_TO_REM_EMPTY;;;16`
   },
   {
     id: 'roi-calc',

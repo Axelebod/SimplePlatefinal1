@@ -26,6 +26,7 @@ import { TextAnalyzerDisplay } from '../components/TextAnalyzerDisplay';
 import { JsonFormatterDisplay } from '../components/JsonFormatterDisplay';
 import { DecisionWheel } from '../components/DecisionWheel';
 import { HtmlResultDisplay } from '../components/HtmlResultDisplay';
+import { PxRemDisplay } from '../components/PxRemDisplay';
 import { ToolInput } from '../types';
 import { useToolSEO } from '../hooks/useToolSEO';
 import { useToolGeneration } from '../hooks/useToolGeneration';
@@ -172,6 +173,13 @@ export const ToolPage: React.FC = () => {
   // Plus de restrictions PRO - tous les outils sont accessibles
   const isLocked = false;
   const hasCredits = credits >= tool.cost;
+
+  // Pour px-to-rem, initialiser le résultat directement
+  useEffect(() => {
+    if (tool.id === 'px-to-rem' && !result) {
+      setResult('### Conversions (Base: 16px)\n\n| Original | Pixels | REM | EM |\n|---------|--------|-----|-----|\n\n*Utilisez l\'interface graphique ci-dessous pour ajouter des conversions.*');
+    }
+  }, [tool.id, result]);
 
   // Debounced input pour les champs texte (optimisation)
   const debouncedInputs = useDebounce(inputs, 300);
@@ -433,10 +441,14 @@ export const ToolPage: React.FC = () => {
       {/* AD BANNER (HEADER) FOR FREE USERS */}
       <AdBanner location="header" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' ? '' : 'lg:grid-cols-2'} gap-8`}>
         {/* Left Column: Input */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
+            {/* Pour px-to-rem, afficher directement l'interface graphique */}
+            {tool.id === 'px-to-rem' ? (
+              <PxRemDisplay result={result || '### Conversions (Base: 16px)\n\n| Original | Pixels | REM | EM |\n|---------|--------|-----|-----|\n\n*Utilisez l\'interface graphique ci-dessous pour ajouter des conversions.*'} baseSize={16} />
+            ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {tool.inputs.map((input) => (
                 <div key={input.name}>
@@ -617,13 +629,15 @@ export const ToolPage: React.FC = () => {
                 )}
               </button>
             </form>
+          )}
           </div>
           
           {/* AD BANNER (SIDEBAR) */}
           <AdBanner location="sidebar" />
         </div>
 
-        {/* Right Column: Output */}
+        {/* Right Column: Output - Masqué pour px-to-rem */}
+        {tool.id !== 'px-to-rem' && (
         <div className="relative bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none min-h-[400px] flex flex-col">
            
            {/* HEADER */}
@@ -1005,6 +1019,7 @@ export const ToolPage: React.FC = () => {
 
            </div>
         </div>
+        )}
       </div>
 
       {/* Suggestions d'outils complémentaires */}
