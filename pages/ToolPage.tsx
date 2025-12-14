@@ -305,6 +305,34 @@ export const ToolPage: React.FC = () => {
     }
   };
 
+  const handleSubmitFromComponent = async (data: { prompt: string; data: any }) => {
+    setError(null);
+    setResult(null);
+    setShowSuggestions(false);
+    setIsResultSaved(false);
+    
+    // Mettre à jour les inputs pour la sauvegarde
+    setInputs(data.data);
+    
+    // Générer avec le prompt fourni - utiliser directement le service
+    if (!isApiReady()) {
+      setError("Clé API manquante.");
+      return;
+    }
+    
+    // Appeler generate normalement - il utilisera le promptGenerator du tool
+    await generate(data.data, undefined);
+    
+    // Déduction atomique après génération réussie
+    if (tool.cost > 0 && result) {
+      const success = await deductCredits(tool.cost);
+      if (!success) {
+        setError("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+        setResult(null);
+      }
+    }
+  };
+
   const handleLoadTemplate = (templateInputs: Record<string, any>) => {
     setInputs(templateInputs);
     setResult(null);
@@ -432,13 +460,37 @@ export const ToolPage: React.FC = () => {
 
       {/* AD BANNER (HEADER) FOR FREE USERS */}
 
-      <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' ? '' : 'lg:grid-cols-2'} gap-8`}>
+      <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' || tool.id === 'brand-name-gen' ? '' : 'lg:grid-cols-2'} gap-8`}>
         {/* Left Column: Input */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-            {/* Pour px-to-rem, afficher directement l'interface graphique */}
+            {/* Pour px-to-rem et brand-name-gen, afficher directement l'interface graphique */}
             {tool.id === 'px-to-rem' ? (
               <PxRemDisplay result={result || '### Conversions (Base: 16px)\n\n| Original | Pixels | REM | EM |\n|---------|--------|-----|-----|\n\n*Utilisez l\'interface graphique ci-dessous pour ajouter des conversions.*'} baseSize={16} />
+            ) : tool.id === 'brand-name-gen' ? (
+              <BrandNameStudio 
+                result={result ? String(result) : ''} 
+                inputValue={inputs.project ? String(inputs.project) : undefined}
+                onSave={isLoggedIn ? handleSaveResult : undefined}
+                isSaved={isResultSaved}
+                isSaving={savingResult}
+                onChange={(value) => {
+                  setResult(value);
+                  setIsResultSaved(false);
+                }}
+                onSubmit={(data) => {
+                  // Gérer la soumission depuis le composant
+                  if (tool && tool.promptGenerator) {
+                    const prompt = tool.promptGenerator(data);
+                    if (prompt && !prompt.startsWith('ERROR:')) {
+                      handleSubmitFromComponent({ prompt, data });
+                    }
+                  }
+                }}
+                tool={tool}
+                hasCredits={hasCredits || false}
+                loading={loading || false}
+              />
             ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {tool.inputs.map((input) => (
@@ -619,8 +671,8 @@ export const ToolPage: React.FC = () => {
           
         </div>
 
-        {/* Right Column: Output - Masqué pour px-to-rem */}
-        {tool.id !== 'px-to-rem' && (
+        {/* Right Column: Output - Masqué pour px-to-rem et brand-name-gen */}
+        {tool.id !== 'px-to-rem' && tool.id !== 'brand-name-gen' && (
         <div className="relative bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none min-h-[400px] flex flex-col">
            
            {/* HEADER */}
@@ -669,12 +721,12 @@ export const ToolPage: React.FC = () => {
              )}
 
              {/* RESULT */}
-             {result && (
+             {!loading && result && (
                tool.outputType === 'image' ? (
                  <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500">
-                    <img src={result} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" />
+                    <img src={String(result)} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" onError={(e) => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }} />
                     <div className="mt-4 text-center">
-                      <a href={result} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
+                      <a href={String(result)} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
                         Télécharger l'image
                       </a>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center justify-center gap-1">
@@ -684,7 +736,7 @@ export const ToolPage: React.FC = () => {
                  </div>
               ) : tool.id === 'business-plan-pro' ? (
                 <BusinessPlanDisplay
-                  result={result || ''}
+                  result={result ? String(result) : ''}
                   onSave={isLoggedIn ? handleSaveResult : undefined}
                   isSaved={isResultSaved}
                   isSaving={savingResult}
@@ -867,28 +919,16 @@ export const ToolPage: React.FC = () => {
                                 }
                               }}
                             >
-                              {result}
+                              {String(result || '')}
                             </ReactMarkdown>
                           </div>
                         </div>
               ) : tool.id === 'hex-to-rgb' ? (
-                        <HexColorDisplay result={result} inputValue={inputs.hex}
-                        />
-               ) : tool.id === 'brand-name-gen' ? (
-                        <BrandNameStudio 
-                          result={result || ''} 
-                          inputValue={inputs.project}
-                          onSave={isLoggedIn ? handleSaveResult : undefined}
-                          isSaved={isResultSaved}
-                          isSaving={savingResult}
-                          onChange={(value) => {
-                            setResult(value);
-                            setIsResultSaved(false);
-                          }}
+                        <HexColorDisplay result={result ? String(result) : ''} inputValue={inputs.hex ? String(inputs.hex) : undefined}
                         />
                ) : tool.id === 'invoice-generator' ? (
                         <HtmlResultDisplay
-                          result={result}
+                          result={result ? String(result) : ''}
                           title="Facture"
                           filename="facture"
                           onSave={isLoggedIn ? handleSaveResult : undefined}
@@ -901,7 +941,7 @@ export const ToolPage: React.FC = () => {
                         />
                ) : tool.id === 'cv-generator' ? (
                         <HtmlResultDisplay
-                          result={result}
+                          result={result ? String(result) : ''}
                           title="CV"
                           filename="cv"
                           onSave={isLoggedIn ? handleSaveResult : undefined}
@@ -1002,6 +1042,16 @@ export const ToolPage: React.FC = () => {
                )
              )}
 
+             {/* Suggestions d'outils complémentaires - Bannière */}
+             {!loading && showSuggestions && result && (
+               <div className="mt-6">
+                 <ToolSuggestions 
+                   currentToolId={tool.id} 
+                   onClose={() => setShowSuggestions(false)} 
+                 />
+               </div>
+             )}
+
              {/* IDLE */}
              {!loading && !result && (
                <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
@@ -1014,14 +1064,6 @@ export const ToolPage: React.FC = () => {
         </div>
         )}
       </div>
-
-      {/* Suggestions d'outils complémentaires */}
-      {showSuggestions && result && (
-        <ToolSuggestions 
-          currentToolId={tool.id} 
-          onClose={() => setShowSuggestions(false)} 
-        />
-      )}
 
       {/* HISTORIQUE ET TEMPLATES - Micro SaaS Features */}
       {isLoggedIn && (

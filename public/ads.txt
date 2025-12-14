@@ -1,0 +1,6 @@
+# ads.txt file for SimplePlate
+# This file authorizes Google AdSense and other advertising partners
+
+# Google AdSense
+google.com, ca-pub-3795795150757338, DIRECT, f08c47fec0942fa0
+

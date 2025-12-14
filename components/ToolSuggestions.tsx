@@ -63,63 +63,41 @@ export const ToolSuggestions: React.FC<ToolSuggestionsProps> = ({ currentToolId,
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-gray-800 border-4 border-neo-black dark:border-white rounded-lg p-6 max-w-2xl w-full shadow-neo animate-in slide-in-from-bottom-4 duration-300">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-neo-yellow rounded-full flex items-center justify-center border-2 border-neo-black">
-              <Sparkles className="w-6 h-6 text-neo-black" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-bold dark:text-white">Suggestion d'outils</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
+    <div className="w-full bg-gradient-to-r from-neo-yellow to-yellow-300 dark:from-purple-900 dark:to-purple-800 border-2 border-neo-black dark:border-white rounded-lg p-4 shadow-neo animate-in slide-in-from-top duration-300 mb-6">
+      <div className="flex items-start justify-between gap-4">
+        {/* Left side - Icon and message */}
+        <div className="flex items-start gap-3 flex-1">
+          <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-neo-black dark:border-white shrink-0">
+            <Sparkles className="w-5 h-5 text-neo-black dark:text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-display text-lg font-bold dark:text-white mb-1">Suggestion d'outils</h3>
+            <p className="text-sm text-gray-800 dark:text-gray-200 mb-3">{message}</p>
+            
+            {/* Tools as horizontal scrollable list */}
+            <div className="flex flex-wrap gap-2">
+              {suggestedTools.map((tool) => (
+                <button
+                  key={tool!.id}
+                  onClick={() => handleToolClick(tool!.id)}
+                  className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-neo-black dark:border-white rounded-md hover:shadow-neo-sm transition-all group flex items-center gap-2 text-sm font-bold"
+                >
+                  <span className="dark:text-white">{tool!.title}</span>
+                  <ArrowRight className="w-4 h-4 text-neo-violet dark:text-neo-blue group-hover:translate-x-1 transition-transform" />
+                </button>
+              ))}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-            aria-label="Fermer"
-          >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {suggestedTools.map((tool) => (
-            <button
-              key={tool!.id}
-              onClick={() => handleToolClick(tool!.id)}
-              className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-neo-violet dark:hover:border-neo-blue hover:shadow-neo transition-all text-left group"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="font-bold text-lg dark:text-white mb-1 group-hover:text-neo-violet dark:group-hover:text-neo-blue transition-colors">
-                    {tool!.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {tool!.description}
-                  </p>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-neo-violet dark:text-neo-blue font-bold">
-                    <span>Essayer</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-          >
-            Plus tard
-          </button>
-        </div>
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-colors shrink-0"
+          aria-label="Fermer"
+        >
+          <X className="w-5 h-5 text-neo-black dark:text-white" />
+        </button>
       </div>
     </div>
   );

@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
-import { Zap, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock } from 'lucide-react';
+import { Zap, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock, Languages } from 'lucide-react';
+import { useLanguageStore } from '../store/languageStore';
+import { useTranslation } from '../hooks/useTranslation';
 import { SimpleBot } from './SimpleBot';
 import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
@@ -10,6 +12,8 @@ import { supabase } from '../lib/supabaseClient';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, credits, creditsFree, creditsPaid, buyCredits, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
+  const { language, toggleLanguage } = useLanguageStore();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -109,6 +113,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
+             {/* Language Toggle */}
+             <button 
+                onClick={toggleLanguage} 
+                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white font-bold flex items-center gap-1"
+                title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
+             >
+                 <Languages className="w-5 h-5" />
+                 <span className="text-xs">{language.toUpperCase()}</span>
+             </button>
+
              {/* Dark Mode Toggle */}
              <button 
                 onClick={toggleDarkMode} 
@@ -122,7 +136,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                to="/pricing" 
                className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white"
              >
-               Tarifs
+               {t('nav.pricing')}
              </Link>
 
              {user ? (
@@ -130,7 +144,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link 
                         to="/pricing"
                         className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-700 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        title="Acheter des crédits"
+                        title={t('nav.buyCredits')}
                     >
                         <Zap className="w-4 h-4 text-neo-orange fill-current" />
                         <div className="flex flex-col items-start leading-tight">
@@ -165,7 +179,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     className="flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold border-2 border-black dark:border-white rounded-md hover:shadow-[4px_4px_0px_0px_#fde047] dark:hover:shadow-[4px_4px_0px_0px_#fde047] hover:text-neo-yellow dark:hover:text-neo-violet transition-all"
                  >
                     <LogIn className="w-4 h-4" />
-                    Connexion
+                    {t('nav.login')}
                  </Link>
              )}
           </div>
@@ -238,7 +252,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         Se connecter / S'inscrire
                     </Link>
                     <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white">
-                        Voir les Tarifs
+                        {t('nav.pricing')}
                     </Link>
                  </>
              )}
@@ -268,7 +282,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex flex-wrap justify-center gap-6 text-sm font-bold underline dark:text-gray-300">
             <Link to="/contact" className="hover:text-neo-violet">Nous Contacter</Link>
             <Link to="/legal">Mentions Légales</Link>
-            <Link to="/pricing">Tarifs</Link>
+            <Link to="/pricing">{t('nav.pricing')}</Link>
             <Link to="/sitemap">Plan du Site</Link>
           </div>
         </div>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useUserStore } from '../store/userStore';
 import { Zap, AlertCircle, Tag } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const Pricing: React.FC = () => {
   const { buyCredits } = useUserStore();
+  const { t } = useTranslation();
 
   const creditPacks = [
     { 
@@ -36,9 +38,9 @@ export const Pricing: React.FC = () => {
     <div className="max-w-5xl mx-auto py-10 px-4">
       <div className="text-center mb-12">
         <h1 className="font-display text-4xl md:text-5xl font-bold mb-4 dark:text-white">
-          Achetez des <span className="bg-neo-green px-2 border border-black dark:border-white transform -rotate-1 inline-block shadow-[3px_3px_0px_0px_#000] dark:shadow-none text-black">crédits</span>.
+          {t('pricing.title')} <span className="bg-neo-green px-2 border border-black dark:border-white transform -rotate-1 inline-block shadow-[3px_3px_0px_0px_#000] dark:shadow-none text-black">{t('pricing.titleHighlight')}</span>.
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300">Payez uniquement ce que vous utilisez. Les crédits ne s'expirent jamais.</p>
+        <p className="text-xl text-gray-600 dark:text-gray-300">{t('pricing.subtitle')}</p>
       </div>
 
       {/* ALERT INFO RECHARGE */}
@@ -46,18 +48,18 @@ export const Pricing: React.FC = () => {
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
               <p className="mb-2">
-                  <strong>Crédits gratuits :</strong> 5 crédits par semaine (non cumulables - maximum 5). Si vous ne les utilisez pas, ils ne s'accumulent pas.
+                  <strong>{t('pricing.freeCredits')} :</strong> {t('pricing.freeCreditsDesc')}
               </p>
               <p>
-                  <strong>Crédits payants :</strong> Achetez des crédits supplémentaires qui ne s'expirent jamais. Utilisez-les quand vous voulez.
+                  <strong>{t('pricing.paidCredits')} :</strong> {t('pricing.paidCreditsDesc')}
               </p>
           </div>
       </div>
 
       {/* CREDIT PACKS */}
       <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-2 text-center dark:text-white">Packs de Crédits</h2>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-8">Choisissez le pack qui correspond à vos besoins</p>
+          <h2 className="text-2xl font-bold mb-2 text-center dark:text-white">{t('pricing.creditPacks')}</h2>
+          <p className="text-center text-gray-600 dark:text-gray-400 mb-8">{t('pricing.creditPacksDesc')}</p>
           
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -86,7 +88,7 @@ export const Pricing: React.FC = () => {
                         onClick={() => buyCredits(pack.amount)} 
                         className="w-full py-3 border-2 border-black dark:border-white font-bold rounded-lg bg-neo-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                       >
-                          Acheter
+                          {t('pricing.buy')}
                       </button>
                   </div>
               ))}
@@ -95,19 +97,19 @@ export const Pricing: React.FC = () => {
 
       {/* INFO SECTION */}
       <div className="mt-12 bg-gray-50 dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-6">
-          <h3 className="text-xl font-bold mb-4 dark:text-white">Comment ça marche ?</h3>
+          <h3 className="text-xl font-bold mb-4 dark:text-white">{t('pricing.howItWorks')}</h3>
           <div className="space-y-3 text-gray-700 dark:text-gray-300">
               <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
-                  <p><strong>Achetez des crédits</strong> - Choisissez le pack qui vous convient. Les crédits sont ajoutés immédiatement à votre compte.</p>
+                  <p><strong>{t('pricing.step1')}</strong> - {t('pricing.step1Desc')}</p>
               </div>
               <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
-                  <p><strong>Utilisez vos crédits</strong> - Chaque outil coûte entre 0 et 3 crédits selon sa complexité.</p>
+                  <p><strong>{t('pricing.step2')}</strong> - {t('pricing.step2Desc')}</p>
               </div>
               <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">3</div>
-                  <p><strong>Crédits illimités</strong> - Les crédits payants ne s'expirent jamais. Utilisez-les à votre rythme.</p>
+                  <p><strong>{t('pricing.step3')}</strong> - {t('pricing.step3Desc')}</p>
               </div>
           </div>
       </div>

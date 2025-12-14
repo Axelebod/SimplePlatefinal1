@@ -28,7 +28,7 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
   const [selectedTemplate, setSelectedTemplate] = useState(0);
   const [accentColor, setAccentColor] = useState(PLAN_TEMPLATES[0]?.accent || '#6C47FF');
   const [editableContent, setEditableContent] = useState(result || '');
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Mode aperçu par défaut
   const [copied, setCopied] = useState(false);
 
   const { exportToPDF } = useExportToPDF({ 
@@ -37,7 +37,36 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
   });
 
   useEffect(() => {
-    setEditableContent(result);
+    if (result) {
+      // Nettoyer le résultat si nécessaire (enlever les blocs de code markdown inutiles)
+      let cleanedResult = result;
+      
+      // Si le résultat commence par ```markdown ou ```, on le nettoie
+      if (cleanedResult.startsWith('```')) {
+        const lines = cleanedResult.split('\n');
+        // Trouver la première ligne qui n'est pas ``` ou ```markdown
+        let startIndex = 0;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].trim().startsWith('```')) {
+            startIndex = i + 1;
+            break;
+          }
+        }
+        // Trouver la dernière ligne avec ```
+        let endIndex = lines.length;
+        for (let i = lines.length - 1; i >= 0; i--) {
+          if (lines[i].trim().startsWith('```')) {
+            endIndex = i;
+            break;
+          }
+        }
+        cleanedResult = lines.slice(startIndex, endIndex).join('\n');
+      }
+      
+      setEditableContent(cleanedResult);
+    } else {
+      setEditableContent('');
+    }
   }, [result]);
 
   const handleContentChange = (value: string) => {
@@ -177,7 +206,77 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
           <div className="w-24 h-1 rounded-full" style={{ backgroundColor: accentColor }} />
         </div>
         <div className="prose prose-sm max-w-none dark:prose-invert text-gray-800 dark:text-gray-100 leading-relaxed">
-          <ReactMarkdown>{editableContent}</ReactMarkdown>
+          {editableContent && editableContent.trim() ? (
+            <ReactMarkdown
+              components={{
+                // Améliorer le rendu des blocs de code
+                code: ({node, inline, className, children, ...props}: any) => {
+                  if (inline) {
+                    return <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm" {...props}>{children}</code>;
+                  }
+                  return (
+                    <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-4">
+                      <code className="text-sm" {...props}>{children}</code>
+                    </pre>
+                  );
+                },
+                // Améliorer le rendu des paragraphes
+                p: ({node, children, ...props}: any) => (
+                  <p className="mb-4" {...props}>{children}</p>
+                ),
+                // Améliorer le rendu des titres
+                h1: ({node, children, ...props}: any) => (
+                  <h1 className="text-3xl font-bold mb-4 mt-6" style={{ color: accentColor }} {...props}>{children}</h1>
+                ),
+                h2: ({node, children, ...props}: any) => (
+                  <h2 className="text-2xl font-bold mb-3 mt-5" style={{ color: accentColor }} {...props}>{children}</h2>
+                ),
+                h3: ({node, children, ...props}: any) => (
+                  <h3 className="text-xl font-bold mb-2 mt-4" style={{ color: accentColor }} {...props}>{children}</h3>
+                ),
+                // Améliorer les listes
+                ul: ({node, children, ...props}: any) => (
+                  <ul className="list-disc list-inside mb-4 space-y-2" {...props}>{children}</ul>
+                ),
+                ol: ({node, children, ...props}: any) => (
+                  <ol className="list-decimal list-inside mb-4 space-y-2" {...props}>{children}</ol>
+                ),
+                li: ({node, children, ...props}: any) => (
+                  <li className="ml-4" {...props}>{children}</li>
+                ),
+                // Améliorer les tableaux
+                table: ({node, children, ...props}: any) => (
+                  <div className="overflow-x-auto my-4">
+                    <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>{children}</table>
+                  </div>
+                ),
+                th: ({node, children, ...props}: any) => (
+                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-bold" {...props}>{children}</th>
+                ),
+                td: ({node, children, ...props}: any) => (
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2" {...props}>{children}</td>
+                ),
+                // Améliorer les blockquotes
+                blockquote: ({node, children, ...props}: any) => (
+                  <blockquote className="border-l-4 pl-4 italic my-4 border-gray-300 dark:border-gray-600" style={{ borderLeftColor: accentColor }} {...props}>{children}</blockquote>
+                ),
+                // Améliorer les liens
+                a: ({node, children, ...props}: any) => (
+                  <a className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300" {...props}>{children}</a>
+                ),
+                // Améliorer les strong
+                strong: ({node, children, ...props}: any) => (
+                  <strong className="font-bold" style={{ color: accentColor }} {...props}>{children}</strong>
+                ),
+              }}
+            >
+              {editableContent}
+            </ReactMarkdown>
+          ) : (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <p>Aucun contenu à afficher. Générez un business plan pour commencer.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
