@@ -462,7 +462,7 @@ export const ToolPage: React.FC = () => {
 
       {/* AD BANNER (HEADER) FOR FREE USERS */}
 
-      <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' || tool.id === 'brand-name-gen' ? '' : 'lg:grid-cols-2'} gap-8`}>
+      <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' || tool.id === 'brand-name-gen' || tool.id === 'business-plan-pro' ? '' : 'lg:grid-cols-2'} gap-8`}>
         {/* Left Column: Input */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
@@ -486,6 +486,29 @@ export const ToolPage: React.FC = () => {
                     const prompt = tool.promptGenerator(data);
                     if (prompt && !prompt.startsWith('ERROR:')) {
                       handleSubmitFromComponent({ prompt, data });
+                    }
+                  }
+                }}
+                tool={tool}
+                hasCredits={hasCredits || false}
+                loading={loading || false}
+              />
+            ) : tool.id === 'business-plan-pro' ? (
+              <BusinessPlanStudio
+                result={result ? String(result) : ''}
+                inputValue={inputs.input ? String(inputs.input) : undefined}
+                onSave={isLoggedIn ? handleSaveResult : undefined}
+                isSaved={isResultSaved}
+                isSaving={savingResult}
+                onChange={(value) => {
+                  setResult(value);
+                  setIsResultSaved(false);
+                }}
+                onSubmit={(data) => {
+                  if (tool && tool.promptGenerator) {
+                    const prompt = tool.promptGenerator(data.data);
+                    if (prompt && !prompt.startsWith('ERROR:')) {
+                      handleSubmitFromComponent({ prompt, data: data.data });
                     }
                   }
                 }}
@@ -736,29 +759,6 @@ export const ToolPage: React.FC = () => {
                       </p>
                     </div>
                  </div>
-              ) : tool.id === 'business-plan-pro' ? (
-                <BusinessPlanStudio
-                  result={result ? String(result) : ''}
-                  inputValue={inputs.input ? String(inputs.input) : undefined}
-                  onSave={isLoggedIn ? handleSaveResult : undefined}
-                  isSaved={isResultSaved}
-                  isSaving={savingResult}
-                  onChange={(value) => {
-                    setResult(value);
-                    setIsResultSaved(false);
-                  }}
-                  onSubmit={(data) => {
-                    if (tool && tool.promptGenerator) {
-                      const prompt = tool.promptGenerator(data.data);
-                      if (prompt && !prompt.startsWith('ERROR:')) {
-                        handleSubmitFromComponent({ prompt, data: data.data });
-                      }
-                    }
-                  }}
-                  tool={tool}
-                  hasCredits={hasCredits || false}
-                  loading={loading || false}
-                />
               ) : tool.id === 'website-generator' ? (
                 showPreview ? (
                     // Website Generator avec iframe preview amélioré
