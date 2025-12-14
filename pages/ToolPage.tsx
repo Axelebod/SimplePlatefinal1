@@ -6,7 +6,6 @@ import { useUserStore } from '../store/userStore';
 import { isApiReady } from '../services/geminiService';
 import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save, Download } from 'lucide-react';
 import { LOADING_MESSAGES } from '../constants';
-import { AdBanner } from '../components/AdBanner';
 import ReactMarkdown from 'react-markdown';
 import { generateToolSEOContent } from '../utils/toolContentGenerator';
 import { ToolHistory } from '../components/ToolHistory';
@@ -27,6 +26,7 @@ import { JsonFormatterDisplay } from '../components/JsonFormatterDisplay';
 import { DecisionWheel } from '../components/DecisionWheel';
 import { HtmlResultDisplay } from '../components/HtmlResultDisplay';
 import { PxRemDisplay } from '../components/PxRemDisplay';
+import { BrandNameStudio } from '../components/BrandNameStudio';
 import { ToolInput } from '../types';
 import { useToolSEO } from '../hooks/useToolSEO';
 import { useToolGeneration } from '../hooks/useToolGeneration';
@@ -55,7 +55,7 @@ export const ToolPage: React.FC = () => {
     }
   }, [slug, tool]);
   
-  const { user, credits, deductCredits, isPro } = useUserStore();
+  const { user, credits, deductCredits } = useUserStore();
   
   // Form State
   const [inputs, setInputs] = useState<Record<string, any>>({});
@@ -170,8 +170,6 @@ export const ToolPage: React.FC = () => {
     );
   }
 
-  // Plus de restrictions PRO - tous les outils sont accessibles
-  const isLocked = false;
   const hasCredits = credits >= tool.cost;
 
   // Pour px-to-rem, initialiser le résultat directement
@@ -225,11 +223,6 @@ export const ToolPage: React.FC = () => {
 
     if (!isLoggedIn) {
       navigate('/signup');
-      return;
-    }
-
-    if (isLocked) {
-      alert("Cet outil nécessite un plan PRO.");
       return;
     }
 
@@ -340,7 +333,7 @@ export const ToolPage: React.FC = () => {
         {
           model: tool.outputType === 'image' ? 'imagen-4.0-generate-001' : 'gemini-2.5-flash',
         },
-        isPro || false,
+        false,
         false // skipLimitCheck = false pour sauvegarde manuelle (avec limites)
       );
 
@@ -414,7 +407,6 @@ export const ToolPage: React.FC = () => {
         </button>
         <div className="flex items-center gap-3">
            <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white">{tool.title}</h1>
-           {tool.isPremium && <span className="bg-neo-black dark:bg-white text-white dark:text-black px-2 py-1 text-xs font-bold rounded">PRO</span>}
         </div>
         <p className="text-gray-600 dark:text-gray-300 mt-2">{tool.description}</p>
       </div>
@@ -439,7 +431,6 @@ export const ToolPage: React.FC = () => {
       )}
 
       {/* AD BANNER (HEADER) FOR FREE USERS */}
-      <AdBanner location="header" />
 
       <div className={`grid grid-cols-1 ${tool.id === 'px-to-rem' ? '' : 'lg:grid-cols-2'} gap-8`}>
         {/* Left Column: Input */}
@@ -468,7 +459,7 @@ export const ToolPage: React.FC = () => {
                       content={inputs[input.name] || ''}
                       onChange={(content) => handleInputChange(input.name, content)}
                       placeholder={input.placeholder || 'Commencez à écrire...'}
-                      editable={!loading && !isLocked}
+                      editable={!loading}
                     />
                   ) : input.type === 'textarea' ? (
                     <textarea
@@ -476,14 +467,14 @@ export const ToolPage: React.FC = () => {
                       placeholder={input.placeholder}
                       rows={input.rows || 4}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked}
+                      disabled={loading}
                       maxLength={MAX_CHARS}
                     />
                   ) : input.type === 'select' ? (
                     <select
                        className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                        onChange={(e) => handleInputChange(input.name, e.target.value)}
-                       disabled={loading || isLocked}
+                       disabled={loading}
                     >
                       <option value="">Sélectionnez une option</option>
                       {input.options?.map(opt => (
@@ -519,7 +510,7 @@ export const ToolPage: React.FC = () => {
                                 className="hidden" 
                                 accept={input.accept}
                                 onChange={(e) => handleFileChange(e, input)}
-                                disabled={loading || isLocked}
+                                disabled={loading}
                             />
                         </label>
                     </div>
@@ -541,7 +532,7 @@ export const ToolPage: React.FC = () => {
                             }
                           }
                         }}
-                        disabled={loading || isLocked}
+                        disabled={loading}
                         className="w-24 h-24 rounded-lg border-4 border-black dark:border-white cursor-pointer shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]"
                       />
                       <div className="flex-1">
@@ -564,7 +555,7 @@ export const ToolPage: React.FC = () => {
                           }}
                           className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white font-mono font-bold ${input.className || ''}`}
                           placeholder="#000000"
-                          disabled={loading || isLocked}
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -574,7 +565,7 @@ export const ToolPage: React.FC = () => {
                       className={`w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-md focus:border-black dark:focus:border-white focus:ring-0 bg-neo-white dark:bg-gray-900 dark:text-white ${input.className || ''}`}
                       placeholder={input.placeholder}
                       onChange={(e) => handleInputChange(input.name, e.target.value)}
-                      disabled={loading || isLocked}
+                      disabled={loading}
                       maxLength={MAX_CHARS}
                     />
                   )}
@@ -592,14 +583,12 @@ export const ToolPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={loading || (isLoggedIn && (isLocked || !hasCredits))}
+                disabled={loading || (isLoggedIn && !hasCredits)}
                 className={`
                   w-full py-4 font-bold text-lg border-2 border-black dark:border-gray-500 rounded-md flex items-center justify-center gap-2 transition-all
                   ${!isLoggedIn
                     ? 'bg-neo-yellow text-black hover:bg-yellow-400 cursor-pointer shadow-[4px_4px_0px_0px_#000] dark:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000]'
-                    : isLocked 
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed' 
-                      : loading 
+                    : loading 
                         ? 'bg-neo-yellow text-black cursor-wait'
                         : !hasCredits 
                           ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
@@ -615,10 +604,6 @@ export const ToolPage: React.FC = () => {
                     <Loader2 className="w-5 h-5 animate-spin" /> 
                     Génération...
                   </>
-                ) : isLocked ? (
-                  <>
-                    <Lock className="w-5 h-5" /> Débloquer avec PRO
-                  </>
                 ) : !hasCredits ? (
                   <>Pas assez de crédits ({tool.cost})</>
                 ) : (
@@ -632,8 +617,6 @@ export const ToolPage: React.FC = () => {
           )}
           </div>
           
-          {/* AD BANNER (SIDEBAR) */}
-          <AdBanner location="sidebar" />
         </div>
 
         {/* Right Column: Output - Masqué pour px-to-rem */}
@@ -700,10 +683,8 @@ export const ToolPage: React.FC = () => {
                     </div>
                  </div>
               ) : tool.id === 'business-plan-pro' ? (
-                <HtmlResultDisplay
-                  result={result}
-                  title="Business Plan"
-                  filename="business-plan"
+                <BusinessPlanDisplay
+                  result={result || ''}
                   onSave={isLoggedIn ? handleSaveResult : undefined}
                   isSaved={isResultSaved}
                   isSaving={savingResult}
@@ -892,6 +873,18 @@ export const ToolPage: React.FC = () => {
                         </div>
               ) : tool.id === 'hex-to-rgb' ? (
                         <HexColorDisplay result={result} inputValue={inputs.hex}
+                        />
+               ) : tool.id === 'brand-name-gen' ? (
+                        <BrandNameStudio 
+                          result={result || ''} 
+                          inputValue={inputs.project}
+                          onSave={isLoggedIn ? handleSaveResult : undefined}
+                          isSaved={isResultSaved}
+                          isSaving={savingResult}
+                          onChange={(value) => {
+                            setResult(value);
+                            setIsResultSaved(false);
+                          }}
                         />
                ) : tool.id === 'invoice-generator' ? (
                         <HtmlResultDisplay
@@ -1104,7 +1097,7 @@ export const ToolPage: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {tool.cost === 0 
                       ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
-                      : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. ${tool.isPremium ? 'Cet outil est disponible uniquement pour les membres PRO.' : 'Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.'}`}
+                      : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.`}
                   </p>
                 </div>
                 <div>

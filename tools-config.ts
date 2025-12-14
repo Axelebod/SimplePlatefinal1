@@ -977,16 +977,71 @@ Tone: Professionnel, convaincant, data-driven. Génère maintenant le HTML compl
     { title: 'Générateur Réponse Avis Client (Google/Amazon)', description: 'Répondez aux avis clients automatiquement avec professionnalisme. Gestion de crise et fidélisation par IA.', keywords: ['répondre avis google', 'service client ia', 'gestion avis négatif', 'amazon review reply'] }, 
     1
   ),
-  createSimpleTool(
-    'brand-name-gen', 
-    'Générateur Nom de Marque', 
-    'Vous cherchez le nom parfait pour votre marque ? On vous propose 10 idées originales, mémorables et qui sonnent bien. Le branding, c\'est important !', 
-    'Business', 
-    'Propose 10 noms de marque uniques, courts, mémorables et modernes pour ce projet. Vérifie mentalement que ça sonne bien en français et anglais. Projet :', 
-    'Tag', 'text', { placeholder: 'Ex: Une marque de vêtements éco-responsables' },
-    { title: 'Générateur de Nom de Marque & Startup', description: 'Trouvez le nom parfait pour votre entreprise ou boutique Shopify. Idées de noms originaux et disponibles.', keywords: ['générateur nom entreprise', 'trouver nom marque', 'branding ia', 'naming tool'] }, 
-    1
-  ),
+  {
+    id: 'brand-name-gen',
+    slug: 'studio-branding',
+    title: 'Studio de Branding',
+    description: 'Mini SaaS complet pour créer votre marque : génération de noms, slogans, analyse de disponibilité, variations et export. Tout pour lancer votre marque !',
+    category: 'Business',
+    cost: 2,
+    isPremium: false,
+    iconName: 'Sparkles',
+    outputType: 'text',
+    seo: { 
+      title: 'Studio de Branding - Générateur Nom de Marque & Startup Complet', 
+      description: 'Plateforme complète de branding : générez des noms de marque, slogans, analysez la disponibilité des domaines, créez des variations. Tout pour créer votre identité de marque.', 
+      keywords: ['studio branding', 'générateur nom entreprise', 'trouver nom marque', 'branding ia', 'naming tool', 'créer marque', 'identité de marque'] 
+    },
+    inputs: [
+      { 
+        name: 'project', 
+        label: 'Description du projet', 
+        type: 'textarea', 
+        placeholder: 'Ex: Une marque de vêtements éco-responsables pour jeunes actifs urbains', 
+        required: true,
+        rows: 3,
+        helpText: 'Décrivez votre projet, votre cible et votre positionnement'
+      },
+      {
+        name: 'style',
+        label: 'Style de nom souhaité',
+        type: 'select',
+        options: ['Moderne', 'Classique', 'Créatif', 'Tech', 'Luxe', 'Nature', 'Mixte'],
+        required: false,
+        helpText: 'Choisissez le style de nom qui correspond à votre marque'
+      },
+      {
+        name: 'length',
+        label: 'Longueur préférée',
+        type: 'select',
+        options: ['Court (3-6 lettres)', 'Moyen (7-10 lettres)', 'Long (11+ lettres)', 'Toutes'],
+        required: false,
+        helpText: 'Préférence pour la longueur du nom'
+      }
+    ],
+    promptGenerator: (data) => `${SYSTEM_PROMPT}
+TÂCHE: Génère 15 noms de marque professionnels et uniques pour ce projet.
+
+PROJET: "${data.project}"
+STYLE: ${data.style || 'Mixte'}
+LONGUEUR: ${data.length || 'Toutes'}
+
+FORMAT DE RÉPONSE (STRICT):
+Liste les noms un par ligne, numérotés de 1 à 15, sous cette forme exacte :
+1. NomDeMarque1
+2. NomDeMarque2
+3. NomDeMarque3
+...
+
+RÈGLES:
+- Noms courts, mémorables et prononçables en français ET anglais
+- Uniques et originaux (pas de copies de marques existantes)
+- Adaptés au style demandé
+- Pas de caractères spéciaux, seulement lettres et espaces si nécessaire
+- Chaque nom sur une ligne séparée avec numéro
+
+Génère maintenant les 15 noms.`
+  },
 
   // --- NEW AI TOOLS ---
   {

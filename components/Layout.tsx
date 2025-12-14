@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
-import { Zap, Crown, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock } from 'lucide-react';
+import { Zap, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock } from 'lucide-react';
 import { SimpleBot } from './SimpleBot';
 import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, credits, creditsFree, creditsPaid, isPro, buyCredits, togglePro, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
+  const { user, credits, creditsFree, creditsPaid, buyCredits, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -147,13 +147,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </div>
                     </Link>
 
-                    <Link 
-                        to="/pricing"
-                        className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all ${isPro ? 'bg-neo-violet' : 'bg-gray-100 dark:bg-gray-900'}`}
-                    >
-                        <Crown className={`w-4 h-4 ${isPro ? 'fill-white text-white' : 'text-gray-500 dark:text-gray-400'}`} />
-                        <span className="font-bold dark:text-white">{isPro ? 'PRO' : 'Passer PRO'}</span>
-                    </Link>
                     
                     <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700 flex items-center gap-3">
                         <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors">

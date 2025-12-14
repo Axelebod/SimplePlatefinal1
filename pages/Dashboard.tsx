@@ -4,13 +4,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
-import { Zap, Crown, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
+import { Zap, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
 import { getRecentActivity } from '../services/toolHistoryService';
 import { ToolResult } from '../types/toolHistory';
 import { tools } from '../tools-config';
 
 export const Dashboard: React.FC = () => {
-  const { user, credits, isPro, logout, togglePro, refreshCredits } = useUserStore();
+  const { user, credits, logout, refreshCredits } = useUserStore();
   const navigate = useNavigate();
   const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -106,7 +106,8 @@ export const Dashboard: React.FC = () => {
 
   if (!user) return null;
 
-  const handleManageSubscription = () => {
+  // Fonction supprimée - plus d'abonnement PRO
+  const _handleManageSubscription = () => {
       // Redirection vers le portail client Stripe
       const portalUrl = SITE_CONFIG.stripe.customerPortal;
       if (portalUrl && !portalUrl.includes('votre_portail')) {
@@ -163,7 +164,7 @@ export const Dashboard: React.FC = () => {
                 </div>
                 <div className="mt-4 space-y-2">
                     <p className="text-xs text-gray-400">
-                        {isPro ? "Abonnement PRO actif." : "Passez PRO pour obtenir 100 crédits/mois."}
+                        Achetez des crédits pour utiliser plus d'outils.
                     </p>
                     {nextResetDate && (
                         <div className="flex items-center gap-2 text-xs bg-gray-100 dark:bg-gray-500 px-3 py-2 rounded-md border border-gray-300 dark:border-white">
@@ -172,7 +173,7 @@ export const Dashboard: React.FC = () => {
                                 <span className="font-bold">Prochaine recharge :</span> {timeRemaining}
                             </span>
                             <span className="text-gray-500 dark:text-gray-400 ml-auto">
-                                ({isPro ? '100' : '5'} crédits)
+                                (5 crédits)
                             </span>
                         </div>
                     )}
@@ -180,42 +181,6 @@ export const Dashboard: React.FC = () => {
             </div>
         </div>
 
-        {/* CARD 2 : ABONNEMENT */}
-        <div className={`border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] relative overflow-hidden ${isPro ? 'bg-neo-violet text-black' : 'bg-white dark:bg-gray-600 dark:text-white'}`}>
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Crown className="w-32 h-32 text-white dark:text-gray-500" />
-            </div>
-
-            <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2 font-bold uppercase tracking-wider text-xs opacity-70">
-                    <Crown className="w-4 h-4" /> Mon Plan
-                </div>
-                <div className="font-display text-6xl font-bold mb-2">
-                    {isPro ? "PRO" : "Gratuit"}
-                </div>
-                <div className="mb-6 text-sm font-medium opacity-80">
-                    {isPro ? "Abonnement actif." : "Fonctionnalités limitées."}
-                </div>
-
-                <div className="flex gap-3">
-                    {isPro ? (
-                        <button 
-                            onClick={handleManageSubscription}
-                            className="flex-1 py-3 bg-white text-black font-bold border-2 border-black rounded-md hover:bg-gray-100 transition-colors"
-                        >
-                            Gérer l'abonnement / Résilier
-                        </button>
-                    ) : (
-                        <Link 
-                            to="/pricing"
-                            className="flex-1 py-3 bg-neo-black dark:bg-white text-white dark:text-black font-bold text-center rounded-md shadow-[3px_3px_0px_0px_#fff] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
-                        >
-                            Passer PRO (9.99€)
-                        </Link>
-                    )}
-                </div>
-            </div>
-        </div>
 
       </div>
 

@@ -4,7 +4,6 @@ import { tools } from '../tools-config';
 import { ToolCard } from '../components/ToolCard';
 import { CATEGORIES, CATEGORY_LABELS } from '../constants';
 import { Search, Plus } from 'lucide-react';
-import { AdBanner } from '../components/AdBanner';
 import { Link } from 'react-router-dom';
 import { StatsCounter } from '../components/StatsCounter';
 import { HomeCTA } from '../components/HomeCTA';
@@ -147,10 +146,6 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* PUB DISCRETE */}
-      <div className="max-w-2xl mx-auto">
-         <AdBanner location="home-middle" />
-      </div>
 
       {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pb-8">
@@ -228,10 +223,6 @@ export const Home: React.FC = () => {
          </div>
       </section>
 
-      {/* PUB DISCRETE */}
-      <div className="max-w-4xl mx-auto pb-10">
-          <AdBanner location="home-bottom" />
-      </div>
     </div>
   );
 };

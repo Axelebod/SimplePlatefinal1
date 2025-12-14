@@ -26,8 +26,8 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
 }) => {
   const planRef = useRef<HTMLDivElement>(null);
   const [selectedTemplate, setSelectedTemplate] = useState(0);
-  const [accentColor, setAccentColor] = useState(PLAN_TEMPLATES[0].accent);
-  const [editableContent, setEditableContent] = useState(result);
+  const [accentColor, setAccentColor] = useState(PLAN_TEMPLATES[0]?.accent || '#6C47FF');
+  const [editableContent, setEditableContent] = useState(result || '');
   const [isEditing, setIsEditing] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -167,7 +167,7 @@ export const BusinessPlanDisplay: React.FC<BusinessPlanDisplayProps> = ({
 
       <div
         ref={planRef}
-        className={`mx-auto border-2 rounded-xl p-10 shadow-neo dark:shadow-none ${PLAN_TEMPLATES[selectedTemplate].border} ${PLAN_TEMPLATES[selectedTemplate].background}`}
+        className={`mx-auto border-2 rounded-xl p-10 shadow-neo dark:shadow-none ${PLAN_TEMPLATES[selectedTemplate]?.border || PLAN_TEMPLATES[0].border} ${PLAN_TEMPLATES[selectedTemplate]?.background || PLAN_TEMPLATES[0].background}`}
         style={{ width: '210mm', minHeight: '297mm' }}
       >
         <div className="mb-6">
