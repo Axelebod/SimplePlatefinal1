@@ -19,7 +19,7 @@ import { CVDisplay } from '../components/CVDisplay';
 import { PoemDisplay } from '../components/PoemDisplay';
 import { EnhancedResultDisplay } from '../components/EnhancedResultDisplay';
 import { ToolSuggestions } from '../components/ToolSuggestions';
-import { BusinessPlanDisplay } from '../components/BusinessPlanDisplay';
+import { BusinessPlanStudio } from '../components/BusinessPlanStudio';
 import { HexColorDisplay } from '../components/HexColorDisplay';
 import { TextAnalyzerDisplay } from '../components/TextAnalyzerDisplay';
 import { JsonFormatterDisplay } from '../components/JsonFormatterDisplay';
@@ -31,10 +31,12 @@ import { ToolInput } from '../types';
 import { useToolSEO } from '../hooks/useToolSEO';
 import { useToolGeneration } from '../hooks/useToolGeneration';
 import { useDebounce } from '../hooks/useDebounce';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // Trouver l'outil correspondant au slug
   const tool = tools.find(t => {
@@ -153,18 +155,18 @@ export const ToolPage: React.FC = () => {
   if (!tool) {
     return (
       <div className="text-center py-20 px-4">
-        <h2 className="text-2xl font-bold mb-4 dark:text-white">Outil non trouvé</h2>
+        <h2 className="text-2xl font-bold mb-4 dark:text-white">{t('tools.toolNotFound')}</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-2">
-          Slug recherché: <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{slug}</code>
+          {t('tools.slugSearched')}: <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{slug}</code>
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
-          Vérifiez que l'URL est correcte ou retournez à la page d'accueil.
+          {t('tools.checkUrl')}
         </p>
         <Link 
           to="/" 
           className="inline-block px-6 py-3 bg-neo-violet text-white rounded-md font-bold hover:bg-purple-500 transition-colors"
         >
-          Retour à l'accueil
+          {t('notFound.backHome')}
         </Link>
       </div>
     );
@@ -227,7 +229,7 @@ export const ToolPage: React.FC = () => {
     }
 
     if (!hasCredits) {
-      alert(`Pas assez de crédits ! Il vous en faut ${tool.cost}.`);
+      alert(`${t('tools.noCredits')} ${t('tools.creditsRequired')} ${tool.cost}.`);
       return;
     }
 
@@ -258,7 +260,7 @@ export const ToolPage: React.FC = () => {
       // Validation standard pour les autres outils
       const missing = tool.inputs.filter(i => i.required && !inputs[i.name]);
       if (missing.length > 0) {
-        setError(`Veuillez remplir : ${missing.map(m => m.label).join(', ')}`);
+        setError(`${t('tools.fillRequired')}: ${missing.map(m => m.label).join(', ')}`);
         return;
       }
     }
@@ -649,15 +651,15 @@ export const ToolPage: React.FC = () => {
               >
                 {!isLoggedIn ? (
                   <>
-                    <LogIn className="w-5 h-5" /> Créer un compte pour utiliser
+                    <LogIn className="w-5 h-5" /> {t('tools.createAccount')} {t('tools.toUse')}
                   </>
                 ) : loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" /> 
-                    Génération...
+                    {t('tools.loading')}
                   </>
                 ) : !hasCredits ? (
-                  <>Pas assez de crédits ({tool.cost})</>
+                  <>{t('tools.noCredits')} ({tool.cost})</>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
@@ -735,8 +737,9 @@ export const ToolPage: React.FC = () => {
                     </div>
                  </div>
               ) : tool.id === 'business-plan-pro' ? (
-                <BusinessPlanDisplay
+                <BusinessPlanStudio
                   result={result ? String(result) : ''}
+                  inputValue={inputs.input ? String(inputs.input) : undefined}
                   onSave={isLoggedIn ? handleSaveResult : undefined}
                   isSaved={isResultSaved}
                   isSaving={savingResult}
@@ -744,6 +747,17 @@ export const ToolPage: React.FC = () => {
                     setResult(value);
                     setIsResultSaved(false);
                   }}
+                  onSubmit={(data) => {
+                    if (tool && tool.promptGenerator) {
+                      const prompt = tool.promptGenerator(data.data);
+                      if (prompt && !prompt.startsWith('ERROR:')) {
+                        handleSubmitFromComponent({ prompt, data: data.data });
+                      }
+                    }
+                  }}
+                  tool={tool}
+                  hasCredits={hasCredits || false}
+                  loading={loading || false}
                 />
               ) : tool.id === 'website-generator' ? (
                 showPreview ? (

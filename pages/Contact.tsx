@@ -2,19 +2,21 @@
 import React from 'react';
 import { SITE_CONFIG } from '../constants';
 import { Mail, MessageSquare, HelpCircle, Bug, Lightbulb, ArrowRight } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const Contact: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
       
       {/* HEADER */}
       <div className="text-center mb-12">
         <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
-          On discute ?
+          {t('contact.title')}
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Une suggestion, un bug ou une idée de génie ? <br/>
-          Notre équipe (et notre robot) est à l'écoute.
+          {t('contact.subtitle')}
         </p>
       </div>
 
@@ -47,9 +49,9 @@ export const Contact: React.FC = () => {
                         <HelpCircle className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-1">Comment résilier ?</h3>
+                        <h3 className="font-bold text-lg mb-1">{t('contact.howToCancel')}</h3>
                         <p className="text-gray-600 text-sm">
-                            Pas besoin de nous écrire ! Si vous avez pris un abonnement, vous pouvez l'annuler à tout moment depuis votre lien Stripe reçu par email.
+                            {t('contact.cancelInfo')}
                         </p>
                     </div>
                 </div>
@@ -61,9 +63,9 @@ export const Contact: React.FC = () => {
                         <Bug className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-1">Un bug sur un outil ?</h3>
+                        <h3 className="font-bold text-lg mb-1">{t('contact.bugTitle')}</h3>
                         <p className="text-gray-600 text-sm">
-                            Si un outil charge à l'infini, essayez de désactiver votre bloqueur de pub ou de rafraîchir la page. Si ça persiste, écrivez-nous !
+                            {t('contact.bugInfo')}
                         </p>
                     </div>
                 </div>
@@ -75,9 +77,9 @@ export const Contact: React.FC = () => {
                         <MessageSquare className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-1">Partenariats ?</h3>
+                        <h3 className="font-bold text-lg mb-1">{t('contact.partnershipTitle')}</h3>
                         <p className="text-gray-600 text-sm">
-                            Vous voulez sponsoriser SimplePlate ou proposer un outil ? Envoyez un mail avec [PARTENARIAT] dans le sujet.
+                            {t('contact.partnershipInfo')}
                         </p>
                     </div>
                 </div>
@@ -94,9 +96,9 @@ export const Contact: React.FC = () => {
                       <Lightbulb className="w-6 h-6 text-neo-orange" />
                   </div>
                   <div>
-                      <h3 className="font-bold text-lg">Vous avez une idée d'outil ?</h3>
+                      <h3 className="font-bold text-lg">{t('contact.toolIdea')}</h3>
                       <p className="text-sm text-gray-600 max-w-md">
-                          Si vous ne trouvez pas ce que vous cherchez, dites-le nous. On ajoute des nouveaux outils chaque semaine basés sur vos retours.
+                          {t('contact.toolIdeaDesc')}
                       </p>
                   </div>
               </div>
@@ -104,7 +106,7 @@ export const Contact: React.FC = () => {
                 href={`mailto:${SITE_CONFIG.contactEmail}?subject=Suggestion d'outil&body=Nom de l'outil :%0D%0ACatégorie :%0D%0ADescription :`}
                 className="whitespace-nowrap px-6 py-3 bg-white text-black font-bold border-2 border-black rounded-md hover:shadow-neo-sm transition-all flex items-center gap-2"
               >
-                  Suggérer un outil <ArrowRight className="w-4 h-4" />
+                  {t('contact.suggestTool')} <ArrowRight className="w-4 h-4" />
               </a>
           </div>
       </div>
