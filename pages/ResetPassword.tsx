@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Loader2, AlertTriangle, Check, Lock } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,12 +38,12 @@ export const ResetPassword: React.FC = () => {
     setMessage(null);
 
     if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      setError(t('resetPassword.minLengthError'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t('resetPassword.mismatchError'));
       return;
     }
 
@@ -52,7 +54,7 @@ export const ResetPassword: React.FC = () => {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (!session) {
-        throw new Error("Session expirée. Veuillez demander un nouveau lien de réinitialisation.");
+        throw new Error(t('resetPassword.sessionExpired'));
       }
 
       const { error } = await supabase.auth.updateUser({
@@ -61,12 +63,12 @@ export const ResetPassword: React.FC = () => {
 
       if (error) throw error;
 
-      setMessage("Mot de passe réinitialisé avec succès ! Redirection...");
+      setMessage(t('resetPassword.success'));
       setTimeout(() => {
         navigate('/login');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "Une erreur est survenue lors de la réinitialisation.");
+      setError(err.message || t('resetPassword.genericError'));
     } finally {
       setLoading(false);
     }
@@ -81,15 +83,15 @@ export const ResetPassword: React.FC = () => {
           </div>
 
           <h2 className="font-display text-3xl font-bold mb-2 text-center">
-            Nouveau mot de passe
+            {t('resetPassword.title')}
           </h2>
           <p className="text-center text-gray-500 mb-8 text-sm">
-            Choisissez un nouveau mot de passe sécurisé pour votre compte.
+            {t('resetPassword.subtitle')}
           </p>
 
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Nouveau mot de passe</label>
+              <label className="block text-sm font-bold mb-1">{t('resetPassword.newPassword')}</label>
               <input 
                 type="password" 
                 required
@@ -99,11 +101,11 @@ export const ResetPassword: React.FC = () => {
                 className="w-full p-3 border-2 border-black rounded-md bg-neo-white focus:ring-0 focus:shadow-[2px_2px_0px_0px_#000] transition-all"
                 placeholder="••••••••"
               />
-              <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
+              <p className="text-xs text-gray-500 mt-1">{t('resetPassword.minLengthHint')}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Confirmer le mot de passe</label>
+              <label className="block text-sm font-bold mb-1">{t('resetPassword.confirmPassword')}</label>
               <input 
                 type="password" 
                 required
@@ -132,7 +134,7 @@ export const ResetPassword: React.FC = () => {
               className="w-full py-3 bg-neo-black text-white font-bold border-2 border-black rounded-md shadow-[3px_3px_0px_0px_#86efac] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Réinitialiser le mot de passe
+              {t('resetPassword.submit')}
             </button>
           </form>
 
@@ -141,7 +143,7 @@ export const ResetPassword: React.FC = () => {
               onClick={() => navigate('/login')}
               className="text-sm text-neo-violet hover:underline font-bold"
             >
-              Retour à la connexion
+              {t('resetPassword.backToLogin')}
             </button>
           </div>
         </div>

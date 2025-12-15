@@ -17,6 +17,61 @@ export const en = {
     getStarted: 'Get Started',
     learnMore: 'Learn More',
   },
+  // Home (landing page)
+  homePage: {
+    seo: {
+      title: 'SimplePlate AI - 50+ Professional AI Tools (Dev, Image, Business)',
+      description:
+        'SaaS platform with 50+ professional AI tools: Business Plan Generator, Converters, Image Analysis, and more. Credit system available.',
+      keywords:
+        'professional ai tools, ai text generator, online dev tools, ai saas, artificial intelligence, ai credits',
+      ogTitle: 'SimplePlate AI - The Ultimate Toolbox',
+    },
+    hero: {
+      titleLine1: 'Boost your',
+      titleHighlight: 'productivity',
+      subtitleLine1: '50+ AI tools and utilities to code, write, and create instantly.',
+      subtitleLine2: 'Fast. Professional. English.',
+    },
+    searchPlaceholder: "Search for a tool (e.g. 'Legal', 'Image')...",
+    suggestToolHintLine1: 'Missing something?',
+    suggestToolHintLine2: 'Tell us.',
+    noToolsTitle: 'No tools found.',
+    noToolsSubtitle: 'Try another keyword (e.g. "PDF", "Image", "Calculator").',
+    socialProof: {
+      title: 'They love SimplePlate',
+      reviews: {
+        0: {
+          name: 'Thomas',
+          role: 'Developer',
+          text: 'The Regex generator saved me 3 times this week. Essential.',
+        },
+        1: {
+          name: 'Sarah',
+          role: 'Founder',
+          text: 'I built my business plan in 10 minutes with AI. Impressive.',
+        },
+        2: {
+          name: 'Kevin',
+          role: 'Student',
+          text: 'The text humanizer is perfect for my assignments. Thanks!',
+        },
+      },
+    },
+    faq: {
+      title: 'Frequently Asked Questions',
+      q1: {
+        question: 'How do credits work?',
+        answer:
+          'Each user receives 5 free credits per week (non-cumulative). Tools cost between 0 and 3 credits depending on complexity.',
+      },
+      q2: {
+        question: 'Is my data private?',
+        answer:
+          'Yes. Local tools run in your browser. AI tools send data to the provider for processing and are not stored by us.',
+      },
+    },
+  },
   // Dashboard
   dashboard: {
     title: 'My Space',
@@ -24,10 +79,17 @@ export const en = {
     credits: 'Available Balance',
     buyCredits: 'Buy Credits',
     nextReset: 'Next Reset',
+    resetAvailable: 'Reset available!',
     creditsInfo: 'Buy credits to use more tools.',
     accountDetails: 'Account Details',
     recentActivity: 'Recent Activity',
     refresh: 'Refresh',
+    memberId: 'Member ID',
+    activityLoading: 'Loading your latest actions...',
+    noRecentActivity: 'No recent saves. Use a tool and save the result to see activity here.',
+    needInvoiceTitle: 'Need an invoice?',
+    needInvoiceBody:
+      'Invoices are automatically sent by Stripe to your email address for each payment. Check your spam folder or contact support.',
   },
   // Pricing
   pricing: {
@@ -69,6 +131,8 @@ export const en = {
     checkUrl: 'Check that the URL is correct or return to the home page.',
     fillRequired: 'Please fill in',
     toUse: 'to use',
+    credit: 'credit',
+    credits: 'credits',
   },
   // Business Plan
   businessPlan: {
@@ -133,6 +197,7 @@ export const en = {
     cancel: 'Cancel',
     confirm: 'Confirm',
     close: 'Close',
+    open: 'Open',
     back: 'Back',
     next: 'Next',
     previous: 'Previous',
@@ -177,6 +242,86 @@ export const en = {
     toolIdea: 'Have a tool idea?',
     toolIdeaDesc: 'If you can\'t find what you\'re looking for, let us know. We add new tools every week based on your feedback.',
     suggestTool: 'Suggest a tool',
+  },
+  toolSuggestions: {
+    title: 'Suggested tools',
+    defaultMessage: 'Discover these complementary tools!',
+  },
+  toolPage: {
+    backToTools: 'Back to tools',
+    fileTooLarge: 'File too large (Max 4MB)',
+    invalidHex: 'Invalid hex code (must be 6 characters, e.g. #FF0000)',
+    homeworkMissingInputs: 'Please provide either a photo of the exercise OR a written question.',
+    invalidConfig: 'Invalid configuration',
+    missingApiKey: 'Missing API key.',
+    savedSuccess: '✅ Result saved successfully!',
+    saveError: 'Error while saving.',
+    saveErrorRetry: '❌ Error while saving. Please try again.',
+    selectOption: 'Select an option',
+    fileReady: 'File ready!',
+    uploadClick: 'Click to upload',
+    maxCsv: 'CSV (Max 4MB)',
+    maxImages: 'PNG, JPG (Max 4MB)',
+    generateFree: 'Generate for free',
+    result: 'Result',
+    previewSite: 'Website preview',
+    viewCode: 'View code',
+    downloadImage: 'Download image',
+    aiGeneratedImage: 'AI-generated image.',
+    downloadHtml: 'Download HTML',
+    copyCode: 'Copy code',
+    downloadZip: 'Download ZIP',
+    waiting: 'Waiting for your instructions...',
+    qrEncodedData: 'Encoded data:',
+    downloadQrCode: 'Download QR Code',
+    qrError: 'Error while generating the QR code',
+    creditDeductionFailed: 'Unable to deduct your credits. Please refresh your balance.',
+  },
+  sitemap: {
+    pageTitle: 'Sitemap | SimplePlate AI',
+    title: 'Sitemap',
+    subtitleLine1: 'The complete structure of SimplePlate.',
+    toolsCountLabel: 'tools',
+    subtitleLine2: 'ready to use.',
+    backHome: 'Back to home',
+    links: {
+      home: 'Home',
+      pricing: 'Pricing',
+      member: 'Member area',
+      contact: 'Contact',
+      legal: 'Legal',
+      privacy: 'Privacy',
+    },
+  },
+  auth: {
+    headlineSignup: 'Join the club.',
+    headlineLogin: 'Welcome back.',
+    subtitleSignup: 'Create an account to save your credits and results.',
+    subtitleLogin: 'Log in to access your tools and history.',
+    confirmationSent: 'Confirmation email sent! Check your inbox to activate your account.',
+    enterEmail: 'Please enter your email address.',
+    resetSent: 'A password reset email has been sent! Check your inbox.',
+    resetError: 'An error occurred while sending the email.',
+    forgotPasswordHelp: 'Enter your email and we will send you a link to reset your password.',
+    password: 'Password',
+    forgotPassword: 'Forgot password?',
+    createAccount: 'Create my account',
+    termsPrefix: 'By continuing, you agree to our',
+    termsLink: 'Terms of Service',
+  },
+  resetPassword: {
+    title: 'New password',
+    subtitle: 'Choose a new secure password for your account.',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm password',
+    minLengthHint: 'Minimum 6 characters',
+    minLengthError: 'Password must be at least 6 characters.',
+    mismatchError: 'Passwords do not match.',
+    sessionExpired: 'Session expired. Please request a new reset link.',
+    success: 'Password reset successfully! Redirecting...',
+    genericError: 'An error occurred while resetting your password.',
+    submit: 'Reset password',
+    backToLogin: 'Back to login',
   },
 };
 

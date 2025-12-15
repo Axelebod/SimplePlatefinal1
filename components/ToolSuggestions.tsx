@@ -1,7 +1,8 @@
 import React from 'react';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { tools } from '../tools-config';
+import { getTools } from '../tools-config';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface ToolSuggestionsProps {
   currentToolId: string;
@@ -41,10 +42,30 @@ const SUGGESTION_MESSAGES: Record<string, string> = {
   'workout-generator': "Planifiez aussi vos repas pour optimiser vos résultats !",
 };
 
+const SUGGESTION_MESSAGES_EN: Record<string, string> = {
+  'ecom-product-scanner': 'Want to generate an invoice for this product?',
+  'website-generator': 'Need a logo or meta tags for your website?',
+  'business-plan-pro': 'Create your CV and cover letter to complete your package!',
+  'invoice-generator': 'Generate your CV or brand name too!',
+  'cv-generator': 'Pair it with a strong cover letter!',
+  'cover-letter-gen': 'Create a professional CV too!',
+  'brand-name-gen': 'Find a domain name and create your logo!',
+  'ecom-ad-gen': 'Boost visibility with hashtags and LinkedIn posts!',
+  'python-pro-gen': 'Document your code with a professional README!',
+  'ai-image-analysis': 'Create a logo or wallpaper from this analysis!',
+  'homework-helper': 'Improve your text and simplify concepts!',
+  'recipe-generator': 'Build a complete meal plan for the week!',
+  'workout-generator': 'Plan your meals to optimize results!',
+};
+
 export const ToolSuggestions: React.FC<ToolSuggestionsProps> = ({ currentToolId, onClose }) => {
   const navigate = useNavigate();
+  const { t, language } = useTranslation();
+  const tools = React.useMemo(() => getTools(language), [language]);
   const suggestedToolIds = TOOL_SUGGESTIONS[currentToolId] || [];
-  const message = SUGGESTION_MESSAGES[currentToolId] || "Découvrez ces outils complémentaires !";
+  const message =
+    (language === 'fr' ? SUGGESTION_MESSAGES : SUGGESTION_MESSAGES_EN)[currentToolId] ||
+    t('toolSuggestions.defaultMessage');
 
   if (suggestedToolIds.length === 0) {
     return null;
@@ -71,7 +92,7 @@ export const ToolSuggestions: React.FC<ToolSuggestionsProps> = ({ currentToolId,
             <Sparkles className="w-5 h-5 text-neo-black dark:text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="font-display text-lg font-bold dark:text-white mb-1">Suggestion d'outils</h3>
+            <h3 className="font-display text-lg font-bold dark:text-white mb-1">{t('toolSuggestions.title')}</h3>
             <p className="text-sm text-gray-800 dark:text-gray-200 mb-3">{message}</p>
             
             {/* Tools as horizontal scrollable list */}
@@ -94,7 +115,7 @@ export const ToolSuggestions: React.FC<ToolSuggestionsProps> = ({ currentToolId,
         <button
           onClick={onClose}
           className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-colors shrink-0"
-          aria-label="Fermer"
+          aria-label={t('common.close')}
         >
           <X className="w-5 h-5 text-neo-black dark:text-white" />
         </button>

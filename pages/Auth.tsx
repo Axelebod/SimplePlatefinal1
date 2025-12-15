@@ -4,11 +4,13 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useUserStore } from '../store/userStore';
 import { Loader2, AlertTriangle, Check, Mail } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const Auth: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useUserStore();
+  const { t } = useTranslation();
   
   const isSignupInitial = location.pathname.includes('signup');
   const [isSignup, setIsSignup] = useState(isSignupInitial);
@@ -34,7 +36,7 @@ export const Auth: React.FC = () => {
           password,
         });
         if (error) throw error;
-        setMessage("Email de confirmation envoyé ! Vérifiez votre boîte mail pour activer le compte.");
+        setMessage(t('auth.confirmationSent'));
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -50,7 +52,7 @@ export const Auth: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Auth Error:", err);
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export const Auth: React.FC = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setError("Veuillez entrer votre adresse email.");
+      setError(t('auth.enterEmail'));
       return;
     }
 
@@ -74,10 +76,10 @@ export const Auth: React.FC = () => {
       });
 
       if (error) throw error;
-      setMessage("Un email de réinitialisation a été envoyé ! Vérifiez votre boîte mail.");
+      setMessage(t('auth.resetSent'));
       setShowForgotPassword(false);
     } catch (err: any) {
-      setError(err.message || "Une erreur est survenue lors de l'envoi de l'email.");
+      setError(err.message || t('auth.resetError'));
     } finally {
       setLoading(false);
     }
@@ -93,13 +95,13 @@ export const Auth: React.FC = () => {
             onClick={() => { setIsSignup(false); setError(null); setMessage(null); }}
             className={`flex-1 py-3 font-bold text-sm uppercase tracking-wider transition-colors ${!isSignup ? 'bg-neo-black text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
           >
-            Connexion
+            {t('nav.login')}
           </button>
           <button
             onClick={() => { setIsSignup(true); setError(null); setMessage(null); }}
             className={`flex-1 py-3 font-bold text-sm uppercase tracking-wider transition-colors ${isSignup ? 'bg-neo-yellow text-black border-l-2 border-black' : 'bg-white text-gray-500 hover:bg-gray-50 border-l-2 border-gray-200'}`}
           >
-            Inscription
+            {t('nav.signup')}
           </button>
         </div>
 
@@ -110,17 +112,17 @@ export const Auth: React.FC = () => {
            </div>
 
            <h2 className="font-display text-3xl font-bold mb-2 text-center">
-             {isSignup ? "Rejoignez le club." : "Bon retour."}
+             {isSignup ? t('auth.headlineSignup') : t('auth.headlineLogin')}
            </h2>
            <p className="text-center text-gray-500 mb-8 text-sm">
-             {isSignup ? "Créez un compte pour sauvegarder vos crédits." : "Connectez-vous pour accéder à vos outils."}
+             {isSignup ? t('auth.subtitleSignup') : t('auth.subtitleLogin')}
            </p>
 
            {showForgotPassword ? (
              <form onSubmit={handleForgotPassword} className="space-y-4">
                <div className="mb-4">
                  <p className="text-sm text-gray-600 mb-4">
-                   Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+                   {t('auth.forgotPasswordHelp')}
                  </p>
                </div>
                <div>
@@ -131,7 +133,7 @@ export const Auth: React.FC = () => {
                    value={email}
                    onChange={(e) => setEmail(e.target.value)}
                    className="w-full p-3 border-2 border-black rounded-md bg-neo-white focus:ring-0 focus:shadow-[2px_2px_0px_0px_#000] transition-all"
-                   placeholder="votre@email.com"
+                   placeholder="you@email.com"
                  />
                </div>
 
@@ -152,7 +154,7 @@ export const Auth: React.FC = () => {
                    onClick={() => { setShowForgotPassword(false); setError(null); setMessage(null); }}
                    className="flex-1 py-3 bg-gray-100 text-black font-bold border-2 border-black rounded-md hover:bg-gray-200 transition-all"
                  >
-                   Annuler
+                   {t('common.cancel')}
                  </button>
                  <button 
                    type="submit" 
@@ -160,7 +162,7 @@ export const Auth: React.FC = () => {
                    className="flex-1 py-3 bg-neo-black text-white font-bold border-2 border-black rounded-md shadow-[3px_3px_0px_0px_#86efac] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2"
                  >
                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                   Envoyer
+                   {t('contact.send')}
                  </button>
                </div>
              </form>
@@ -174,19 +176,19 @@ export const Auth: React.FC = () => {
                  value={email}
                  onChange={(e) => setEmail(e.target.value)}
                  className="w-full p-3 border-2 border-black rounded-md bg-neo-white focus:ring-0 focus:shadow-[2px_2px_0px_0px_#000] transition-all"
-                 placeholder="votre@email.com"
+                 placeholder="you@email.com"
                />
              </div>
              <div>
                <div className="flex justify-between items-center mb-1">
-                 <label className="block text-sm font-bold">Mot de passe</label>
+                 <label className="block text-sm font-bold">{t('auth.password')}</label>
                  {!isSignup && (
                    <button
                      type="button"
                      onClick={() => setShowForgotPassword(true)}
                      className="text-xs text-neo-violet hover:underline font-bold"
                    >
-                     Mot de passe oublié ?
+                     {t('auth.forgotPassword')}
                    </button>
                  )}
                </div>
@@ -219,7 +221,7 @@ export const Auth: React.FC = () => {
                className="w-full py-3 bg-neo-black text-white font-bold border-2 border-black rounded-md shadow-[3px_3px_0px_0px_#86efac] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2"
              >
                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-               {isSignup ? "Créer mon compte" : "Se connecter"}
+               {isSignup ? t('auth.createAccount') : t('nav.login')}
              </button>
            </form>
            )}
@@ -228,7 +230,8 @@ export const Auth: React.FC = () => {
         
         <div className="text-center mt-6">
             <p className="text-sm text-gray-500">
-                En continuant, vous acceptez nos <Link to="/legal" className="underline font-bold text-black">CGU</Link>.
+                {t('auth.termsPrefix')}{' '}
+                <Link to="/legal" className="underline font-bold text-black">{t('auth.termsLink')}</Link>.
             </p>
         </div>
 

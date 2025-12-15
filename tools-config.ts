@@ -1,5 +1,6 @@
 
 import { ToolConfig } from './types';
+import { useLanguageStore } from './store/languageStore';
 
 // Fonction pour générer un slug français SEO-friendly
 const createFrenchSlug = (title: string): string => {
@@ -13,14 +14,33 @@ const createFrenchSlug = (title: string): string => {
     .replace(/^-|-$/g, ''); // Supprime les tirets en début/fin
 };
 
-// Directive stricte pour l'IA
-const SYSTEM_PROMPT = `
+const getCurrentLanguage = (): 'fr' | 'en' => {
+  try {
+    return useLanguageStore.getState().language;
+  } catch {
+    return 'fr';
+  }
+};
+
+// System prompts for the AI (language-aware)
+const SYSTEM_PROMPT_FR = `
 RÔLE: Tu es un expert francophone précis et efficace.
 RÈGLES ABSOLUES:
 1. TU DOIS RÉPONDRE UNIQUEMENT EN FRANÇAIS (Sauf si on demande explicitement de traduire vers une autre langue ou pour le code informatique).
 2. Sois direct. Pas de "Bonjour", pas de "Voici la réponse". Donne le résultat.
 3. Utilise le format Markdown pour la mise en forme (Gras, Listes, Code).
 `;
+
+const SYSTEM_PROMPT_EN = `
+ROLE: You are a precise, efficient expert.
+ABSOLUTE RULES:
+1. YOU MUST RESPOND ONLY IN ENGLISH (unless explicitly asked to translate to another language or for code keywords).
+2. Be direct. No greetings. No filler. Provide the result.
+3. Use Markdown for formatting (bold, lists, code).
+4. If the task description is in French, first translate it mentally, then execute it in English.
+`;
+
+const SYSTEM_PROMPT = () => (getCurrentLanguage() === 'fr' ? SYSTEM_PROMPT_FR : SYSTEM_PROMPT_EN);
 
 // Helper pour les outils IA classiques
 const createSimpleTool = (
@@ -58,12 +78,12 @@ const createSimpleTool = (
     rows: inputConfig.rows || 4,
     className: inputConfig.className || ''
   }],
-  promptGenerator: (data) => `${SYSTEM_PROMPT}
+  promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: ${promptPrefix}
 CONTEXTE UTILISATEUR: "${data.input}"`,
 });
 
-export const tools: ToolConfig[] = [
+const TOOLS_FR: ToolConfig[] = [
   // --- HIGH TICKET TOOLS (3 CREDITS) ---
   {
     id: 'ecom-product-scanner',
@@ -115,7 +135,7 @@ export const tools: ToolConfig[] = [
         helpText: 'Pour un positionnement différenciant'
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Analyse cette image de produit comme un expert Copywriter E-commerce spécialisé ${data.platform || 'Shopify/Amazon'}.
 CIBLE: ${data.niche || "Grand public"}
 GAMME PRIX: ${data.priceRange || 'Non spécifiée'}
@@ -449,7 +469,7 @@ Génère maintenant le HTML complet avec tous les placeholders remplacés par le
       const sectionsList = data.sections ? `\nSECTIONS: ${data.sections}` : '';
       const taglineText = data.tagline ? `\nTAGLINE: ${data.tagline}` : '';
       
-      return `${SYSTEM_PROMPT}
+      return `${SYSTEM_PROMPT()}
 TÂCHE: Code une page web HTML complète, moderne et professionnelle.
 
 TYPE DE SITE: ${data.siteType}
@@ -542,7 +562,7 @@ GÉNÈRE LE CODE MAINTENANT :`;
         required: false 
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Agis comme un Expert Python Senior. Écris un script complet, professionnel et production-ready pour : "${data.task}".
 
 NIVEAU DE COMPLEXITÉ: ${data.complexity || 'Intermédiaire'}
@@ -653,7 +673,7 @@ Génère maintenant le code complet avec tous ces éléments.`
       },
       { name: 'question', label: 'Question spécifique (Optionnel)', type: 'text', placeholder: 'Ex: Quel est le style artistique ? Y a-t-il des artefacts ?', required: false }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Analyse approfondie de cette image avec rapport professionnel structuré.
 
 TYPE D'ANALYSE: ${data.analysisType || 'Complète'}
@@ -780,7 +800,7 @@ Génère maintenant le rapport complet.`
         helpText: 'Utilisez l\'éditeur pour formater votre texte professionnellement'
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un consultant McKinsey Senior. Génère un Business Plan complet en HTML/CSS professionnel.
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Agis comme un consultant McKinsey Senior. Génère un Business Plan complet en HTML/CSS professionnel.
 
 ENTREPRISE: ${data.companyName}
 SECTEUR: ${data.sector}
@@ -1019,7 +1039,7 @@ Tone: Professionnel, convaincant, data-driven. Génère maintenant le HTML compl
         helpText: 'Préférence pour la longueur du nom'
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère 15 noms de marque professionnels et uniques pour ce projet.
 
 PROJET: "${data.project}"
@@ -1060,7 +1080,7 @@ Génère maintenant les 15 noms.`
       keywords: ['détecteur ia professionnel', 'vérifier chatgpt', 'ai detector français', 'anti plagiat ia', 'reconnaître texte ia']
     },
     inputs: [{ name: 'content', label: 'Texte à analyser', type: 'textarea', rows: 8, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un algorithme de détection de motifs IA. Analyse ce texte : "${data.content}". \n1. Donne un pourcentage de probabilité qu'il soit écrit par une IA.\n2. Liste les indices (répétitions, manque de nuance, structure trop parfaite).\n3. Verdict final : HUMAIN ou IA.`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Agis comme un algorithme de détection de motifs IA. Analyse ce texte : "${data.content}". \n1. Donne un pourcentage de probabilité qu'il soit écrit par une IA.\n2. Liste les indices (répétitions, manque de nuance, structure trop parfaite).\n3. Verdict final : HUMAIN ou IA.`
   },
   {
     id: 'ai-humanizer',
@@ -1078,7 +1098,7 @@ Génère maintenant les 15 noms.`
       keywords: ['humaniser texte', 'bypass ai detection', 'reformuler chatgpt', 'style humain', 'paraphraseur ia'] 
     },
     inputs: [{ name: 'content', label: 'Texte robotique à humaniser', type: 'textarea', rows: 8, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 RÔLE: Tu es un copywriter senior français, spécialisé dans la réécriture "anti-IA".
 MISSION: Réécris le texte suivant pour qu'il paraisse écrit par un humain cultivé : "${data.content}".
 
@@ -1110,7 +1130,7 @@ FORMAT DE SORTIE :
       keywords: ['prompt generator', 'prompt engineering', 'meilleur prompt chatgpt', 'générateur de prompt', 'midjourney helper'] 
     },
     inputs: [{ name: 'idea', label: 'Votre idée de base', type: 'textarea', rows: 4, placeholder: 'Ex: Je veux un plan marketing pour vendre des chaussures...', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un expert mondial en Prompt Engineering. Transforme cette idée simple : "${data.idea}" en un MEGA-PROMPT structuré et optimisé.\nStructure attendue :\n1. Rôle (Persona)\n2. Contexte & Tâche\n3. Contraintes & Format\n4. Étapes de réflexion (Chain of Thought).`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Tu es un expert mondial en Prompt Engineering. Transforme cette idée simple : "${data.idea}" en un MEGA-PROMPT structuré et optimisé.\nStructure attendue :\n1. Rôle (Persona)\n2. Contexte & Tâche\n3. Contraintes & Format\n4. Étapes de réflexion (Chain of Thought).`
   },
 
   // --- MANDATORY / FLAGSHIP TOOLS (IA) ---
@@ -1130,7 +1150,7 @@ FORMAT DE SORTIE :
       keywords: ['arnaque sms', 'détecteur phishing', 'numéro suspect', 'vérifier arnaque', 'signalement spam'] 
     },
     inputs: [{ name: 'content', label: 'Message ou Numéro suspect', type: 'textarea', rows: 4, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Analyse ce message suspect : "${data.content}". \nFormat de réponse :\n1. **VERDICT** : (ARNAQUE CERTAINE / SUSPECT / SÛR)\n2. **Risque** : X/10\n3. **Analyse** : Explique pourquoi en 2 phrases.`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Analyse ce message suspect : "${data.content}". \nFormat de réponse :\n1. **VERDICT** : (ARNAQUE CERTAINE / SUSPECT / SÛR)\n2. **Risque** : X/10\n3. **Analyse** : Explique pourquoi en 2 phrases.`
   },
   {
     id: 'legal-translator',
@@ -1148,7 +1168,7 @@ FORMAT DE SORTIE :
       keywords: ['traducteur juridique', 'comprendre contrat', 'simplifier droit', 'avocat ia', 'résumé juridique'] 
     },
     inputs: [{ name: 'text', label: 'Collez le texte juridique', type: 'textarea', rows: 10, className: 'text-sm', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Traduis ce texte juridique en langage courant et compréhensible pour un enfant de 12 ans. Liste ensuite les points dangereux (clauses abusives potentielles) :\n"${data.text}"`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Traduis ce texte juridique en langage courant et compréhensible pour un enfant de 12 ans. Liste ensuite les points dangereux (clauses abusives potentielles) :\n"${data.text}"`
   },
   {
     id: 'dream-interpreter',
@@ -1166,7 +1186,7 @@ FORMAT DE SORTIE :
       keywords: ['signification rêve', 'interprétation rêves', 'cauchemar signification', 'psychologie rêve', 'dictionnaire rêves'] 
     },
     inputs: [{ name: 'dream', label: 'Racontez votre rêve', type: 'textarea', rows: 6, required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Agis comme un psychanalyste expert. Interprète ce rêve : "${data.dream}". Donne une signification symbolique et psychologique.`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Agis comme un psychanalyste expert. Interprète ce rêve : "${data.dream}". Donne une signification symbolique et psychologique.`
   },
   {
     id: 'roast-my-code',
@@ -1184,7 +1204,7 @@ FORMAT DE SORTIE :
       keywords: ['roast my code', 'critique code', 'audit code humour', 'refactoring fun', 'code review ai'] 
     },
     inputs: [{ name: 'code', label: 'Votre Code à détruire', type: 'textarea', rows: 15, className: 'font-mono text-xs', required: true }],
-    promptGenerator: (data) => `${SYSTEM_PROMPT} Tu es un développeur Senior aigri et très drôle. "Roast" (critique violemment) ce code : "${data.code}". \n1. Une insulte créative sur le niveau du dev.\n2. Les vrais problèmes techniques.\n3. La version corrigée.`
+    promptGenerator: (data) => `${SYSTEM_PROMPT()} Tu es un développeur Senior aigri et très drôle. "Roast" (critique violemment) ce code : "${data.code}". \n1. Une insulte créative sur le niveau du dev.\n2. Les vrais problèmes techniques.\n3. La version corrigée.`
   },
 
   // --- LOCAL TOOLS (Gratuits - 0 Crédit) ---
@@ -1540,7 +1560,7 @@ FORMAT DE SORTIE :
       
       const questionText = hasText ? data.question : 'Analyse cette image et explique-moi tout en détail.';
       
-      return `${SYSTEM_PROMPT}
+      return `${SYSTEM_PROMPT()}
 RÔLE: Tu es un professeur patient et pédagogue, expert dans toutes les matières scolaires (Mathématiques, Français, Histoire, Sciences, Langues, etc.).
 
 MISSION: Aider l'élève à comprendre et résoudre son exercice ou sa question en donnant des explications DÉTAILLÉES et PÉDAGOGIQUES.
@@ -1736,7 +1756,7 @@ ${hasImage ? 'Analyse maintenant la photo fournie et explique tout en détail.' 
         required: false
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère un CV professionnel complet en HTML/CSS avec le template fourni.
 
 POSTE VISÉ: "${data.poste}"
@@ -2134,7 +2154,7 @@ Génère maintenant le HTML complet avec tous les placeholders remplacés.`
         helpText: 'Laissez vide si vous ne facturez pas de TVA'
       }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère une facture professionnelle complète en HTML/CSS avec le template fourni.
 
 ÉMETTEUR:
@@ -2436,8 +2456,18 @@ TEMPLATE HTML à utiliser (remplis les placeholders) :
       
       updateTotals(config);
       
-      document.getElementById('footer-text').innerHTML = '<strong>Mentions légales:</strong> ' + (config.footer_text || defaultConfig.footer_text);
-      document.getElementById('payment-terms').innerHTML = '<strong>Conditions de paiement:</strong> ' + (config.payment_terms || defaultConfig.payment_terms);
+      // Avoid XSS: user-provided values must be inserted as text nodes, not HTML.
+      const footerEl = document.getElementById('footer-text');
+      if (footerEl) {
+        footerEl.innerHTML = '<strong>Mentions légales:</strong> ';
+        footerEl.appendChild(document.createTextNode(config.footer_text || defaultConfig.footer_text));
+      }
+
+      const paymentTermsEl = document.getElementById('payment-terms');
+      if (paymentTermsEl) {
+        paymentTermsEl.innerHTML = '<strong>Conditions de paiement:</strong> ';
+        paymentTermsEl.appendChild(document.createTextNode(config.payment_terms || defaultConfig.payment_terms));
+      }
     }
     
     // Rendre les champs éditables
@@ -2499,7 +2529,7 @@ Génère maintenant le HTML complet avec tous les placeholders remplacés.`
       { name: 'ingredients', label: 'Ingrédients disponibles', type: 'textarea', rows: 4, placeholder: 'Ex: Poulet, Riz, Tomates, Ail, Basilic...', required: true },
       { name: 'diet', label: 'Régime alimentaire (Optionnel)', type: 'text', placeholder: 'Ex: Végétarien, Sans gluten, Keto...', required: false }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère une recette de cuisine complète et détaillée en Markdown.
 
 INGRÉDIENTS DISPONIBLES: "${data.ingredients}"
@@ -2548,7 +2578,7 @@ FORMAT ATTENDU:
       { name: 'competences', label: 'Vos compétences clés', type: 'textarea', rows: 4, placeholder: 'Ex: React, Node.js, Gestion de projet...', required: true },
       { name: 'experience', label: 'Expérience pertinente (Optionnel)', type: 'textarea', rows: 3, placeholder: 'Ex: 3 ans en développement web...', required: false }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Rédige une lettre de motivation professionnelle et personnalisée en Markdown.
 
 POSTE VISÉ: "${data.poste}"
@@ -2618,7 +2648,7 @@ INSTRUCTIONS:
       { name: 'duree', label: 'Durée par séance (Optionnel)', type: 'text', placeholder: 'Ex: 30 min, 1h...', required: false },
       { name: 'equipement', label: 'Équipement disponible (Optionnel)', type: 'text', placeholder: 'Ex: Salle de sport, Maison, Poids libres...', required: false }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère un programme d'entraînement complet et structuré en Markdown.
 
 OBJECTIF: "${data.objectif}"
@@ -2669,7 +2699,7 @@ FORMAT ATTENDU:
       { name: 'theme', label: 'Thème / Secteur', type: 'text', placeholder: 'Ex: E-commerce mode, Tech startup, Blog cuisine...', required: true },
       { name: 'extension', label: 'Extension préférée (Optionnel)', type: 'text', placeholder: 'Ex: .com, .fr, .io...', required: false }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère 15 suggestions de noms de domaine créatifs et mémorables.
 
 THÈME: "${data.theme}"
@@ -2717,7 +2747,7 @@ FORMAT ATTENDU:
       { name: 'budget', label: 'Budget approximatif (Optionnel)', type: 'text', placeholder: 'Ex: Économique, Moyen, Élevé', required: false },
       { name: 'personnes', label: 'Nombre de personnes', type: 'number', placeholder: '2', required: true }
     ],
-    promptGenerator: (data) => `${SYSTEM_PROMPT}
+    promptGenerator: (data) => `${SYSTEM_PROMPT()}
 TÂCHE: Génère un plan de repas hebdomadaire complet et équilibré en Markdown.
 
 RÉGIME: "${data.diet}"
@@ -2756,3 +2786,352 @@ FORMAT ATTENDU:
 - [Conseil conservation]`
   }
 ];
+
+type Language = 'fr' | 'en';
+
+// English UI overrides (titles, descriptions, input labels/placeholders/help/options)
+const TOOL_UI_EN: Record<
+  string,
+  {
+    title: string;
+    description: string;
+    inputs?: Record<
+      string,
+      {
+        label?: string;
+        placeholder?: string;
+        helpText?: string;
+        options?: string[];
+      }
+    >;
+  }
+> = {
+  'ecom-product-scanner': {
+    title: 'Ecom Product Scanner',
+    description:
+      'All-in-one product sheet studio: photo analysis, AI copy, Shopify/Amazon templates, CSV/JSON export. Everything to sell faster.',
+    inputs: {
+      image: { label: 'Product photo', helpText: 'Even a casual photo works—AI analyzes visual details.' },
+      platform: {
+        label: 'Target platform',
+        options: ['Shopify', 'Amazon', 'WooCommerce', 'PrestaShop', 'Both (Shopify + Amazon)'],
+        helpText: 'Pick a platform to adapt the format',
+      },
+      niche: { label: 'Niche / Audience', placeholder: 'e.g. Athletes, Parents, Luxury, Tech...', helpText: 'Sets tone and marketing style' },
+      priceRange: {
+        label: 'Price range (€)',
+        options: ['Under €20', '€20–€50', '€50–€100', '€100–€200', '€200–€500', 'Over €500'],
+        helpText: 'Helps the AI position the offer',
+      },
+      competitors: { label: 'Main competitors (optional)', placeholder: 'e.g. Apple, Samsung, Xiaomi...', helpText: 'For differentiated positioning' },
+    },
+  },
+  'website-generator': {
+    title: 'Website Generator',
+    description: 'Generate a complete, modern website (HTML + Tailwind) from a short brief. Preview, edit, and download the HTML.',
+    inputs: {
+      siteType: { label: 'Website type', placeholder: 'e.g. Landing page, portfolio, SaaS...', helpText: 'What kind of website do you want?' },
+      companyName: { label: 'Project / Company name', placeholder: 'e.g. SimplePlate', helpText: 'Used for branding and headings' },
+      tagline: { label: 'Tagline (optional)', placeholder: 'e.g. Build faster with AI', helpText: 'Short slogan under the title' },
+      desc: { label: 'Description', placeholder: 'Describe what the website is about...', helpText: 'The more details, the better the result' },
+      primaryColor: { label: 'Primary color (optional)', placeholder: '#7C3AED', helpText: 'Main accent color' },
+      style: {
+        label: 'Visual style',
+        options: ['Modern & Minimal', 'Bold & Colorful', 'Elegant & Professional', 'Creative & Artistic', 'Tech & Futuristic', 'Classic & Corporate', 'Dark Mode'],
+        helpText: 'Overall design direction',
+      },
+      sections: {
+        label: 'Sections to include',
+        options: ['Hero + Features + CTA', 'Hero + About + Services + Contact', 'Hero + Pricing + Testimonials + FAQ', 'Hero + Portfolio + Blog + Contact', 'Everything (recommended)'],
+        helpText: 'Page structure',
+      },
+    },
+  },
+  'python-pro-gen': {
+    title: 'Python Pro Generator',
+    description: 'Generate production-ready Python scripts with best practices, error handling, and optional tests.',
+    inputs: {
+      task: { label: 'What do you want to build?', placeholder: 'e.g. Scrape a website and export to CSV...', helpText: 'Describe the task clearly' },
+      complexity: { label: 'Complexity', placeholder: 'Intermediate', helpText: 'Select the expected level' },
+      includeTests: { label: 'Include tests?', helpText: 'Generate pytest tests when relevant' },
+      dependencies: { label: 'Dependencies (optional)', placeholder: 'e.g. requests, pandas...', helpText: 'Libraries you want to use' },
+      requirements: { label: 'Special requirements (optional)', placeholder: 'e.g. async, type hints, SOLID...', helpText: 'Any constraints to follow' },
+    },
+  },
+  'ai-image-analysis': {
+    title: 'AI Image Analysis',
+    description: 'Deep image analysis: objects, text, style, AI-likelihood, and a structured report.',
+    inputs: {
+      image: { label: 'Image to analyze', helpText: 'Upload a JPG/PNG (max 4MB).' },
+      analysisType: {
+        label: 'Analysis type',
+        options: ['Full (AI + technical + prompt)', 'AI detection only', 'Reverse prompt only', 'Technical analysis (resolution, colors, etc.)'],
+        helpText: 'Choose the analysis depth',
+      },
+      aiModel: {
+        label: 'Suspected AI model (optional)',
+        options: ['Auto-detect', 'Midjourney', 'DALL·E', 'Stable Diffusion', 'Imagen', 'Other'],
+        helpText: 'Helps refine the analysis if you have an idea',
+      },
+      question: { label: 'Specific question (optional)', placeholder: 'e.g. What style is this? Any artifacts?', helpText: 'Optional focus for the analysis' },
+    },
+  },
+  'business-plan-pro': {
+    title: 'Business Plan Pro',
+    description: 'Investor-ready business plan generated by AI (structured, clear, and exportable).',
+    inputs: {
+      companyName: { label: 'Company name', placeholder: 'e.g. Acme', helpText: 'Used in the document header' },
+      sector: { label: 'Industry', placeholder: 'e.g. SaaS, Food, Finance...', helpText: 'Your business sector' },
+      targetMarket: { label: 'Target market', placeholder: 'e.g. SMBs, students...', helpText: 'Who you sell to' },
+      fundingNeeded: { label: 'Funding needed (optional)', placeholder: 'e.g. 50000', helpText: 'Amount you want to raise' },
+      idea: { label: 'Detailed project description', placeholder: 'Describe your product/service, vision, and advantages...', helpText: 'Use the editor to format professionally' },
+    },
+  },
+  'brand-name-gen': {
+    title: 'Brand Name Generator',
+    description: 'Generate 15 strong brand name ideas with scoring, selection, and export.',
+    inputs: {
+      project: { label: 'Project description', placeholder: 'Describe your project in one sentence...', helpText: 'Industry, target, positioning' },
+      style: { label: 'Style (optional)', options: ['Modern', 'Luxury', 'Tech', 'Playful', 'Minimal', 'Mixed'], helpText: 'Naming vibe' },
+      length: {
+        label: 'Preferred length',
+        options: ['Short (3–6 letters)', 'Medium (7–10 letters)', 'Long (11+ letters)', 'All'],
+        helpText: 'Name length preference',
+      },
+    },
+  },
+  'ai-detector': {
+    title: 'AI Text Detector',
+    description: 'Estimate whether a text was written by AI (ChatGPT, Claude, Gemini) or a human.',
+    inputs: { content: { label: 'Text to analyze', placeholder: 'Paste your text here...', helpText: 'Longer samples improve accuracy' } },
+  },
+  'ai-humanizer': {
+    title: 'AI Text Humanizer',
+    description: 'Rewrite AI-generated text into natural, human-sounding writing.',
+    inputs: { content: { label: 'AI-ish text to humanize', placeholder: 'Paste the text to rewrite...', helpText: 'We keep the meaning, improve the tone' } },
+  },
+  'pro-prompt-gen': {
+    title: 'Pro Prompt Generator',
+    description: 'Turn a basic idea into a structured, optimized mega-prompt for better AI results.',
+    inputs: { idea: { label: 'Your basic idea', placeholder: 'e.g. I want a marketing plan to sell shoes...', helpText: 'Describe the desired outcome' } },
+  },
+  'scam-detector': {
+    title: 'Scam Detector',
+    description: 'Paste a suspicious SMS/email and get a verdict (scam/suspicious/safe) with risk score.',
+    inputs: { content: { label: 'Suspicious message or number', placeholder: 'Paste the message...', helpText: 'Include links and sender info if possible' } },
+  },
+  'legal-translator': {
+    title: 'Legal Translator',
+    description: 'Translate legal jargon into plain English and highlight risky clauses.',
+    inputs: { text: { label: 'Paste the legal text', placeholder: 'Terms, contract, lease...', helpText: 'We simplify and flag potential pitfalls' } },
+  },
+  'dream-interpreter': {
+    title: 'Dream Interpreter',
+    description: 'Describe your dream and get a symbolic and psychological interpretation.',
+    inputs: { dream: { label: 'Tell your dream', placeholder: 'What happened in your dream?', helpText: 'Add emotions and key details' } },
+  },
+  'roast-my-code': {
+    title: 'Roast My Code',
+    description: 'A funny (but useful) code review: harsh critique, real issues, and a cleaned-up version.',
+    inputs: { code: { label: 'Your code to roast', placeholder: 'Paste your code...', helpText: 'Include language and context if possible' } },
+  },
+  'csv-to-json': {
+    title: 'CSV to JSON',
+    description: 'Convert CSV to JSON in one click. 100% local—your data never leaves your browser.',
+    inputs: {
+      csv: { label: 'Paste your CSV (with headers)', placeholder: 'name,price\nApple,1.2', helpText: 'Columns must be comma-separated.' },
+      csv_upload: { label: 'Or upload a CSV file', helpText: 'Never uploaded to a server—conversion is 100% local.', placeholder: '' },
+    },
+  },
+  'hex-to-rgb': {
+    title: 'HEX to RGB',
+    description: 'Convert HEX colors to RGB instantly.',
+    inputs: { hex: { label: 'HEX color', placeholder: '#FF0000', helpText: 'Enter a 6-digit hex color' } },
+  },
+  'percent-calc': {
+    title: 'Percentage Calculator',
+    description: 'Compute percentages quickly (increase/decrease, percent of, etc.).',
+    inputs: { input: { label: 'Your calculation', placeholder: 'e.g. 20% of 350', helpText: 'Write it in plain language' } },
+  },
+  'meta-tag-gen': {
+    title: 'Meta Tags Generator',
+    description: 'Generate SEO meta tags (title/description/keywords) for your page or product.',
+    inputs: { input: { label: 'Page description', placeholder: 'Describe the page/product...', helpText: 'We generate optimized SEO tags' } },
+  },
+  'morse-trans': {
+    title: 'Morse Translator',
+    description: 'Translate text to Morse code and Morse to text.',
+    inputs: { input: { label: 'Text or Morse code', placeholder: 'SOS or ... --- ...', helpText: 'Paste text or Morse' } },
+  },
+  'password-gen': {
+    title: 'Password Generator',
+    description: 'Generate strong, secure passwords instantly.',
+    inputs: { input: { label: 'Requirements (optional)', placeholder: 'e.g. 16 chars, symbols, no ambiguous', helpText: 'Leave empty for a default strong password' } },
+  },
+  'json-formatter': {
+    title: 'JSON Formatter',
+    description: 'Format and prettify JSON for readability.',
+    inputs: { input: { label: 'JSON input', placeholder: '{"hello":"world"}', helpText: 'Paste JSON to format' } },
+  },
+  'uuid-gen': {
+    title: 'UUID Generator',
+    description: 'Generate UUIDs instantly (v4).',
+    inputs: { input: { label: 'How many UUIDs?', placeholder: 'e.g. 5', helpText: 'Enter a number' } },
+  },
+  'slug-gen': {
+    title: 'Slug Generator',
+    description: 'Generate SEO-friendly slugs from text.',
+    inputs: { input: { label: 'Text to slugify', placeholder: 'e.g. My Great Article Title', helpText: 'We remove accents and symbols' } },
+  },
+  'px-to-rem': {
+    title: 'PX to REM Converter',
+    description: 'Convert px to rem/em with a visual table.',
+    inputs: { input: { label: 'PX values (optional)', placeholder: 'e.g. 12, 14, 16', helpText: 'Use the interface to add conversions' } },
+  },
+  'roi-calc': {
+    title: 'ROI Calculator',
+    description: 'Calculate ROI and profitability for an investment.',
+    inputs: { input: { label: 'Your scenario', placeholder: 'e.g. Invest 1000, return 1400', helpText: 'Include costs and revenue' } },
+  },
+  'freelance-calc': {
+    title: 'Freelance Rate Calculator',
+    description: 'Estimate your freelance daily/hourly rate from salary goals and expenses.',
+    inputs: { input: { label: 'Your situation', placeholder: 'e.g. €60k/year target, 20 days off...', helpText: 'Add your constraints' } },
+  },
+  'base64-tool': {
+    title: 'Base64 Encoder/Decoder',
+    description: 'Encode or decode Base64 safely.',
+    inputs: { input: { label: 'Text/Base64', placeholder: 'Paste text or base64...', helpText: 'We detect and convert' } },
+  },
+  'text-analyzer': {
+    title: 'Text Analyzer',
+    description: 'Analyze a text: word count, readability, key metrics, and quick insights.',
+    inputs: { input: { label: 'Text to analyze', placeholder: 'Paste your text...', helpText: 'We compute stats instantly' } },
+  },
+  'decision-maker': {
+    title: 'Decision Maker',
+    description: 'Turn choices into a wheel and pick randomly (useful for quick decisions).',
+    inputs: { input: { label: 'Your options', placeholder: 'Option A, Option B, Option C...', helpText: 'Separate options with commas or new lines' } },
+  },
+  'homework-helper': {
+    title: 'Homework Helper',
+    description: 'Upload a photo of an exercise and/or ask a question to get a step-by-step explanation.',
+    inputs: {
+      image: { label: 'Exercise photo (optional)', helpText: 'Upload a clear photo (max 4MB).' },
+      subject: { label: 'Subject', placeholder: 'e.g. Math, English, History...', helpText: 'Helps adapt explanations' },
+      level: { label: 'School level (optional)', placeholder: 'e.g. Middle school, High school...', helpText: 'Helps match the difficulty' },
+      question: {
+        label: 'Your question or exercise (optional)',
+        placeholder: 'e.g. Explain how to solve a quadratic equation...',
+        helpText: 'At least a photo OR a question is required.',
+      },
+    },
+  },
+  'qr-code-generator': {
+    title: 'QR Code Generator',
+    description: 'Generate QR codes instantly (local and private).',
+    inputs: { input: { label: 'Content to encode', placeholder: 'URL, text, phone...', helpText: 'Your QR code is generated locally' } },
+  },
+  'cv-generator': {
+    title: 'Resume (CV) Generator',
+    description: 'Generate a clean, professional resume in HTML you can edit and export.',
+    inputs: {
+      poste: { label: 'Target role', placeholder: 'e.g. Full Stack Developer', helpText: 'The job you are applying for' },
+      experiences: {
+        label: 'Work experience',
+        placeholder: 'List roles (title, company, dates, responsibilities)...',
+        helpText: 'Include dates and key achievements',
+      },
+      formations: { label: 'Education (optional)', placeholder: 'e.g. MSc Computer Science - University (2018–2020)' },
+      competences: { label: 'Key skills (optional)', placeholder: 'e.g. React, Node.js, Python...' },
+    },
+  },
+  'invoice-generator': {
+    title: 'Invoice Generator',
+    description: 'Generate a professional invoice in HTML (ready to edit/export).',
+    inputs: {
+      emetteur: { label: 'Sender details (your business)', placeholder: 'Company name\nAddress\nVAT/SIRET\nEmail\nPhone', helpText: 'Your business details' },
+      client: { label: 'Client details', placeholder: 'Company/Name\nAddress\nEmail', helpText: 'Who you are invoicing' },
+      services: {
+        label: 'Services / Items',
+        placeholder: 'Description | Quantity | Unit price\ne.g. Website development | 1 | 1500€',
+        helpText: 'List each item with qty and price',
+      },
+      numero: { label: 'Invoice number (optional)', placeholder: 'e.g. INV-2025-001' },
+      date: { label: 'Invoice date (optional)', placeholder: 'e.g. 01/15/2025' },
+      tva: { label: 'VAT rate (optional)', placeholder: 'e.g. 20% or 0%', helpText: 'Leave blank if no VAT is charged' },
+    },
+  },
+  'recipe-generator': {
+    title: 'Recipe Generator',
+    description: 'Generate recipes based on the ingredients you have.',
+    inputs: {
+      ingredients: { label: 'Available ingredients', placeholder: 'e.g. Chicken, rice, tomatoes, garlic...', helpText: 'List what you have' },
+      diet: { label: 'Diet (optional)', placeholder: 'e.g. Vegetarian, Gluten-free, Keto...' },
+    },
+  },
+  'cover-letter-gen': {
+    title: 'Cover Letter Generator',
+    description: 'Generate a tailored, professional cover letter for a job application.',
+    inputs: {
+      poste: { label: 'Role', placeholder: 'e.g. Full Stack Developer' },
+      entreprise: { label: 'Company name', placeholder: 'e.g. TechCorp' },
+      competences: { label: 'Key skills', placeholder: 'e.g. React, Node.js, project management...' },
+      experience: { label: 'Relevant experience (optional)', placeholder: 'e.g. 3 years in web development...' },
+    },
+  },
+  'workout-generator': {
+    title: 'Workout Plan Generator',
+    description: 'Create a personalized workout plan based on your goals, level, and equipment.',
+    inputs: {
+      objectif: { label: 'Goal', placeholder: 'e.g. Fat loss, muscle gain, endurance...' },
+      niveau: { label: 'Level', placeholder: 'e.g. Beginner, Intermediate, Advanced' },
+      duree: { label: 'Session duration (optional)', placeholder: 'e.g. 30 min, 1h...' },
+      equipement: { label: 'Available equipment (optional)', placeholder: 'e.g. Gym, home, dumbbells...' },
+    },
+  },
+  'domain-name-gen': {
+    title: 'Domain Name Generator',
+    description: 'Generate domain name ideas (short, memorable) for your project.',
+    inputs: {
+      theme: { label: 'Theme / Industry', placeholder: 'e.g. Fashion e-commerce, Tech startup, Food blog...' },
+      extension: { label: 'Preferred extension (optional)', placeholder: 'e.g. .com, .io...' },
+    },
+  },
+  'meal-plan-gen': {
+    title: 'Meal Plan Generator',
+    description: 'Create a balanced weekly meal plan with a shopping list.',
+    inputs: {
+      diet: { label: 'Diet', placeholder: 'e.g. Omnivore, Vegetarian, Vegan, Keto...' },
+      budget: { label: 'Budget (optional)', placeholder: 'e.g. Low, Medium, High' },
+      personnes: { label: 'Number of people', placeholder: '2' },
+    },
+  },
+};
+
+const localizeTool = (tool: ToolConfig, language: Language): ToolConfig => {
+  if (language !== 'en') return tool;
+  const override = TOOL_UI_EN[tool.id];
+  if (!override) return tool;
+
+  return {
+    ...tool,
+    title: override.title || tool.title,
+    description: override.description || tool.description,
+    inputs: tool.inputs.map((input) => {
+      const io = override.inputs?.[input.name];
+      if (!io) return input;
+      return {
+        ...input,
+        ...io,
+        options: io.options ?? input.options,
+      };
+    }),
+  };
+};
+
+export const getTools = (language: Language = getCurrentLanguage()): ToolConfig[] =>
+  TOOLS_FR.map((tool) => localizeTool(tool, language));
+
+// Backwards-compatible export (French by default)
+export const tools: ToolConfig[] = TOOLS_FR;

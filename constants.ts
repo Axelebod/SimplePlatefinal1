@@ -46,6 +46,20 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   Security: 'Sécurité',
 };
 
+export const CATEGORY_LABELS_EN: Record<ToolCategory, string> = {
+  Text: 'Text',
+  Image: 'Image',
+  Dev: 'Dev',
+  Life: 'Lifestyle',
+  Business: 'Business',
+  Security: 'Security',
+};
+
+export const getCategoryLabel = (category: ToolCategory, language: 'fr' | 'en') => {
+  const labels = language === 'fr' ? CATEGORY_LABELS : CATEGORY_LABELS_EN;
+  return labels[category] || category;
+};
+
 export const LOADING_MESSAGES = [
   "Consultation de l'oracle numérique...",
   "Préchauffage du hamster GPU...",
@@ -57,3 +71,18 @@ export const LOADING_MESSAGES = [
   "Assemblage des nanobots...",
   "Lecture de la matrice...",
 ];
+
+export const LOADING_MESSAGES_EN = [
+  'Consulting the digital oracle...',
+  'Warming up the GPU hamster...',
+  'Translating binary into genius...',
+  'Brewing pixel coffee...',
+  'Computing the universal answer...',
+  'Negotiating with the algorithms...',
+  'Quantum analysis in progress...',
+  'Assembling nanobots...',
+  'Reading the matrix...',
+];
+
+export const getLoadingMessages = (language: 'fr' | 'en') =>
+  language === 'fr' ? LOADING_MESSAGES : LOADING_MESSAGES_EN;

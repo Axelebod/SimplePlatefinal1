@@ -168,31 +168,60 @@ export const useUserStore = create<UserState>()(
         
         // Déduction atomique côté serveur (évite les race conditions)
         try {
-          const { data, error } = await supabase.rpc('deduct_credits', {
-            user_id_param: user.id,
-            amount_param: amount
-          });
+          // The RPC signature can vary depending on your Supabase setup.
+          // Try the most common parameter names used elsewhere in this codebase (p_user_id),
+          // and fall back to the previous naming.
+          const attempts: Array<Record<string, any>> = [
+            { p_user_id: user.id, p_amount: amount },
+            { p_user_id: user.id, amount: amount },
+            { user_id_param: user.id, amount_param: amount },
+            { user_id: user.id, amount: amount },
+          ];
+
+          let lastError: any = null;
+          let data: any = null;
+          let error: any = null;
+
+          for (const params of attempts) {
+            const res = await supabase.rpc('deduct_credits', params);
+            data = res.data;
+            error = res.error;
+            if (!error) break;
+            lastError = error;
+          }
           
           if (error) {
-            console.error("Erreur déduction crédits:", error);
+            console.error("Erreur déduction crédits:", lastError || error);
             // En cas d'erreur, rafraîchir depuis la DB
             await get().refreshCredits();
             return false;
           }
           
-          if (data && data.success) {
-            // Mise à jour avec les vraies valeurs depuis la DB
-            set({ 
-              credits: data.credits_total || (data.credits_free + data.credits_paid),
-              creditsFree: data.credits_free || 0,
-              creditsPaid: data.credits_paid || 0
-            });
+          // Some implementations return a JSON object with success + balances,
+          // others return the updated profile row or just a boolean.
+          if (data?.success === true) {
+            if (typeof data.credits_free === 'number' || typeof data.credits_paid === 'number' || typeof data.credits_total === 'number') {
+              set({ 
+                credits: data.credits_total ?? ((data.credits_free || 0) + (data.credits_paid || 0)),
+                creditsFree: data.credits_free ?? 0,
+                creditsPaid: data.credits_paid ?? 0
+              });
+            } else {
+              // Unknown shape: force refresh
+              await get().refreshCredits();
+            }
             return true;
-          } else {
-            // Pas assez de crédits côté serveur
-            await get().refreshCredits();
-            return false;
           }
+
+          // If the RPC returned something truthy but without "success", assume it worked and refresh.
+          if (data) {
+            await get().refreshCredits();
+            return true;
+          }
+
+          // Pas assez de crédits côté serveur / réponse vide
+          await get().refreshCredits();
+          return false;
         } catch (err: any) {
           console.error("Erreur déduction crédits:", err);
           // En cas d'erreur, rafraîchir depuis la DB

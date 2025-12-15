@@ -2,9 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, Loader2, Trash2, Zap } from 'lucide-react';
 import { askBot } from '../services/geminiService';
-import { tools } from '../tools-config';
+import { getTools } from '../tools-config';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface Message {
   role: 'user' | 'bot';
@@ -18,21 +19,29 @@ interface BotUsage {
 
 const DAILY_LIMIT = 5;
 
+const getInitialBotMessage = (language: 'fr' | 'en'): Message => ({
+  role: 'bot',
+  content:
+    language === 'fr'
+      ? "Salut ! Je suis **SimpleBot**. Je connais les 50+ outils du site. Tu cherches quoi ? (ex: *'Un truc pour Instagram'* ou *'Aide moi à coder'*)"
+      : "Hi! I'm **SimpleBot**. I know all the tools on the site. What are you looking for? (e.g. *'something for Instagram'* or *'help me code'*)",
+});
+
 export const SimpleBot: React.FC = () => {
+  const { language } = useTranslation();
+  const tools = React.useMemo(() => getTools(language), [language]);
   const [isOpen, setIsOpen] = useState(false);
   
   // Initialisation de l'état avec le localStorage
   const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = localStorage.getItem('simplebot_history');
-    return saved ? JSON.parse(saved) : [
-      { role: 'bot', content: "Salut ! Je suis **SimpleBot**. Je connais les 50+ outils du site. Tu cherches quoi ? (ex: *'Un truc pour Instagram'* ou *'Aide moi à coder'*)" }
-    ];
+    const saved = localStorage.getItem(`simplebot_history_${language}`);
+    return saved ? JSON.parse(saved) : [getInitialBotMessage(language)];
   });
 
   // Gestion du quota (INDÉPENDANT de l'état utilisateur - utilise uniquement localStorage)
   // La limite de 5 messages/jour est appliquée à tous les utilisateurs, connectés ou non
   const [usage, setUsage] = useState<BotUsage>(() => {
-      const savedUsage = localStorage.getItem('simplebot_usage');
+      const savedUsage = localStorage.getItem(`simplebot_usage_${language}`);
       const today = new Date().toDateString();
       if (savedUsage) {
           const parsed = JSON.parse(savedUsage);
@@ -40,6 +49,21 @@ export const SimpleBot: React.FC = () => {
       }
       return { date: today, count: 0 };
   });
+
+  // Reload per-language history/quota when language changes
+  useEffect(() => {
+    const saved = localStorage.getItem(`simplebot_history_${language}`);
+    setMessages(saved ? JSON.parse(saved) : [getInitialBotMessage(language)]);
+
+    const savedUsage = localStorage.getItem(`simplebot_usage_${language}`);
+    const today = new Date().toDateString();
+    if (savedUsage) {
+      const parsed = JSON.parse(savedUsage);
+      setUsage(parsed.date === today ? parsed : { date: today, count: 0 });
+    } else {
+      setUsage({ date: today, count: 0 });
+    }
+  }, [language]);
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -59,19 +83,27 @@ export const SimpleBot: React.FC = () => {
 
   // Sauvegarde automatique
   useEffect(() => {
-    localStorage.setItem('simplebot_history', JSON.stringify(messages));
+    localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(messages));
     scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, language]);
 
   useEffect(() => {
-      localStorage.setItem('simplebot_usage', JSON.stringify(usage));
-  }, [usage]);
+      localStorage.setItem(`simplebot_usage_${language}`, JSON.stringify(usage));
+  }, [usage, language]);
 
   // Fonction pour vider la mémoire
   const clearHistory = () => {
-    const initialMsg: Message[] = [{ role: 'bot', content: "Mémoire effacée ! On repart à zéro. Que puis-je faire ?" }];
+    const initialMsg: Message[] = [
+      {
+        role: 'bot',
+        content:
+          language === 'fr'
+            ? 'Mémoire effacée ! On repart à zéro. Que puis-je faire ?'
+            : 'Memory cleared! Starting fresh—how can I help?',
+      },
+    ];
     setMessages(initialMsg);
-    localStorage.setItem('simplebot_history', JSON.stringify(initialMsg));
+    localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(initialMsg));
   };
 
   const handleSend = async (e?: React.FormEvent) => {
@@ -85,7 +117,13 @@ export const SimpleBot: React.FC = () => {
     } else if (usage.count >= DAILY_LIMIT) {
         setMessages(prev => [...prev, 
             { role: 'user', content: input },
-            { role: 'bot', content: "🚫 **Quota journalier atteint.** \n\nJe suis un petit robot coûteux ! Revenez demain pour discuter ou utilisez directement les outils." }
+            {
+              role: 'bot',
+              content:
+                language === 'fr'
+                  ? "🚫 **Quota journalier atteint.** \n\nJe suis un petit robot coûteux ! Revenez demain pour discuter ou utilisez directement les outils."
+                  : "🚫 **Daily limit reached.** \n\nI'm a tiny (and expensive) robot. Come back tomorrow or use the tools directly.",
+            }
         ]);
         setInput('');
         return;
@@ -104,40 +142,72 @@ export const SimpleBot: React.FC = () => {
 
     try {
       // On prépare le contexte avec la liste des outils
-      const toolsContext = tools.map(t => `- ${t.title} (ID: ${t.id}, Catégorie: ${t.category}): ${t.description}`).join('\n');
+      const toolsContext = tools
+        .map((t) => `- ${t.title} (ID: ${t.id}, Category: ${t.category}): ${t.description}`)
+        .join('\n');
       
       // On récupère les 5 derniers échanges pour donner du contexte à l'IA (Mémoire court terme)
       const recentHistory = newHistory.slice(-6).map(m => 
         `${m.role === 'user' ? 'UTILISATEUR' : 'SIMPLEBOT'}: ${m.content.replace(/\n/g, ' ')}`
       ).join('\n');
 
-      const systemPrompt = `
-        CONTEXTE : Tu es SimpleBot, l'assistant virtuel intelligent du site "SimplePlate".
-        TA MISSION : Aider l'utilisateur à trouver l'outil parfait parmi la liste ci-dessous ou répondre à ses questions sur le fonctionnement du site.
-        
-        LISTE DES OUTILS DISPONIBLES :
-        ${toolsContext}
-        
-        CONSIGNES :
-        1. Sois bref, serviable et un peu "geek/cool".
-        2. Tu as une mémoire : base-toi sur l'HISTORIQUE DE CONVERSATION ci-dessous pour répondre de manière cohérente.
-        3. Si tu recommandes un outil, tu DOIS utiliser ce format exact pour créer un lien interne : [Nom de l'outil](/tool/ID_DE_L_OUTIL).
-        4. Réponds en Français.
-        
-        ---
-        HISTORIQUE DE CONVERSATION :
-        ${recentHistory}
-        ---
-        
-        NOUVELLE QUESTION UTILISATEUR : "${userMsg}"
-        RÉPONSE DE SIMPLEBOT :
-      `;
+      const systemPrompt =
+        language === 'fr'
+          ? `
+CONTEXTE : Tu es SimpleBot, l'assistant virtuel intelligent du site "SimplePlate".
+TA MISSION : Aider l'utilisateur à trouver l'outil parfait parmi la liste ci-dessous ou répondre à ses questions sur le fonctionnement du site.
+
+LISTE DES OUTILS DISPONIBLES :
+${toolsContext}
+
+CONSIGNES :
+1. Sois bref, serviable et un peu "geek/cool".
+2. Tu as une mémoire : base-toi sur l'HISTORIQUE DE CONVERSATION ci-dessous pour répondre de manière cohérente.
+3. Si tu recommandes un outil, tu DOIS utiliser ce format exact pour créer un lien interne : [Nom de l'outil](/tool/ID_DE_L_OUTIL).
+4. Réponds en Français.
+
+---
+HISTORIQUE DE CONVERSATION :
+${recentHistory}
+---
+
+NOUVELLE QUESTION UTILISATEUR : "${userMsg}"
+RÉPONSE DE SIMPLEBOT :
+`
+          : `
+CONTEXT: You are SimpleBot, the smart virtual assistant for the "SimplePlate" website.
+MISSION: Help the user find the best tool from the list below or answer questions about how the site works.
+
+AVAILABLE TOOLS:
+${toolsContext}
+
+RULES:
+1. Be brief, helpful, and a bit geek/cool.
+2. You have memory: use the CONVERSATION HISTORY below to answer consistently.
+3. If you recommend a tool, you MUST use this exact format for an internal link: [Tool Name](/tool/TOOL_ID).
+4. Respond in English.
+
+---
+CONVERSATION HISTORY:
+${recentHistory}
+---
+
+NEW USER QUESTION: "${userMsg}"
+SIMPLEBOT ANSWER:
+`;
 
       const response = await askBot(systemPrompt);
       
       setMessages(prev => [...prev, { role: 'bot', content: response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'bot', content: "Oups, mes circuits ont surchauffé. Réessaie plus tard !" }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'bot',
+          content:
+            language === 'fr' ? 'Oups, mes circuits ont surchauffé. Réessaie plus tard !' : 'Oops, my circuits overheated. Try again later!',
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -157,11 +227,17 @@ export const SimpleBot: React.FC = () => {
                     <span className="font-bold font-display tracking-wide text-sm">SimpleBot</span>
                 </div>
                 <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
-                    {DAILY_LIMIT - usage.count} msg{DAILY_LIMIT - usage.count > 1 ? 's' : ''} restant{DAILY_LIMIT - usage.count > 1 ? 's' : ''}
+                    {language === 'fr'
+                      ? `${DAILY_LIMIT - usage.count} msg${DAILY_LIMIT - usage.count > 1 ? 's' : ''} restant${DAILY_LIMIT - usage.count > 1 ? 's' : ''}`
+                      : `${DAILY_LIMIT - usage.count} msg${DAILY_LIMIT - usage.count > 1 ? 's' : ''} left`}
                 </span>
             </div>
             <div className="flex items-center gap-2">
-                <button onClick={clearHistory} title="Effacer la mémoire" className="hover:text-neo-red transition-colors">
+                <button
+                  onClick={clearHistory}
+                  title={language === 'fr' ? 'Effacer la mémoire' : 'Clear memory'}
+                  className="hover:text-neo-red transition-colors"
+                >
                     <Trash2 className="w-4 h-4" />
                 </button>
                 <button onClick={() => setIsOpen(false)} className="hover:text-neo-yellow dark:hover:text-neo-violet transition-colors">
@@ -217,7 +293,9 @@ export const SimpleBot: React.FC = () => {
               <div className="flex justify-start">
                 <div className="bg-gray-200 dark:bg-gray-700 p-3 rounded-md rounded-bl-none border border-black dark:border-gray-500 flex items-center gap-2">
                    <Loader2 className="w-4 h-4 animate-spin dark:text-white" />
-                   <span className="text-xs font-bold dark:text-white">SimpleBot réfléchit...</span>
+                   <span className="text-xs font-bold dark:text-white">
+                    {language === 'fr' ? 'SimpleBot réfléchit...' : 'SimpleBot is thinking...'}
+                   </span>
                 </div>
               </div>
             )}
@@ -230,7 +308,15 @@ export const SimpleBot: React.FC = () => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={usage.count >= DAILY_LIMIT ? "Quota épuisé" : "Posez votre question..."}
+              placeholder={
+                usage.count >= DAILY_LIMIT
+                  ? language === 'fr'
+                    ? 'Quota épuisé'
+                    : 'Limit reached'
+                  : language === 'fr'
+                    ? 'Posez votre question...'
+                    : 'Ask your question...'
+              }
               disabled={usage.count >= DAILY_LIMIT}
               className="flex-1 p-2 text-base border border-gray-300 dark:border-white rounded focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-500 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-400 disabled:cursor-not-allowed"
               autoFocus
