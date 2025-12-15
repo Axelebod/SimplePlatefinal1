@@ -54,6 +54,14 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
     return poemText.split('\n');
   }, [content]);
 
+  const escapeHtml = (input: string) =>
+    input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
   const handleContentChange = (value: string) => {
     setContent(value);
     onChange?.(value);
@@ -227,7 +235,8 @@ export const PoemDisplay: React.FC<PoemDisplayProps> = ({
                     : 'text-xl leading-relaxed'
                 }`}
                 dangerouslySetInnerHTML={{
-                  __html: line
+                  // Important: escape user/AI-provided text to avoid XSS, then apply limited markup.
+                  __html: escapeHtml(line)
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
                 }}

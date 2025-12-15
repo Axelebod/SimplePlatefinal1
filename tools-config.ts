@@ -2436,8 +2436,18 @@ TEMPLATE HTML à utiliser (remplis les placeholders) :
       
       updateTotals(config);
       
-      document.getElementById('footer-text').innerHTML = '<strong>Mentions légales:</strong> ' + (config.footer_text || defaultConfig.footer_text);
-      document.getElementById('payment-terms').innerHTML = '<strong>Conditions de paiement:</strong> ' + (config.payment_terms || defaultConfig.payment_terms);
+      // Avoid XSS: user-provided values must be inserted as text nodes, not HTML.
+      const footerEl = document.getElementById('footer-text');
+      if (footerEl) {
+        footerEl.innerHTML = '<strong>Mentions légales:</strong> ';
+        footerEl.appendChild(document.createTextNode(config.footer_text || defaultConfig.footer_text));
+      }
+
+      const paymentTermsEl = document.getElementById('payment-terms');
+      if (paymentTermsEl) {
+        paymentTermsEl.innerHTML = '<strong>Conditions de paiement:</strong> ';
+        paymentTermsEl.appendChild(document.createTextNode(config.payment_terms || defaultConfig.payment_terms));
+      }
     }
     
     // Rendre les champs éditables

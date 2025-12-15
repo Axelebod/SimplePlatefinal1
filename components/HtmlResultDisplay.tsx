@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { Download, Edit3, Eye, Code, Save, Maximize, Minimize, FileImage, FileText } from 'lucide-react';
 import { useExportToPDF } from '../hooks/useExportToPDF';
 import { useExportToPNG } from '../hooks/useExportToPNG';
@@ -27,6 +27,7 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
   const [viewMode, setViewMode] = useState<'preview' | 'code'>('preview');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [htmlContent, setHtmlContent] = useState(result);
+  const htmlContentRef = useRef(htmlContent);
   const previewRef = useRef<HTMLDivElement>(null);
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
 
@@ -42,7 +43,17 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
 
   React.useEffect(() => {
     setHtmlContent(result);
+    htmlContentRef.current = result;
   }, [result]);
+
+  const handleContentChange = useCallback(
+    (newContent: string) => {
+      htmlContentRef.current = newContent;
+      setHtmlContent(newContent);
+      onChange?.(newContent);
+    },
+    [onChange]
+  );
 
   // Synchroniser les modifications depuis l'iframe
   React.useEffect(() => {
@@ -51,10 +62,11 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
     const iframe = iframeRef.current;
     
     // Debounce pour éviter trop de mises à jour
-    let updateTimeout: NodeJS.Timeout;
+    let updateTimeout: ReturnType<typeof setTimeout> | undefined;
+    let teardownListeners: (() => void) | undefined;
     
     const syncContent = () => {
-      clearTimeout(updateTimeout);
+      if (updateTimeout) clearTimeout(updateTimeout);
       updateTimeout = setTimeout(() => {
         try {
           const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -62,7 +74,7 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
           
           // Récupérer le HTML complet de l'iframe
           const updatedHtml = iframeDoc.documentElement.outerHTML;
-          if (updatedHtml && updatedHtml !== htmlContent) {
+          if (updatedHtml && updatedHtml !== htmlContentRef.current) {
             handleContentChange(updatedHtml);
           }
         } catch (e) {
@@ -77,6 +89,9 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
         const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
         if (!iframeDoc) return;
 
+        // If the iframe reloads, avoid stacking listeners.
+        teardownListeners?.();
+
         // Ajouter des listeners sur tous les éléments contentEditable
         const editableElements = iframeDoc.querySelectorAll('[contenteditable="true"]');
         
@@ -88,6 +103,15 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
         // Écouter aussi les changements sur le document entier
         iframeDoc.addEventListener('input', syncContent);
         iframeDoc.addEventListener('blur', syncContent, true);
+
+        teardownListeners = () => {
+          editableElements.forEach((el) => {
+            el.removeEventListener('input', syncContent);
+            el.removeEventListener('blur', syncContent);
+          });
+          iframeDoc.removeEventListener('input', syncContent);
+          iframeDoc.removeEventListener('blur', syncContent, true);
+        };
       } catch (e) {
         console.log('Setup editable listeners:', e);
       }
@@ -108,15 +132,11 @@ export const HtmlResultDisplay: React.FC<HtmlResultDisplayProps> = ({
     }, 100);
 
     return () => {
-      clearTimeout(updateTimeout);
+      if (updateTimeout) clearTimeout(updateTimeout);
+      teardownListeners?.();
       iframe.removeEventListener('load', handleLoad);
     };
-  }, [htmlContent, editable, viewMode, handleContentChange]);
-
-  const handleContentChange = (newContent: string) => {
-    setHtmlContent(newContent);
-    onChange?.(newContent);
-  };
+  }, [editable, viewMode, handleContentChange]);
 
   const handleDownload = () => {
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
