@@ -498,7 +498,7 @@ export const ToolPage: React.FC = () => {
             ) : tool.id === 'business-plan-pro' ? (
               <BusinessPlanStudio
                 result={result ? String(result) : ''}
-                inputValue={inputs.input ? String(inputs.input) : undefined}
+                inputValue={inputs.idea ? String(inputs.idea) : undefined}
                 onSave={isLoggedIn ? handleSaveResult : undefined}
                 isSaved={isResultSaved}
                 isSaving={savingResult}
