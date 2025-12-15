@@ -120,20 +120,20 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <nav className="sticky top-0 z-50 bg-neo-white dark:bg-gray-800 border-b-2 border-black dark:border-gray-600 px-4 py-3 shadow-neo-sm dark:shadow-none transition-all duration-300">
         {/* ANNOUNCEMENT BANNER (90s vibe) */}
         {showAnnouncement && (
-          <div className="mb-3 border-2 border-black dark:border-white rounded-md overflow-hidden shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
-            <div className="px-3 py-2 bg-gradient-to-r from-fuchsia-500 via-yellow-300 to-cyan-400 text-black flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
+          <div className="mb-3 w-full border-2 border-black dark:border-white rounded-md overflow-hidden shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
+            <div className="px-3 py-2 bg-gradient-to-r from-fuchsia-500 via-yellow-300 to-cyan-400 text-black flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
                 <span className="px-2 py-0.5 bg-black text-white font-extrabold text-xs uppercase tracking-widest border border-black">
                   ANNÉES 90
                 </span>
-                <p className="font-extrabold text-sm truncate">
+                <p className="font-extrabold text-xs sm:text-sm leading-snug whitespace-normal">
                   Pour fêter notre passage sur <span className="underline decoration-2">Les Pépites Tech</span> : les crédits ne sont pas déduits (temporaire).
                 </p>
               </div>
               <button
                 type="button"
                 onClick={dismissAnnouncement}
-                className="shrink-0 p-1.5 bg-white/70 hover:bg-white border-2 border-black rounded-md transition-colors"
+                className="self-end sm:self-auto shrink-0 p-1.5 bg-white/70 hover:bg-white border-2 border-black rounded-md transition-colors"
                 aria-label="Fermer"
                 title="Fermer"
               >
