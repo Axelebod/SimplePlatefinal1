@@ -14,7 +14,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const { user, credits, creditsFree, creditsPaid, buyCredits, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
   const { language, toggleLanguage } = useLanguageStore();
   const { t } = useTranslation();
-  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -50,26 +49,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     window.addEventListener('scroll', checkScroll);
     return () => window.removeEventListener('scroll', checkScroll);
   }, []);
-
-  // Announcement banner dismissal (localStorage)
-  useEffect(() => {
-    try {
-      const key = 'simpleplate_announcement_pepites_tech_credits_v1';
-      const dismissed = localStorage.getItem(key) === '1';
-      setShowAnnouncement(!dismissed);
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const dismissAnnouncement = () => {
-    setShowAnnouncement(false);
-    try {
-      localStorage.setItem('simpleplate_announcement_pepites_tech_credits_v1', '1');
-    } catch {
-      // Ignore
-    }
-  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -118,31 +97,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <div className="min-h-screen bg-neo-white dark:bg-gray-900 dark:text-gray-100 font-sans text-neo-black flex flex-col transition-colors duration-300">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-neo-white dark:bg-gray-800 border-b-2 border-black dark:border-gray-600 px-4 py-3 shadow-neo-sm dark:shadow-none transition-all duration-300">
-        {/* ANNOUNCEMENT BANNER (90s vibe) */}
-        {showAnnouncement && (
-          <div className="mb-3 w-full border-2 border-black dark:border-white rounded-md overflow-hidden shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
-            <div className="px-3 py-2 bg-gradient-to-r from-fuchsia-500 via-yellow-300 to-cyan-400 text-black flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex items-start sm:items-center gap-3 min-w-0">
-                <span className="px-2 py-0.5 bg-black text-white font-extrabold text-xs uppercase tracking-widest border border-black">
-                  ANNÉES 90
-                </span>
-                <p className="font-extrabold text-xs sm:text-sm leading-snug whitespace-normal">
-                  Pour fêter notre passage sur <span className="underline decoration-2">Les Pépites Tech</span> : les crédits ne sont pas déduits (temporaire).
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={dismissAnnouncement}
-                className="self-end sm:self-auto shrink-0 p-1.5 bg-white/70 hover:bg-white border-2 border-black rounded-md transition-colors"
-                aria-label="Fermer"
-                title="Fermer"
-              >
-                <X className="w-4 h-4 text-black" />
-              </button>
-            </div>
-          </div>
-        )}
-
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             {/* LOGO */}
