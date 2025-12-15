@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { tools } from '../tools-config';
+import { getTools } from '../tools-config';
 import { useUserStore } from '../store/userStore';
 import { isApiReady } from '../services/geminiService';
 import { ArrowLeft, Lock, Sparkles, Loader2, Copy, AlertTriangle, Info, Upload, Maximize, Eye, Code, LogIn, Save, Download } from 'lucide-react';
-import { LOADING_MESSAGES } from '../constants';
+import { getLoadingMessages } from '../constants';
 import ReactMarkdown from 'react-markdown';
 import { generateToolSEOContent } from '../utils/toolContentGenerator';
 import { ToolHistory } from '../components/ToolHistory';
@@ -36,7 +36,8 @@ import { useTranslation } from '../hooks/useTranslation';
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const tools = React.useMemo(() => getTools(language), [language]);
   
   // Trouver l'outil correspondant au slug
   const tool = tools.find(t => {
@@ -67,7 +68,7 @@ export const ToolPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
+  const [loadingMsg, setLoadingMsg] = useState(getLoadingMessages(language)[0]);
   
   // Preview Toggle for Website Generator
   const [showPreview, setShowPreview] = useState(true);
@@ -145,12 +146,13 @@ export const ToolPage: React.FC = () => {
   // Handle loading message cycle
   useEffect(() => {
     if (loading) {
+      const messages = getLoadingMessages(language);
       const interval = setInterval(() => {
-        setLoadingMsg(LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]);
+        setLoadingMsg(messages[Math.floor(Math.random() * messages.length)]);
       }, 2000);
       return () => clearInterval(interval);
     }
-  }, [loading]);
+  }, [loading, language]);
 
   if (!tool) {
     return (
@@ -195,7 +197,7 @@ export const ToolPage: React.FC = () => {
       const file = e.target.files?.[0];
       if (file) {
           if (file.size > 4 * 1024 * 1024) { // Limit 4MB
-              alert("Fichier trop lourd (Max 4Mo)");
+              alert(t('toolPage.fileTooLarge'));
               return;
           }
           setFileName(file.name);
@@ -243,7 +245,7 @@ export const ToolPage: React.FC = () => {
         setResult(`HEX: #${hex.toUpperCase()}\nRGB: rgb(${r}, ${g}, ${b})`);
         return;
       } else {
-        setError('Code Hex invalide (doit être 6 caractères, ex: #FF0000)');
+        setError(t('toolPage.invalidHex'));
         return;
       }
     }
@@ -253,7 +255,7 @@ export const ToolPage: React.FC = () => {
       const hasImage = fileInput !== undefined;
       const hasQuestion = inputs.question && inputs.question.trim();
       if (!hasImage && !hasQuestion) {
-        setError('Veuillez fournir au moins une photo de l\'exercice OU une question écrite.');
+        setError(t('toolPage.homeworkMissingInputs'));
         return;
       }
     } else {
@@ -271,7 +273,7 @@ export const ToolPage: React.FC = () => {
 
     // Vérifier la clé API pour les outils IA
     if (!tool.promptGenerator) {
-      setError("Config invalide");
+      setError(t('toolPage.invalidConfig'));
       return;
     }
 
@@ -289,7 +291,7 @@ export const ToolPage: React.FC = () => {
     
     // Les outils locaux ne nécessitent pas de clé API Google
     if (!prompt.startsWith('LOCAL:') && !isApiReady()) {
-      setError("Clé API manquante.");
+      setError(t('toolPage.missingApiKey'));
       return;
     }
 
@@ -318,7 +320,7 @@ export const ToolPage: React.FC = () => {
     
     // Générer avec le prompt fourni - utiliser directement le service
     if (!isApiReady()) {
-      setError("Clé API manquante.");
+      setError(t('toolPage.missingApiKey'));
       return;
     }
     
@@ -369,13 +371,13 @@ export const ToolPage: React.FC = () => {
 
       if (response.success) {
         setIsResultSaved(true);
-        alert('✅ Résultat sauvegardé avec succès !');
+        alert(t('toolPage.savedSuccess'));
       } else {
-        alert(`❌ ${response.message || 'Erreur lors de la sauvegarde.'}`);
+        alert(`❌ ${response.message || t('toolPage.saveError')}`);
       }
     } catch (error: any) {
       console.error('Error saving result:', error);
-      alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
+      alert(t('toolPage.saveErrorRetry'));
     } finally {
       setSavingResult(false);
     }
@@ -384,7 +386,7 @@ export const ToolPage: React.FC = () => {
   const copyToClipboard = () => {
     if (result) {
       navigator.clipboard.writeText(result);
-      alert("Copié !");
+      alert(t('tools.copied'));
     }
   };
 
@@ -433,7 +435,7 @@ export const ToolPage: React.FC = () => {
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
         <button onClick={() => navigate('/')} className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white mb-4">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Retour aux outils
+          <ArrowLeft className="w-4 h-4 mr-1" /> {t('toolPage.backToTools')}
         </button>
         <div className="flex items-center gap-3">
            <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white">{tool.title}</h1>
@@ -447,14 +449,14 @@ export const ToolPage: React.FC = () => {
           <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">
-              Pour utiliser cet outil, vous devez créer un compte. C'est gratuit et rapide ! 🚀
+              {t('tools.loginRequired')}
             </p>
             <button
               onClick={() => navigate('/signup')}
               className="inline-flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors text-sm"
             >
               <LogIn className="w-4 h-4" />
-              Créer un compte
+              {t('tools.createAccount')}
             </button>
           </div>
         </div>
@@ -553,7 +555,7 @@ export const ToolPage: React.FC = () => {
                        onChange={(e) => handleInputChange(input.name, e.target.value)}
                        disabled={loading}
                     >
-                      <option value="">Sélectionnez une option</option>
+                      <option value="">{t('toolPage.selectOption')}</option>
                       {input.options?.map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
@@ -569,15 +571,15 @@ export const ToolPage: React.FC = () => {
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 {fileName ? (
                                     <>
-                                        <span className="text-green-600 dark:text-green-400 font-bold mb-2">Fichier prêt !</span>
+                                        <span className="text-green-600 dark:text-green-400 font-bold mb-2">{t('toolPage.fileReady')}</span>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">{fileName}</p>
                                     </>
                                 ) : (
                                     <>
                                         <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-bold">Cliquez pour uploader</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-bold">{t('toolPage.uploadClick')}</p>
                                         <p className="text-xs text-gray-400">
-                                          {input.accept?.includes('csv') ? 'CSV (Max 4Mo)' : 'PNG, JPG (Max 4Mo)'}
+                                          {input.accept?.includes('csv') ? t('toolPage.maxCsv') : t('toolPage.maxImages')}
                                         </p>
                                     </>
                                 )}
@@ -686,7 +688,9 @@ export const ToolPage: React.FC = () => {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    {tool.cost > 0 ? `Générer (${tool.cost} Crédit${tool.cost > 1 ? 's' : ''})` : 'Générer Gratuitement'}
+                    {tool.cost > 0
+                      ? `${t('tools.generate')} (${tool.cost} ${tool.cost > 1 ? t('tools.credits') : t('tools.credit')})`
+                      : t('toolPage.generateFree')}
                   </>
                 )}
               </button>
@@ -703,21 +707,21 @@ export const ToolPage: React.FC = () => {
            {/* HEADER */}
            <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
              <div className="flex items-center gap-3">
-                 <h3 className="font-bold text-lg dark:text-white">Résultat</h3>
+                 <h3 className="font-bold text-lg dark:text-white">{t('toolPage.result')}</h3>
                  {/* WEBSITE PREVIEW TOGGLE */}
                  {tool.id === 'website-generator' && result && (
                      <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
                         <button 
                             onClick={() => setShowPreview(true)}
                             className={`p-1 rounded ${showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
-                            title="Aperçu Site"
+                            title={t('toolPage.previewSite')}
                         >
                             <Eye className="w-4 h-4" />
                         </button>
                         <button 
                             onClick={() => setShowPreview(false)}
                             className={`p-1 rounded ${!showPreview ? 'bg-white dark:bg-gray-600 shadow-sm' : 'text-gray-500'}`}
-                            title="Voir le Code"
+                            title={t('toolPage.viewCode')}
                         >
                             <Code className="w-4 h-4" />
                         </button>
@@ -727,7 +731,7 @@ export const ToolPage: React.FC = () => {
 
              {result && (
                <div className="flex gap-2">
-                 <button onClick={copyToClipboard} className="btn-small-icon dark:text-white" title="Copier"><Copy className="w-4 h-4" /></button>
+                 <button onClick={copyToClipboard} className="btn-small-icon dark:text-white" title={t('tools.copy')}><Copy className="w-4 h-4" /></button>
                </div>
              )}
            </div>
@@ -752,10 +756,10 @@ export const ToolPage: React.FC = () => {
                     <img src={String(result)} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" onError={(e) => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }} />
                     <div className="mt-4 text-center">
                       <a href={String(result)} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
-                        Télécharger l'image
+                        {t('toolPage.downloadImage')}
                       </a>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center justify-center gap-1">
-                        <Info className="w-3 h-3" /> Image générée par IA.
+                        <Info className="w-3 h-3" /> {t('toolPage.aiGeneratedImage')}
                       </p>
                     </div>
                  </div>
@@ -788,7 +792,7 @@ export const ToolPage: React.FC = () => {
                             className="px-3 py-1.5 bg-neo-black text-white rounded-md text-xs font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
                           >
                             <Download className="w-3 h-3" />
-                            Télécharger HTML
+                            {t('toolPage.downloadHtml')}
                           </button>
                         </div>
                         <div className="flex-1 border-2 border-black dark:border-gray-600 rounded-md overflow-hidden mb-4 min-h-[500px] relative bg-white shadow-neo dark:shadow-none">
@@ -828,7 +832,7 @@ export const ToolPage: React.FC = () => {
                         className="px-3 py-1.5 bg-neo-green text-black rounded-md text-xs font-bold hover:bg-green-400 transition-colors flex items-center gap-2"
                       >
                         <Download className="w-3 h-3" />
-                        Télécharger
+                        {t('tools.download')}
                       </button>
                     </div>
                     <textarea
@@ -846,7 +850,7 @@ export const ToolPage: React.FC = () => {
                         onClick={copyToClipboard}
                         className="px-4 py-2 bg-neo-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors"
                       >
-                        Copier le code
+                        {t('toolPage.copyCode')}
                       </button>
                     </div>
                   </div>
@@ -898,7 +902,7 @@ export const ToolPage: React.FC = () => {
                               className="px-4 py-2 bg-neo-black text-white rounded-md text-sm font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
                             >
                               <Download className="w-4 h-4" />
-                              Télécharger le ZIP
+                              {t('toolPage.downloadZip')}
                             </button>
                           </div>
                           <div className="prose prose-sm max-w-none markdown-body dark:text-gray-200 prose-a:text-blue-700 dark:prose-a:text-neo-violet prose-a:font-bold prose-a:underline">
@@ -920,11 +924,11 @@ export const ToolPage: React.FC = () => {
                                           onClick={() => {
                                             const code = String(children).replace(/\n$/, '');
                                             navigator.clipboard.writeText(code);
-                                            alert('Code copié !');
+                                            alert(t('tools.copied'));
                                           }}
                                           className="absolute top-2 right-2 px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600"
                                         >
-                                          Copier
+                                          {t('tools.copy')}
                                         </button>
                                       </div>
                                     );
@@ -995,20 +999,21 @@ export const ToolPage: React.FC = () => {
                               />
                               <div className="mt-4 text-center">
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                  Données encodées : <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">{inputs.input || 'N/A'}</code>
+                                  {t('toolPage.qrEncodedData')}{' '}
+                                  <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">{inputs.input || 'N/A'}</code>
                                 </p>
                                 <a 
                                   href={result} 
                                   download={`qr-code-${Date.now()}.png`} 
                                   className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
                                 >
-                                  Télécharger le QR Code
+                                  {t('toolPage.downloadQrCode')}
                                 </a>
                               </div>
                             </>
                           ) : (
                             <div className="text-center text-gray-500 dark:text-gray-400">
-                              <p>Erreur lors de la génération du QR code</p>
+                              <p>{t('toolPage.qrError')}</p>
                               <p className="text-sm mt-2">{result}</p>
                             </div>
                           )}
@@ -1070,7 +1075,7 @@ export const ToolPage: React.FC = () => {
              {!loading && !result && (
                <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                  <Sparkles className="w-12 h-12 mb-2 opacity-20" />
-                 <p>En attente de vos instructions...</p>
+                 <p>{t('toolPage.waiting')}</p>
                </div>
              )}
 
@@ -1093,12 +1098,14 @@ export const ToolPage: React.FC = () => {
 
       {/* SEO CONTENT SECTION - Contenu textuel riche pour le référencement */}
       {(() => {
-        const seoContent = generateToolSEOContent(tool);
+        const seoContent = generateToolSEOContent(tool, language);
         return (
           <div className="mt-12 space-y-8">
             {/* Description détaillée */}
             <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qu'est-ce que {tool.title} ?</h2>
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">
+                {language === 'fr' ? `Qu'est-ce que ${tool.title} ?` : `What is ${tool.title}?`}
+              </h2>
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {seoContent.intro}
@@ -1108,7 +1115,9 @@ export const ToolPage: React.FC = () => {
 
             {/* Comment utiliser */}
             <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Comment utiliser {tool.title} ?</h2>
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">
+                {language === 'fr' ? `Comment utiliser ${tool.title} ?` : `How to use ${tool.title}?`}
+              </h2>
               <ol className="space-y-4 list-decimal list-inside">
                 {seoContent.howTo.map((step, index) => (
                   <li key={index} className="text-gray-700 dark:text-gray-300">
@@ -1120,7 +1129,9 @@ export const ToolPage: React.FC = () => {
 
             {/* Cas d'usage */}
             <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Qui utilise {tool.title} ?</h2>
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">
+                {language === 'fr' ? `Qui utilise ${tool.title} ?` : `Who uses ${tool.title}?`}
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {seoContent.useCases.map((useCase, index) => (
                   <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -1133,7 +1144,9 @@ export const ToolPage: React.FC = () => {
 
             {/* Avantages */}
             <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Pourquoi choisir {tool.title} ?</h2>
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">
+                {language === 'fr' ? `Pourquoi choisir ${tool.title} ?` : `Why choose ${tool.title}?`}
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {seoContent.benefits.map((benefit, index) => (
                   <div key={index} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -1146,35 +1159,54 @@ export const ToolPage: React.FC = () => {
 
             {/* FAQ */}
             <section className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-6 shadow-neo dark:shadow-none">
-              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">Questions fréquentes</h2>
+              <h2 className="font-display text-2xl font-bold mb-4 dark:text-white">
+                {language === 'fr' ? 'Questions fréquentes' : 'Frequently asked questions'}
+              </h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Combien coûte l'utilisation de {tool.title} ?</h3>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">
+                    {language === 'fr'
+                      ? `Combien coûte l'utilisation de ${tool.title} ?`
+                      : `How much does it cost to use ${tool.title}?`}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {tool.cost === 0 
-                      ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
-                      : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.`}
+                      ? (language === 'fr'
+                          ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit. Vous pouvez l'utiliser autant de fois que vous le souhaitez.`
+                          : `${tool.title} is completely free and uses no credits. You can use it as many times as you want.`)
+                      : (language === 'fr'
+                          ? `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération. Les nouveaux utilisateurs reçoivent 5 crédits gratuits par semaine.`
+                          : `Using ${tool.title} costs ${tool.cost} ${tool.cost > 1 ? 'credits' : 'credit'} per generation. New users receive 5 free credits per week.`)}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Les résultats sont-ils de bonne qualité ?</h3>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">
+                    {language === 'fr' ? 'Les résultats sont-ils de bonne qualité ?' : 'Are the results high quality?'}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Oui, {tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité. 
-                    Les résultats sont optimisés pour être utilisables directement dans vos projets.
+                    {language === 'fr'
+                      ? `Oui, ${tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité. Les résultats sont optimisés pour être utilisables directement dans vos projets.`
+                      : `Yes. ${tool.title} uses modern AI to generate professional, high-quality results optimized for direct use in your projects.`}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Mes données sont-elles sécurisées ?</h3>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">
+                    {language === 'fr' ? 'Mes données sont-elles sécurisées ?' : 'Is my data secure?'}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers. 
-                    {tool.inputs.some(i => i.type === 'file') ? ' Les fichiers uploadés sont traités uniquement pour la génération et supprimés immédiatement après.' : ''}
+                    {language === 'fr'
+                      ? `Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers.${tool.inputs.some(i => i.type === 'file') ? ' Les fichiers uploadés sont traités uniquement pour la génération et supprimés immédiatement après.' : ''}`
+                      : `Yes. Your data is handled securely and is not stored or shared with third parties.${tool.inputs.some(i => i.type === 'file') ? ' Uploaded files are processed only for generation and removed immediately after.' : ''}`}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm mb-2 dark:text-white">Puis-je utiliser les résultats commercialement ?</h3>
+                  <h3 className="font-bold text-sm mb-2 dark:text-white">
+                    {language === 'fr' ? 'Puis-je utiliser les résultats commercialement ?' : 'Can I use the results commercially?'}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Oui, vous êtes libre d'utiliser les résultats générés par {tool.title} pour vos projets personnels ou professionnels, 
-                    y compris à des fins commerciales. Les résultats vous appartiennent.
+                    {language === 'fr'
+                      ? `Oui, vous êtes libre d'utiliser les résultats générés par ${tool.title} pour vos projets personnels ou professionnels, y compris à des fins commerciales. Les résultats vous appartiennent.`
+                      : `Yes. You can use results generated by ${tool.title} for personal or professional projects, including commercial use. The results are yours.`}
                   </p>
                 </div>
               </div>

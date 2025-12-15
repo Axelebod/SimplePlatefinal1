@@ -1,24 +1,27 @@
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { tools } from '../tools-config';
-import { CATEGORIES, CATEGORY_LABELS, CATEGORY_COLORS } from '../constants';
+import { getTools } from '../tools-config';
+import { CATEGORIES, CATEGORY_COLORS, getCategoryLabel } from '../constants';
 import { Home, CreditCard, Shield, LogIn, Map, Mail } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export const Sitemap: React.FC = () => {
+  const { t, language } = useTranslation();
+  const tools = React.useMemo(() => getTools(language), [language]);
   
   useEffect(() => {
-      document.title = "Plan du Site | SimplePlate AI";
-  }, []);
+      document.title = t('sitemap.pageTitle');
+  }, [t]);
 
   // Liens principaux du site
   const mainLinks = [
-      { to: "/", label: "Accueil", icon: Home, color: "bg-neo-white" },
-      { to: "/pricing", label: "Tarifs & Pro", icon: CreditCard, color: "bg-neo-green" },
-      { to: "/login", label: "Espace Membre", icon: LogIn, color: "bg-neo-yellow" },
-      { to: "/contact", label: "Contact", icon: Mail, color: "bg-neo-blue" },
-      { to: "/legal", label: "Légal", icon: Shield, color: "bg-gray-200" },
-      { to: "/privacy", label: "Confidentialité", icon: Shield, color: "bg-gray-200" },
+      { to: "/", label: t('sitemap.links.home'), icon: Home, color: "bg-neo-white" },
+      { to: "/pricing", label: t('sitemap.links.pricing'), icon: CreditCard, color: "bg-neo-green" },
+      { to: "/login", label: t('sitemap.links.member'), icon: LogIn, color: "bg-neo-yellow" },
+      { to: "/contact", label: t('sitemap.links.contact'), icon: Mail, color: "bg-neo-blue" },
+      { to: "/legal", label: t('sitemap.links.legal'), icon: Shield, color: "bg-gray-200" },
+      { to: "/privacy", label: t('sitemap.links.privacy'), icon: Shield, color: "bg-gray-200" },
   ];
 
   return (
@@ -30,11 +33,11 @@ export const Sitemap: React.FC = () => {
               <Map className="w-8 h-8 text-black" />
           </div>
           <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
-            Plan du Site
+            {t('sitemap.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            L'architecture complète de SimplePlate. <br/>
-            <span className="font-bold text-black">{tools.length} outils</span> prêts à l'emploi.
+            {t('sitemap.subtitleLine1')} <br/>
+            <span className="font-bold text-black">{tools.length} {t('sitemap.toolsCountLabel')}</span> {t('sitemap.subtitleLine2')}
           </p>
       </div>
 
@@ -70,7 +73,7 @@ export const Sitemap: React.FC = () => {
                     {/* Category Header */}
                     <div className={`${headerColor} p-4 border-b-2 border-black flex justify-between items-center`}>
                         <h2 className="font-display font-bold text-xl uppercase tracking-wider">
-                            {CATEGORY_LABELS[category]}
+                            {getCategoryLabel(category, language)}
                         </h2>
                         <span className="bg-black text-white text-xs font-bold px-2 py-1 rounded-full">
                             {catTools.length}
@@ -106,7 +109,7 @@ export const Sitemap: React.FC = () => {
       
       <div className="mt-16 text-center">
           <Link to="/" className="inline-block px-8 py-3 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-colors">
-              Retour à l'accueil
+              {t('sitemap.backHome')}
           </Link>
       </div>
 

@@ -17,6 +17,61 @@ export const fr = {
     getStarted: 'Commencer',
     learnMore: 'En savoir plus',
   },
+  // Home (landing page)
+  homePage: {
+    seo: {
+      title: 'SimplePlate AI - 50+ Outils IA Professionnels (Dev, Image, Business)',
+      description:
+        "Plateforme SaaS avec 50+ outils IA professionnels : Générateur de Business Plan, Convertisseurs, Analyse d'image, et bien plus. Système de crédits disponible.",
+      keywords:
+        'outils ia professionnels, générateur texte ia, outils dev en ligne, saas, intelligence artificielle, crédits ia',
+      ogTitle: 'SimplePlate AI - La Boîte à Outils Ultime',
+    },
+    hero: {
+      titleLine1: 'Boostez votre',
+      titleHighlight: 'productivité',
+      subtitleLine1: '50+ outils IA et utilitaires pour coder, écrire et créer instantanément.',
+      subtitleLine2: 'Rapide. Professionnel. Français. 🇫🇷',
+    },
+    searchPlaceholder: "Rechercher un outil (ex: 'Juridique', 'Image')...",
+    suggestToolHintLine1: 'Il manque quelque chose ?',
+    suggestToolHintLine2: 'Dites-le nous.',
+    noToolsTitle: 'Aucun outil trouvé.',
+    noToolsSubtitle: 'Essayez un autre mot clé (ex: "PDF", "Image", "Calcul").',
+    socialProof: {
+      title: 'Ils adorent SimplePlate',
+      reviews: {
+        0: {
+          name: 'Thomas',
+          role: 'Développeur',
+          text: "Le générateur de Regex m'a sauvé la vie 3 fois cette semaine. Indispensable.",
+        },
+        1: {
+          name: 'Sarah',
+          role: 'Entrepreneuse',
+          text: "J'ai fait mon Business Plan en 10 minutes avec l'IA. C'est bluffant.",
+        },
+        2: {
+          name: 'Kevin',
+          role: 'Étudiant',
+          text: "L'outil pour humaniser les textes est parfait pour mes devoirs. Merci !",
+        },
+      },
+    },
+    faq: {
+      title: 'Questions Fréquentes',
+      q1: {
+        question: 'Comment fonctionnent les crédits ?',
+        answer:
+          "Chaque utilisateur reçoit 5 crédits gratuits par semaine (non cumulables). Les outils coûtent entre 0 et 3 crédits selon leur complexité.",
+      },
+      q2: {
+        question: 'Mes données sont-elles privées ?',
+        answer:
+          "Absolument. Les outils locaux tournent sur votre navigateur. Les outils IA envoient les données au fournisseur pour traitement et ne sont pas stockés.",
+      },
+    },
+  },
   // Dashboard
   dashboard: {
     title: 'Mon Espace',
@@ -24,10 +79,18 @@ export const fr = {
     credits: 'Solde Disponible',
     buyCredits: 'Acheter des crédits',
     nextReset: 'Prochaine recharge',
+    resetAvailable: 'Recharge disponible !',
     creditsInfo: 'Achetez des crédits pour utiliser plus d\'outils.',
     accountDetails: 'Détails du compte',
     recentActivity: 'Activité récente',
     refresh: 'Actualiser',
+    memberId: 'ID Membre',
+    activityLoading: 'Chargement de vos dernières actions...',
+    noRecentActivity:
+      "Aucune sauvegarde récente. Utilisez un outil et enregistrez le résultat pour voir l'activité ici.",
+    needInvoiceTitle: "Besoin d'une facture ?",
+    needInvoiceBody:
+      "Les factures sont envoyées automatiquement par Stripe à votre adresse email lors de chaque paiement. Vérifiez vos spams ou contactez le support.",
   },
   // Pricing
   pricing: {
@@ -69,6 +132,8 @@ export const fr = {
     checkUrl: 'Vérifiez que l\'URL est correcte ou retournez à la page d\'accueil.',
     fillRequired: 'Veuillez remplir',
     toUse: 'pour utiliser',
+    credit: 'crédit',
+    credits: 'crédits',
   },
   // Business Plan
   businessPlan: {
@@ -133,6 +198,7 @@ export const fr = {
     cancel: 'Annuler',
     confirm: 'Confirmer',
     close: 'Fermer',
+    open: 'Ouvrir',
     back: 'Retour',
     next: 'Suivant',
     previous: 'Précédent',
@@ -177,6 +243,86 @@ export const fr = {
     toolIdea: 'Vous avez une idée d\'outil ?',
     toolIdeaDesc: 'Si vous ne trouvez pas ce que vous cherchez, dites-le nous. On ajoute des nouveaux outils chaque semaine basés sur vos retours.',
     suggestTool: 'Suggérer un outil',
+  },
+  toolSuggestions: {
+    title: "Suggestion d'outils",
+    defaultMessage: 'Découvrez ces outils complémentaires !',
+  },
+  toolPage: {
+    backToTools: 'Retour aux outils',
+    fileTooLarge: 'Fichier trop lourd (Max 4Mo)',
+    invalidHex: 'Code Hex invalide (doit être 6 caractères, ex: #FF0000)',
+    homeworkMissingInputs: "Veuillez fournir au moins une photo de l'exercice OU une question écrite.",
+    invalidConfig: 'Config invalide',
+    missingApiKey: 'Clé API manquante.',
+    savedSuccess: '✅ Résultat sauvegardé avec succès !',
+    saveError: 'Erreur lors de la sauvegarde.',
+    saveErrorRetry: '❌ Erreur lors de la sauvegarde. Veuillez réessayer.',
+    selectOption: 'Sélectionnez une option',
+    fileReady: 'Fichier prêt !',
+    uploadClick: 'Cliquez pour uploader',
+    maxCsv: 'CSV (Max 4Mo)',
+    maxImages: 'PNG, JPG (Max 4Mo)',
+    generateFree: 'Générer Gratuitement',
+    result: 'Résultat',
+    previewSite: 'Aperçu Site',
+    viewCode: 'Voir le Code',
+    downloadImage: "Télécharger l'image",
+    aiGeneratedImage: 'Image générée par IA.',
+    downloadHtml: 'Télécharger HTML',
+    copyCode: 'Copier le code',
+    downloadZip: 'Télécharger le ZIP',
+    waiting: 'En attente de vos instructions...',
+    qrEncodedData: 'Données encodées :',
+    downloadQrCode: 'Télécharger le QR Code',
+    qrError: 'Erreur lors de la génération du QR code',
+  },
+  sitemap: {
+    pageTitle: 'Plan du Site | SimplePlate AI',
+    title: 'Plan du Site',
+    subtitleLine1: "L'architecture complète de SimplePlate.",
+    toolsCountLabel: 'outils',
+    subtitleLine2: "prêts à l'emploi.",
+    backHome: "Retour à l'accueil",
+    links: {
+      home: 'Accueil',
+      pricing: 'Tarifs',
+      member: 'Espace Membre',
+      contact: 'Contact',
+      legal: 'Mentions légales',
+      privacy: 'Confidentialité',
+    },
+  },
+  auth: {
+    headlineSignup: 'Rejoignez le club.',
+    headlineLogin: 'Bon retour.',
+    subtitleSignup: 'Créez un compte pour sauvegarder vos crédits et résultats.',
+    subtitleLogin: 'Connectez-vous pour accéder à vos outils et historique.',
+    confirmationSent: 'Email de confirmation envoyé ! Vérifiez votre boîte mail pour activer le compte.',
+    enterEmail: 'Veuillez entrer votre adresse email.',
+    resetSent: 'Un email de réinitialisation a été envoyé ! Vérifiez votre boîte mail.',
+    resetError: "Une erreur est survenue lors de l'envoi de l'email.",
+    forgotPasswordHelp:
+      "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    password: 'Mot de passe',
+    forgotPassword: 'Mot de passe oublié ?',
+    createAccount: 'Créer mon compte',
+    termsPrefix: 'En continuant, vous acceptez nos',
+    termsLink: 'CGU',
+  },
+  resetPassword: {
+    title: 'Nouveau mot de passe',
+    subtitle: 'Choisissez un nouveau mot de passe sécurisé pour votre compte.',
+    newPassword: 'Nouveau mot de passe',
+    confirmPassword: 'Confirmer le mot de passe',
+    minLengthHint: 'Minimum 6 caractères',
+    minLengthError: 'Le mot de passe doit contenir au moins 6 caractères.',
+    mismatchError: 'Les mots de passe ne correspondent pas.',
+    sessionExpired: 'Session expirée. Veuillez demander un nouveau lien de réinitialisation.',
+    success: 'Mot de passe réinitialisé avec succès ! Redirection...',
+    genericError: 'Une erreur est survenue lors de la réinitialisation.',
+    submit: 'Réinitialiser le mot de passe',
+    backToLogin: 'Retour à la connexion',
   },
 };
 

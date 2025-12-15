@@ -3,22 +3,24 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { ToolConfig } from '../types';
-import { CATEGORY_COLORS, CATEGORY_LABELS } from '../constants';
+import { CATEGORY_COLORS, getCategoryLabel } from '../constants';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface ToolCardProps {
   tool: ToolConfig;
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
+  const { t, language } = useTranslation();
   const Icon = (LucideIcons as any)[tool.iconName] || LucideIcons.Sparkles;
   const bgClass = CATEGORY_COLORS[tool.category] || 'bg-gray-100';
-  const categoryLabel = CATEGORY_LABELS[tool.category] || tool.category;
+  const categoryLabel = getCategoryLabel(tool.category, language);
 
   return (
     <Link 
       to={`/tool/${tool.slug || tool.id}`}
       className="group relative block h-full focus:outline-none focus:ring-2 focus:ring-neo-violet focus:ring-offset-2 rounded-lg"
-      aria-label={`Ouvrir l'outil ${tool.title}: ${tool.description}`}
+      aria-label={`${t('common.open')}: ${tool.title}. ${tool.description}`}
     >
       <div className={`
         h-full flex flex-col justify-between
@@ -47,7 +49,9 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
 
         <div className="mt-auto pt-2 md:pt-4 border-t border-dashed border-gray-300 dark:border-white flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-white">
           <span className="truncate">{categoryLabel}</span>
-          <span className="ml-1">{tool.cost} Crédit{tool.cost > 1 ? 's' : ''}</span>
+          <span className="ml-1">
+            {tool.cost} {tool.cost > 1 ? t('tools.credits') : t('tools.credit')}
+          </span>
         </div>
       </div>
     </Link>

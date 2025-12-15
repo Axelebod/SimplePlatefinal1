@@ -1,12 +1,13 @@
 import { useLanguageStore } from '../store/languageStore';
 import { fr } from '../locales/fr';
 import { en } from '../locales/en';
+import { useCallback } from 'react';
 
 type TranslationKey = keyof typeof fr;
 
 export const useTranslation = () => {
   const { language } = useLanguageStore();
-  const t = (key: string): string => {
+  const t = useCallback((key: string): string => {
     const keys = key.split('.');
     let value: any = language === 'fr' ? fr : en;
     
@@ -19,7 +20,7 @@ export const useTranslation = () => {
     }
     
     return value || key;
-  };
+  }, [language]);
   
   return { t, language };
 };

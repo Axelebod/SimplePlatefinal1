@@ -8,8 +8,10 @@ interface SEOContent {
   benefits: Array<{ title: string; description: string }>;
 }
 
-export const generateToolSEOContent = (tool: ToolConfig): SEOContent => {
-  const personalizedContent: Record<string, SEOContent> = {
+type Language = 'fr' | 'en';
+
+export const generateToolSEOContent = (tool: ToolConfig, language: Language = 'fr'): SEOContent => {
+  const personalizedContentFr: Record<string, SEOContent> = {
     'ecom-product-scanner': {
       intro: `L'outil ${tool.title} analyse automatiquement les pages produits e-commerce pour extraire toutes les informations essentielles : prix, descriptions, images, avis clients, et caractéristiques techniques. Plus besoin de copier-coller manuellement : en quelques secondes, vous avez toutes les données structurées et prêtes à être utilisées.`,
       howTo: [
@@ -174,7 +176,164 @@ export const generateToolSEOContent = (tool: ToolConfig): SEOContent => {
     }
   };
 
-  const defaultContent: SEOContent = {
+  const personalizedContentEn: Record<string, SEOContent> = {
+    'ecom-product-scanner': {
+      intro: `${tool.title} automatically analyzes e-commerce product pages to extract essential information: price, descriptions, images, reviews, and technical specs. No more manual copy/paste: in seconds you get structured data ready to use.`,
+      howTo: [
+        'Paste the URL of the product page you want to analyze (Amazon, etc.).',
+        'Click "Analyze" and wait a few seconds. The AI scans the page and extracts key data.',
+        'Use the structured output: price, description, images, reviews, specifications.',
+      ],
+      useCases: [
+        { title: 'Price comparisons', description: 'Extract prices and specs to build comparisons quickly.' },
+        { title: 'Competitive research', description: 'Analyze competitors’ listings to refine your positioning.' },
+        { title: 'Catalog imports', description: 'Import product information from other e-commerce sites.' },
+      ],
+      benefits: [
+        { title: 'Time saver', description: 'No manual copy/paste—extraction is automated.' },
+        { title: 'Structured data', description: 'Information is organized and ready to reuse.' },
+        { title: 'Multi-platform', description: 'Works with many e-commerce websites.' },
+      ],
+    },
+    'website-generator': {
+      intro: `With ${tool.title}, create a complete website in minutes. Describe your project, pick a style and sections, and the AI generates deploy-ready HTML/CSS/JS. Great for landing pages, portfolios, or a basic marketing site.`,
+      howTo: [
+        'Describe your project: type of site, industry, and the sections you want.',
+        'Choose a visual style (modern, classic, minimalist, etc.).',
+        'Click "Generate" and get a complete HTML website in seconds.',
+      ],
+      useCases: [
+        { title: 'Marketing websites', description: 'Create a website to present your company or services.' },
+        { title: 'Landing pages', description: 'Generate landing pages for marketing campaigns.' },
+        { title: 'Portfolios', description: 'Create a professional portfolio to showcase your work.' },
+      ],
+      benefits: [
+        { title: 'Fast', description: 'A complete site in minutes instead of hours.' },
+        { title: 'Editable', description: 'Clean code that’s easy to customize.' },
+        { title: 'Deploy-ready', description: 'The generated site is functional and ready to ship.' },
+      ],
+    },
+    'qr-code-generator': {
+      intro: `${tool.title} generates QR codes instantly for any content: URLs, text, phone numbers, emails, or WiFi credentials. Free, fast, and private (runs locally in your browser).`,
+      howTo: [
+        'Enter the content to encode (URL, text, etc.).',
+        'Click "Generate" and your QR code appears instantly.',
+        'Download the QR code as a PNG image.',
+      ],
+      useCases: [
+        { title: 'Marketing', description: 'Create QR codes for flyers, posters, or business cards.' },
+        { title: 'Events', description: 'Share information quickly during events.' },
+        { title: 'WiFi', description: 'Share your WiFi access easily.' },
+      ],
+      benefits: [
+        { title: '100% free', description: 'No credits required, unlimited generation.' },
+        { title: 'Private & secure', description: 'Runs locally—your data is never sent.' },
+        { title: 'Downloadable', description: 'High-quality PNG export for any use.' },
+      ],
+    },
+    'homework-helper': {
+      intro: `${tool.title} is your personal homework assistant. Upload a photo of an exercise or ask a question, and get a clear step-by-step explanation. Great for math, science, history, and more.`,
+      howTo: [
+        'Upload a photo of your exercise OR type your question.',
+        'Specify the subject (math, English, history, etc.).',
+        'Click "Generate" to receive a detailed, educational explanation.',
+      ],
+      useCases: [
+        { title: 'Students', description: 'Get help understanding exercises and improving skills.' },
+        { title: 'Parents', description: 'Help your kids even if you’re not an expert in the subject.' },
+        { title: 'Learners', description: 'Review efficiently with detailed explanations.' },
+      ],
+      benefits: [
+        { title: 'Step-by-step', description: 'Each step is explained clearly for real understanding.' },
+        { title: 'Multi-subject', description: 'Works for math, science, languages, history, etc.' },
+        { title: 'Photo or text', description: 'Use a photo or type your question directly.' },
+      ],
+    },
+    'ai-image-analysis': {
+      intro: `${tool.title} deeply analyzes any image to extract visible information: objects, text, colors, composition, and context. Great for photos, screenshots, scanned documents, or designs.`,
+      howTo: [
+        'Upload the image you want to analyze (JPG/PNG, max 4MB).',
+        'Click "Analyze" and wait a few seconds.',
+        'Receive a complete analysis with detected details.',
+      ],
+      useCases: [
+        { title: 'Accessibility', description: 'Generate image descriptions for web accessibility.' },
+        { title: 'Document analysis', description: 'Extract text and information from scanned documents.' },
+        { title: 'Visual research', description: 'Analyze social media or website visuals for research.' },
+      ],
+      benefits: [
+        { title: 'Comprehensive', description: 'Detects objects, text, colors, and context.' },
+        { title: 'Common formats', description: 'Works with JPG, PNG, and other common formats.' },
+        { title: 'Fast & accurate', description: 'Results in seconds with strong accuracy.' },
+      ],
+    },
+    'business-plan-pro': {
+      intro: `Have an idea but no business plan? ${tool.title} turns your concept into a professional business plan you can present to investors. The AI structures everything: Executive Summary, market sizing, business model, go-to-market strategy, and SWOT.`,
+      howTo: [
+        'Describe your business idea: product/service, target market, and goals.',
+        'Click "Generate" and wait 30–60 seconds. The AI structures a complete plan.',
+        'Use the structured plan with the sections you need to pitch confidently.',
+      ],
+      useCases: [
+        { title: 'Startups', description: 'Create a plan for fundraising or investor pitches.' },
+        { title: 'Entrepreneurs', description: 'Validate and structure your model before launching.' },
+        { title: 'Students', description: 'Generate a professional plan for academic projects.' },
+      ],
+      benefits: [
+        { title: 'Professional structure', description: 'Includes essential sections found in real business plans.' },
+        { title: 'Market analysis', description: 'Clear market sizing and positioning.' },
+        { title: 'Pitch-ready', description: 'Professional format you can reuse in your pitch deck.' },
+      ],
+    },
+    'python-pro-gen': {
+      intro: `${tool.title} generates professional, working Python code for any task. Describe what you need and get a complete script with comments and best practices.`,
+      howTo: [
+        'Select the type of Python script you want (scraping, API, data processing, etc.).',
+        'Describe the goal and required technical details.',
+        'Click "Generate" and get ready-to-run Python code.',
+      ],
+      useCases: [
+        { title: 'Developers', description: 'Generate Python quickly without writing everything manually.' },
+        { title: 'Automation', description: 'Create scripts to automate repetitive tasks.' },
+        { title: 'Learning', description: 'Learn by reading generated code and best practices.' },
+      ],
+      benefits: [
+        { title: 'Professional code', description: 'Follows Python best practices and includes comments.' },
+        { title: 'Works out of the box', description: 'Ready to run and test immediately.' },
+        { title: 'Versatile', description: 'Supports scraping, APIs, data processing, and more.' },
+      ],
+    },
+    'ai-detector': {
+      intro: `${tool.title} analyzes a text to estimate whether it was generated by AI. Useful to check authenticity, detect potential AI usage, or validate originality.`,
+      howTo: ['Paste the text you want to analyze.', 'Click "Analyze" and wait a few seconds.', 'Get a probability score (AI vs human).'],
+      useCases: [
+        { title: 'Education', description: 'Check whether a student assignment may be AI-generated.' },
+        { title: 'Editors', description: 'Validate originality of submitted content.' },
+        { title: 'Recruiters', description: 'Assess authenticity of cover letters and statements.' },
+      ],
+      benefits: [
+        { title: 'Accurate detection', description: 'Advanced analysis for common AI writing patterns.' },
+        { title: 'Probability score', description: 'Clear percentage-based estimation.' },
+        { title: 'Fast', description: 'Runs in seconds for texts of any length.' },
+      ],
+    },
+    'ai-humanizer': {
+      intro: `${tool.title} rewrites AI-generated text into natural, human-sounding content while preserving the original meaning. Great for marketing content, articles, or messages.`,
+      howTo: ['Paste the AI-generated text you want to humanize.', 'Click "Humanize" and wait a few seconds.', 'Get a natural, engaging rewrite.'],
+      useCases: [
+        { title: 'Marketing', description: 'Make marketing copy sound more authentic.' },
+        { title: 'Blogging', description: 'Turn AI drafts into natural, readable articles.' },
+        { title: 'Communication', description: 'Make emails and messages feel more personal.' },
+      ],
+      benefits: [
+        { title: 'Natural tone', description: 'Removes obvious AI patterns and improves flow.' },
+        { title: 'Meaning preserved', description: 'Keeps your intent intact while improving style.' },
+        { title: 'More engaging', description: 'Improves clarity and readability for your audience.' },
+      ],
+    },
+  };
+
+  const defaultContentFr: SEOContent = {
     intro: `${tool.title} est un outil puissant qui vous aide à ${tool.description.toLowerCase()}. Simple, rapide et efficace, cet outil vous fait gagner du temps et améliore votre productivité.`,
     howTo: [
       `Remplissez les champs requis avec les informations nécessaires.`,
@@ -193,6 +352,27 @@ export const generateToolSEOContent = (tool: ToolConfig): SEOContent => {
     ]
   };
 
-  return personalizedContent[tool.id] || defaultContent;
+  const defaultContentEn: SEOContent = {
+    intro: `${tool.title} is a powerful tool that helps you ${tool.description.toLowerCase()}. Simple, fast, and effective, it saves time and boosts productivity.`,
+    howTo: [
+      'Fill in the required fields with the needed information.',
+      'Click "Generate" and wait a few seconds.',
+      'Use the result directly in your workflow.',
+    ],
+    useCases: [
+      { title: 'Professionals', description: 'Improve your productivity at work.' },
+      { title: 'Students', description: 'Save time on projects and assignments.' },
+      { title: 'Creators', description: 'Boost creativity and speed up your creation workflow.' },
+    ],
+    benefits: [
+      { title: 'Fast', description: 'Get results in seconds instead of hours.' },
+      { title: 'Quality', description: 'Professional output with strong consistency.' },
+      { title: 'Easy', description: 'Intuitive interface that works for beginners too.' },
+    ],
+  };
+
+  const personalized = language === 'fr' ? personalizedContentFr : personalizedContentEn;
+  const fallback = language === 'fr' ? defaultContentFr : defaultContentEn;
+  return personalized[tool.id] || fallback;
 };
 

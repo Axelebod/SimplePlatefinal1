@@ -1,16 +1,26 @@
 import { useEffect } from 'react';
 import { ToolConfig } from '../types';
+import { useLanguageStore } from '../store/languageStore';
 
 export const useToolSEO = (tool: ToolConfig | undefined) => {
+  const { language } = useLanguageStore();
+
   useEffect(() => {
     if (!tool) {
-      document.title = "Outil non trouvé | SimplePlate";
+      document.title = language === 'fr' ? 'Outil non trouvé | SimplePlate' : 'Tool not found | SimplePlate';
       return;
     }
 
     // Reset states on tool change
     // 1. Title
-    document.title = tool.seo.title;
+    const isEn = language === 'en';
+    const title = isEn ? `${tool.title} | SimplePlate AI` : tool.seo.title;
+    const description = isEn ? tool.description : tool.seo.description;
+    const keywords = isEn
+      ? [tool.title, 'AI tool', 'generator', tool.category, 'SimplePlate AI']
+      : tool.seo.keywords;
+
+    document.title = title;
 
     // Helper to update meta tags
     const updateMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
@@ -24,22 +34,22 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
     };
 
     // 2. Basic Metas
-    updateMeta('description', tool.seo.description);
-    updateMeta('keywords', tool.seo.keywords.join(', '));
+    updateMeta('description', description);
+    updateMeta('keywords', keywords.join(', '));
 
     // 3. Open Graph (Social Media)
-    updateMeta('og:title', tool.seo.title, 'property');
-    updateMeta('og:description', tool.seo.description, 'property');
+    updateMeta('og:title', title, 'property');
+    updateMeta('og:description', description, 'property');
     updateMeta('og:type', 'website', 'property');
     updateMeta('og:url', window.location.href, 'property');
     updateMeta('og:image', `${window.location.origin}/og-image.png`, 'property');
-    updateMeta('og:locale', 'fr_FR', 'property');
+    updateMeta('og:locale', isEn ? 'en_US' : 'fr_FR', 'property');
     updateMeta('og:site_name', 'SimplePlate AI', 'property');
     
     // 4. Twitter Card
     updateMeta('twitter:card', 'summary_large_image', 'name');
-    updateMeta('twitter:title', tool.seo.title, 'name');
-    updateMeta('twitter:description', tool.seo.description, 'name');
+    updateMeta('twitter:title', title, 'name');
+    updateMeta('twitter:description', description, 'name');
     updateMeta('twitter:image', `${window.location.origin}/og-image.png`, 'name');
     
     // 5. Canonical URL
@@ -65,7 +75,7 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": tool.title,
-      "description": tool.seo.description,
+      "description": description,
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Web Browser",
       "url": window.location.href,
@@ -75,7 +85,7 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
         "priceCurrency": "EUR",
         "availability": "https://schema.org/InStock"
       },
-      "featureList": tool.seo.keywords.join(', '),
+      "featureList": keywords.join(', '),
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.8",
@@ -101,28 +111,32 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
       "mainEntity": [
         {
           "@type": "Question",
-          "name": `Combien coûte l'utilisation de ${tool.title} ?`,
+          "name": isEn ? `How much does it cost to use ${tool.title}?` : `Combien coûte l'utilisation de ${tool.title} ?`,
           "acceptedAnswer": {
             "@type": "Answer",
             "text": tool.cost === 0 
-              ? `${tool.title} est entièrement gratuit et ne consomme aucun crédit.`
-              : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération.`
+              ? (isEn ? `${tool.title} is completely free and uses no credits.` : `${tool.title} est entièrement gratuit et ne consomme aucun crédit.`)
+              : (isEn ? `Using ${tool.title} costs ${tool.cost} ${tool.cost > 1 ? 'credits' : 'credit'} per generation.` : `L'utilisation de ${tool.title} coûte ${tool.cost} crédit${tool.cost > 1 ? 's' : ''} par génération.`)
           }
         },
         {
           "@type": "Question",
-          "name": "Les résultats sont-ils de bonne qualité ?",
+          "name": isEn ? 'Are the results high quality?' : "Les résultats sont-ils de bonne qualité ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Oui, ${tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité.`
+            "text": isEn
+              ? `${tool.title} uses modern AI to generate professional, high-quality results.`
+              : `Oui, ${tool.title} utilise les dernières technologies d'intelligence artificielle pour générer des résultats professionnels et de haute qualité.`
           }
         },
         {
           "@type": "Question",
-          "name": "Mes données sont-elles sécurisées ?",
+          "name": isEn ? 'Is my data secure?' : 'Mes données sont-elles sécurisées ?',
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers."
+            "text": isEn
+              ? 'Yes. Your data is handled securely and is not stored or shared with third parties.'
+              : "Absolument. Toutes vos données sont traitées de manière sécurisée et ne sont jamais stockées ou partagées avec des tiers."
           }
         }
       ]
@@ -139,6 +153,6 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
     }
     favicon.href = `/icons/${tool.iconName}.svg`;
 
-  }, [tool]);
+  }, [tool, language]);
 };
 
