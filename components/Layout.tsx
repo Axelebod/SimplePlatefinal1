@@ -14,7 +14,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const { user, credits, creditsFree, creditsPaid, buyCredits, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
   const { language, toggleLanguage } = useLanguageStore();
   const { t } = useTranslation();
-  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -50,26 +49,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     window.addEventListener('scroll', checkScroll);
     return () => window.removeEventListener('scroll', checkScroll);
   }, []);
-
-  // Announcement banner dismissal (localStorage)
-  useEffect(() => {
-    try {
-      const key = 'simpleplate_announcement_pepites_tech_credits_v1';
-      const dismissed = localStorage.getItem(key) === '1';
-      setShowAnnouncement(!dismissed);
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const dismissAnnouncement = () => {
-    setShowAnnouncement(false);
-    try {
-      localStorage.setItem('simpleplate_announcement_pepites_tech_credits_v1', '1');
-    } catch {
-      // Ignore
-    }
-  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,7 +94,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   return (
-  
+    <div className="min-h-screen flex flex-col bg-neo-white dark:bg-gray-900 transition-colors duration-300">
+      <nav className="sticky top-0 z-50 bg-neo-white/90 dark:bg-gray-900/90 backdrop-blur border-b-2 border-black dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             {/* LOGO */}
