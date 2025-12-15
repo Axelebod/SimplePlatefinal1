@@ -17,12 +17,12 @@ export const useToolGeneration = ({ tool, onSuccess, onError }: UseToolGeneratio
   const generate = useCallback(async (
     inputs: Record<string, any>,
     fileInput?: string
-  ) => {
+  ): Promise<string | null> => {
     if (!tool.promptGenerator) {
       const err = new Error("Config invalide");
       setError(err.message);
       onError?.(err);
-      return;
+      return null;
     }
 
     setLoading(true);
@@ -42,7 +42,7 @@ export const useToolGeneration = ({ tool, onSuccess, onError }: UseToolGeneratio
         const err = new Error(prompt.replace('ERROR:', '').trim());
         setError(err.message);
         onError?.(err);
-        return;
+        return null;
       }
 
       // Retry logic avec backoff exponentiel
@@ -71,10 +71,12 @@ export const useToolGeneration = ({ tool, onSuccess, onError }: UseToolGeneratio
 
       setResult(output);
       onSuccess?.(output);
+      return output;
     } catch (err: any) {
       const error = err instanceof Error ? err : new Error(err.message || "Une erreur est survenue.");
       setError(error.message);
       onError?.(error);
+      return null;
     } finally {
       setLoading(false);
     }

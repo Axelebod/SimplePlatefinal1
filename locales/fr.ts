@@ -276,6 +276,7 @@ export const fr = {
     qrEncodedData: 'Données encodées :',
     downloadQrCode: 'Télécharger le QR Code',
     qrError: 'Erreur lors de la génération du QR code',
+    creditDeductionFailed: 'Impossible de débiter vos crédits. Veuillez réactualiser votre solde.',
   },
   sitemap: {
     pageTitle: 'Plan du Site | SimplePlate AI',

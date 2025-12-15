@@ -296,15 +296,16 @@ export const ToolPage: React.FC = () => {
     }
 
     // Générer avec le hook (inclut retry logic)
-    await generate(inputsWithFile, fileInput);
+    const output = await generate(inputsWithFile, fileInput);
     
     // Déduction atomique après génération réussie
     // Ne pas débiter si l'outil est gratuit (0 crédits)
-    if (tool.cost > 0 && result) {
+    if (tool.cost > 0 && output) {
       const success = await deductCredits(tool.cost);
       if (!success) {
-        setError("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+        setError(t('toolPage.creditDeductionFailed'));
         setResult(null);
+        setGenerationResult(null);
       }
     }
   };
@@ -325,14 +326,15 @@ export const ToolPage: React.FC = () => {
     }
     
     // Appeler generate normalement - il utilisera le promptGenerator du tool
-    await generate(data.data, undefined);
+    const output = await generate(data.data, undefined);
     
     // Déduction atomique après génération réussie
-    if (tool.cost > 0 && result) {
+    if (tool.cost > 0 && output) {
       const success = await deductCredits(tool.cost);
       if (!success) {
-        setError("Impossible de débiter vos crédits. Veuillez réactualiser votre solde.");
+        setError(t('toolPage.creditDeductionFailed'));
         setResult(null);
+        setGenerationResult(null);
       }
     }
   };
