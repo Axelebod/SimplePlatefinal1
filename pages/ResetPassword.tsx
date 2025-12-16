@@ -3,16 +3,27 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Loader2, AlertTriangle, Check, Lock } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  useSEO({
+    title: language === 'fr' ? 'Réinitialiser le mot de passe | SimplePlate AI' : 'Reset password | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? 'Réinitialisation du mot de passe SimplePlate AI.'
+        : 'SimplePlate AI password reset.',
+    language,
+    noindex: true,
+  });
 
   useEffect(() => {
     // Vérifier la session Supabase pour voir si on est en mode réinitialisation

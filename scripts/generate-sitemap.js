@@ -1,80 +1,128 @@
-// Script pour générer automatiquement le sitemap.xml
+// Script to generate public/sitemap.xml (no TS runtime needed)
 // Usage: node scripts/generate-sitemap.js
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// Import dynamique des outils (nécessite une conversion TypeScript -> JS ou utiliser ts-node)
-// Pour l'instant, on va créer un sitemap basique et vous pourrez le mettre à jour manuellement
-// ou utiliser un build script qui génère le sitemap à partir de tools-config.ts
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://simpleplate.dev';
+const BASE_URL = process.env.SITE_URL || 'https://simpleplate.dev';
 const CURRENT_DATE = new Date().toISOString().split('T')[0];
 
-// Pages statiques
+const LANGS = /** @type {const} */ (['fr', 'en']);
+
+// Pages statiques indexables
 const staticPages = [
   { path: '/', priority: '1.0', changefreq: 'daily' },
   { path: '/pricing', priority: '0.9', changefreq: 'weekly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },
   { path: '/legal', priority: '0.5', changefreq: 'monthly' },
-  { path: '/sitemap', priority: '0.6', changefreq: 'monthly' },
+  { path: '/privacy', priority: '0.5', changefreq: 'monthly' },
+  { path: '/sitemap', priority: '0.3', changefreq: 'monthly' },
 ];
 
-// Liste des slugs d'outils (à mettre à jour depuis tools-config.ts)
-// Vous pouvez extraire cette liste depuis tools-config.ts avec un script
-const toolSlugs = [
-  'scanner-produit-ecommerce',
-  'generateur-site-web',
-  'generateur-python-pro',
-  'analyseur-image-ia',
-  'business-plan-pro',
-  'audit-smart-contract',
-  'detecteur-texte-ia',
-  'humaniseur-texte',
-  'generateur-prompt-pro',
-  'detecteur-arnaques',
-  'traducteur-juridique',
-  'interprete-reves',
-  'explose-mon-code',
-  'generateur-qr-code',
-  // Ajoutez tous les autres slugs ici
-];
+const withLang = (pathname, lang) => {
+  const url = new URL(pathname, BASE_URL);
+  url.searchParams.set('lang', lang);
+  return url.toString();
+};
+
+const xDefaultUrl = (pathname) => new URL(pathname, BASE_URL).toString();
+
+// Same algorithm as tools-config.ts
+const createFrenchSlug = (title) =>
+  title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+function extractToolSlugsFromSource() {
+  const toolsConfigPath = path.join(__dirname, '../tools-config.ts');
+  const content = fs.readFileSync(toolsConfigPath, 'utf8');
+
+  const slugs = new Set();
+
+  // 1) Literal slugs: slug: '...'
+  for (const m of content.matchAll(/slug:\s*'([^']+)'/g)) {
+    slugs.add(m[1]);
+  }
+
+  // 2) createSimpleTool('id', 'Title', ...) => slug computed from title
+  for (const m of content.matchAll(/createSimpleTool\s*\(\s*'[^']+'\s*,\s*'([^']+)'/g)) {
+    slugs.add(createFrenchSlug(m[1]));
+  }
+
+  return Array.from(slugs).filter(Boolean).sort();
+}
+
+function renderUrlNode({ loc, lastmod, changefreq, priority, alternates }) {
+  const altLinks = alternates
+    .map((a) => `    <xhtml:link rel="alternate" hreflang="${a.hreflang}" href="${a.href}" />`)
+    .join('\n');
+
+  return `  <url>
+    <loc>${loc}</loc>
+${altLinks ? `${altLinks}\n` : ''}    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+}
 
 function generateSitemap() {
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  const toolSlugs = extractToolSlugsFromSource();
+
+  const entries = [];
+
+  const addPath = (pathname, changefreq, priority) => {
+    for (const lang of LANGS) {
+      const loc = withLang(pathname, lang);
+      entries.push(
+        renderUrlNode({
+          loc,
+          lastmod: CURRENT_DATE,
+          changefreq,
+          priority,
+          alternates: [
+            { hreflang: 'fr', href: withLang(pathname, 'fr') },
+            { hreflang: 'en', href: withLang(pathname, 'en') },
+            { hreflang: 'x-default', href: xDefaultUrl(pathname) },
+          ],
+        })
+      );
+    }
+  };
+
+  // Static pages
+  for (const page of staticPages) {
+    addPath(page.path, page.changefreq, page.priority);
+  }
+
+  // Tool pages
+  for (const slug of toolSlugs) {
+    addPath(`/tool/${slug}`, 'weekly', '0.8');
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${entries.join('\n')}
+</urlset>
 `;
 
-  // Pages statiques
-  staticPages.forEach(page => {
-    xml += `  <url>
-    <loc>${BASE_URL}${page.path}</loc>
-    <lastmod>${CURRENT_DATE}</lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
-  </url>
-`;
-  });
-
-  // Outils
-  toolSlugs.forEach(slug => {
-    xml += `  <url>
-    <loc>${BASE_URL}/tool/${slug}</loc>
-    <lastmod>${CURRENT_DATE}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-`;
-  });
-
-  xml += `</urlset>`;
-
-  // Écrire le fichier
   const outputPath = path.join(__dirname, '../public/sitemap.xml');
   fs.writeFileSync(outputPath, xml, 'utf8');
-  console.log(`✅ Sitemap généré: ${outputPath}`);
-  console.log(`   - ${staticPages.length} pages statiques`);
-  console.log(`   - ${toolSlugs.length} outils`);
+  // eslint-disable-next-line no-console
+  console.log(`✅ Sitemap generated: ${outputPath}`);
+  // eslint-disable-next-line no-console
+  console.log(`   - ${staticPages.length} static pages x ${LANGS.length} langs`);
+  // eslint-disable-next-line no-console
+  console.log(`   - ${toolSlugs.length} tools x ${LANGS.length} langs`);
 }
 
 generateSitemap();

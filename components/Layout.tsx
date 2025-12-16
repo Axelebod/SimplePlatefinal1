@@ -9,10 +9,11 @@ import { SimpleBot } from './SimpleBot';
 import { InstallPrompt } from './InstallPrompt';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
+import { setJsonLd } from '../utils/seo';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, credits, creditsFree, creditsPaid, buyCredits, logout, isDarkMode, toggleDarkMode, refreshCredits } = useUserStore();
-  const { language, toggleLanguage } = useLanguageStore();
+  const { language, setLanguage } = useLanguageStore();
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -36,6 +37,46 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         root.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  // Sync language <-> URL (?lang=fr|en) and <html lang="">
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const urlLang = params.get('lang');
+    if (urlLang === 'fr' || urlLang === 'en') {
+      if (urlLang !== language) {
+        setLanguage(urlLang);
+      }
+    } else {
+      // Ensure URL carries a language (helps SEO + hreflang consistency)
+      params.set('lang', language);
+      navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
+    }
+    document.documentElement.lang = language;
+  }, [location.pathname, location.search, language, navigate, setLanguage]);
+
+  const handleToggleLanguage = () => {
+    const next = language === 'fr' ? 'en' : 'fr';
+    setLanguage(next);
+    const params = new URLSearchParams(location.search);
+    params.set('lang', next);
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
+  };
+
+  // Global structured data (site-wide)
+  useEffect(() => {
+    setJsonLd('json-ld-website', {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'SimplePlate AI',
+      url: window.location.origin,
+      inLanguage: language,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${window.location.origin}/?q={search_term_string}&lang=${language}`,
+        'query-input': 'required name=search_term_string',
+      },
+    });
+  }, [language]);
 
   // Gestion du Scroll To Top
   useEffect(() => {
@@ -114,7 +155,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="hidden md:flex items-center gap-4">
              {/* Language Toggle */}
              <button 
-                onClick={toggleLanguage} 
+                onClick={handleToggleLanguage} 
                 className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white font-bold flex items-center gap-1"
                 title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
              >
@@ -190,6 +231,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 className="p-2 text-black dark:text-white"
             >
                  {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+                onClick={handleToggleLanguage}
+                className="p-2 text-black dark:text-white font-bold"
+                title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
+            >
+                <Languages className="w-5 h-5" />
             </button>
             <button 
                 className="p-2 text-black dark:text-white"

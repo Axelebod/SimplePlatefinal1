@@ -9,6 +9,7 @@ import { getRecentActivity } from '../services/toolHistoryService';
 import { ToolResult } from '../types/toolHistory';
 import { getTools } from '../tools-config';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Dashboard: React.FC = () => {
   const { user, credits, logout, refreshCredits } = useUserStore();
@@ -19,6 +20,16 @@ export const Dashboard: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [recentActivity, setRecentActivity] = useState<ToolResult[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
+
+  useSEO({
+    title: language === 'fr' ? 'Tableau de bord | SimplePlate AI' : 'Dashboard | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? 'Espace membre (crédits, activité récente, compte).'
+        : 'Member area (credits, recent activity, account).',
+    language,
+    noindex: true,
+  });
 
   useEffect(() => {
     if (!user) {

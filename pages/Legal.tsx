@@ -1,8 +1,22 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Legal: React.FC = () => {
+  const { language } = useTranslation();
+
+  useSEO({
+    title: language === 'fr' ? 'Mentions légales & CGU | SimplePlate AI' : 'Legal notice & Terms | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? 'Mentions légales, conditions d’utilisation et informations RGPD de SimplePlate AI.'
+        : 'Legal notice, terms of use, and GDPR information for SimplePlate AI.',
+    language,
+    keywords: language === 'fr' ? ['mentions légales', 'cgu', 'rgpd'] : ['legal', 'terms', 'gdpr'],
+  });
+
   return (
     <div className="max-w-4xl mx-auto bg-white border-2 border-black p-8 rounded-lg shadow-neo my-8">
       <h1 className="font-display text-3xl font-bold mb-8">Mentions Légales & CGU</h1>
