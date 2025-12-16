@@ -1,18 +1,25 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { getTools } from '../tools-config';
 import { CATEGORIES, CATEGORY_COLORS, getCategoryLabel } from '../constants';
 import { Home, CreditCard, Shield, LogIn, Map, Mail } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Sitemap: React.FC = () => {
   const { t, language } = useTranslation();
   const tools = React.useMemo(() => getTools(language), [language]);
-  
-  useEffect(() => {
-      document.title = t('sitemap.pageTitle');
-  }, [t]);
+
+  useSEO({
+    title: t('sitemap.pageTitle'),
+    description:
+      language === 'fr'
+        ? 'Plan du site SimplePlate AI: pages principales et liste complète des outils.'
+        : 'SimplePlate AI sitemap page: main pages and full list of tools.',
+    language,
+    keywords: language === 'fr' ? ['plan du site', 'sitemap', 'outils IA'] : ['sitemap', 'AI tools'],
+  });
 
   // Liens principaux du site
   const mainLinks = [

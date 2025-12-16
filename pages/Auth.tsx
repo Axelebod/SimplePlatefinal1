@@ -5,12 +5,13 @@ import { supabase } from '../lib/supabaseClient';
 import { useUserStore } from '../store/userStore';
 import { Loader2, AlertTriangle, Check, Mail } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Auth: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useUserStore();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   
   const isSignupInitial = location.pathname.includes('signup');
   const [isSignup, setIsSignup] = useState(isSignupInitial);
@@ -21,6 +22,22 @@ export const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  useSEO({
+    title: isSignup
+      ? language === 'fr'
+        ? 'Créer un compte | SimplePlate AI'
+        : 'Sign up | SimplePlate AI'
+      : language === 'fr'
+        ? 'Connexion | SimplePlate AI'
+        : 'Log in | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? "Espace membre SimplePlate AI: connexion et création de compte."
+        : 'SimplePlate AI member area: log in and create an account.',
+    language,
+    noindex: true,
+  });
 
 
   const handleAuth = async (e: React.FormEvent) => {

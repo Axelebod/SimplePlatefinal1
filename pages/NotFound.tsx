@@ -3,9 +3,20 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Ghost } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const NotFound: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+
+  useSEO({
+    title: language === 'fr' ? 'Page introuvable | SimplePlate AI' : 'Page not found | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? "Cette page n'existe pas (404)."
+        : 'This page does not exist (404).',
+    language,
+    noindex: true,
+  });
   
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">

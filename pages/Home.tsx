@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { getTools } from '../tools-config';
 import { ToolCard } from '../components/ToolCard';
 import { CATEGORIES, getCategoryLabel } from '../constants';
@@ -10,6 +10,7 @@ import { HomeCTA } from '../components/HomeCTA';
 import { TrustBadges } from '../components/TrustBadges';
 import { WelcomeModal } from '../components/WelcomeModal';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Home: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -17,59 +18,20 @@ export const Home: React.FC = () => {
   const { t, language } = useTranslation();
   const tools = useMemo(() => getTools(language), [language]);
 
-  // ----------------------------------------------------
-  // HOMEPAGE SEO INJECTION (PRODUCTION READY)
-  // ----------------------------------------------------
-  useEffect(() => {
-    document.title = t('homePage.seo.title');
-    
-    const updateMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
-      let element = document.querySelector(`meta[${attr}="${name}"]`);
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute(attr, name);
-        document.head.appendChild(element);
-      }
-      element.setAttribute('content', content);
-    };
+  const title = t('homePage.seo.title');
+  const description = t('homePage.seo.description');
+  const keywordsRaw = t('homePage.seo.keywords');
+  const keywords = keywordsRaw
+    .split(',')
+    .map((k) => k.trim())
+    .filter(Boolean);
 
-    const description = t('homePage.seo.description');
-    
-    updateMeta('description', description);
-    updateMeta('keywords', t('homePage.seo.keywords'));
-
-    // Open Graph
-    updateMeta('og:title', t('homePage.seo.ogTitle'), 'property');
-    updateMeta('og:description', description, 'property');
-    updateMeta('og:type', 'website', 'property');
-    updateMeta('og:url', window.location.href, 'property');
-    updateMeta('og:site_name', 'SimplePlate AI', 'property');
-
-    // JSON-LD for Website (Google Rich Snippets)
-    const scriptId = 'json-ld-home';
-    let script = document.getElementById(scriptId);
-    if (!script) {
-      script = document.createElement('script');
-      script.id = scriptId;
-      script.setAttribute('type', 'application/ld+json');
-      document.head.appendChild(script);
-    }
-
-    const schemaData = {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "SimplePlate AI",
-      "url": window.location.origin,
-      "description": description,
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": `${window.location.origin}/#/?q={search_term_string}`,
-        "query-input": "required name=search_term_string"
-      }
-    };
-    script.innerHTML = JSON.stringify(schemaData);
-
-  }, [t, language]);
+  useSEO({
+    title,
+    description,
+    keywords,
+    language,
+  });
 
   const filteredTools = useMemo(() => {
     return tools.filter(tool => {

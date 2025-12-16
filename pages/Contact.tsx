@@ -3,9 +3,20 @@ import React from 'react';
 import { SITE_CONFIG } from '../constants';
 import { Mail, MessageSquare, HelpCircle, Bug, Lightbulb, ArrowRight } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Contact: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+
+  useSEO({
+    title: language === 'fr' ? 'Contact | SimplePlate AI' : 'Contact | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? 'Contactez SimplePlate AI pour une question, un bug, un partenariat ou une suggestion d’outil.'
+        : 'Contact SimplePlate AI for questions, bug reports, partnerships, or tool suggestions.',
+    language,
+    keywords: language === 'fr' ? ['contact', 'support', 'SimplePlate AI'] : ['contact', 'support', 'SimplePlate AI'],
+  });
   
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">

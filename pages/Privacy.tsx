@@ -1,12 +1,22 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Lock, Eye, FileText, Mail, Database, Cookie, UserCheck } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Privacy: React.FC = () => {
-  useEffect(() => {
-    document.title = "Politique de Confidentialité (RGPD) | SimplePlate AI";
-  }, []);
+  const { language } = useTranslation();
+
+  useSEO({
+    title: language === 'fr' ? 'Politique de confidentialité (RGPD) | SimplePlate AI' : 'Privacy policy (GDPR) | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? 'Politique de confidentialité de SimplePlate AI: données collectées, finalités, conservation, sécurité et droits RGPD.'
+        : 'SimplePlate AI privacy policy: collected data, purposes, retention, security, and GDPR rights.',
+    language,
+    keywords: language === 'fr' ? ['confidentialité', 'rgpd', 'données personnelles'] : ['privacy', 'gdpr', 'personal data'],
+  });
 
   return (
     <div className="max-w-4xl mx-auto bg-white border-2 border-black p-8 rounded-lg shadow-neo my-8">

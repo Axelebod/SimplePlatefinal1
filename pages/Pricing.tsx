@@ -2,10 +2,24 @@ import React from 'react';
 import { useUserStore } from '../store/userStore';
 import { Zap, AlertCircle, Tag } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { useSEO } from '../hooks/useSEO';
 
 export const Pricing: React.FC = () => {
   const { buyCredits } = useUserStore();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+
+  useSEO({
+    title: language === 'fr' ? 'Tarifs & Crédits | SimplePlate AI' : 'Pricing & Credits | SimplePlate AI',
+    description:
+      language === 'fr'
+        ? "Achetez des packs de crédits et utilisez 50+ outils IA (texte, image, dev, business). Paiement sécurisé via Stripe."
+        : 'Buy credit packs and use 50+ AI tools (text, image, dev, business). Secure payments via Stripe.',
+    language,
+    keywords:
+      language === 'fr'
+        ? ['tarifs', 'crédits', 'outils IA', 'générateur IA', 'Stripe', 'SimplePlate AI']
+        : ['pricing', 'credits', 'AI tools', 'AI generator', 'Stripe', 'SimplePlate AI'],
+  });
 
   const creditPacks = [
     { 
