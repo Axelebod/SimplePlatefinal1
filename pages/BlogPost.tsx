@@ -103,11 +103,26 @@ export const BlogPost: React.FC = () => {
               <Link
                 key={p.slug}
                 to={`/blog/${p.slug}`}
-                className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg p-4 shadow-neo dark:shadow-none hover:-translate-y-0.5 transition-transform"
+                className="group bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden shadow-neo dark:shadow-none hover:-translate-y-0.5 transition-transform"
               >
-                <div className="text-xs font-bold text-gray-500 dark:text-gray-400">{p.readingTime}</div>
-                <div className="mt-1 font-bold dark:text-white">{p.title}</div>
-                <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">{p.excerpt}</div>
+                <div className="aspect-[16/9] bg-gray-50 dark:bg-gray-900 border-b-2 border-black dark:border-gray-600">
+                  <img
+                    src={p.cover.src}
+                    alt={p.cover.alt}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-4 text-xs font-bold text-gray-500 dark:text-gray-400">
+                    <span>{p.publishedAt}</span>
+                    <span>{p.readingTime}</span>
+                  </div>
+                  <div className="mt-1 font-bold dark:text-white group-hover:text-neo-violet transition-colors">
+                    {p.title}
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">{p.excerpt}</div>
+                </div>
               </Link>
             ))}
           </div>

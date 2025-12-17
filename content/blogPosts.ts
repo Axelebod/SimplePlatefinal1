@@ -462,6 +462,452 @@ Si votre JSON vient d'un CSV:
 `,
     relatedSlugs: ['formateur-json-en-ligne', 'top-10-outils-ia', 'generateur-de-slug-seo'],
   },
+  {
+    slug: 'generateur-seo-meta',
+    h1: 'Générateur SEO meta',
+    title: 'Générateur SEO meta : title, meta description et Open Graph (guide + exemples)',
+    metaDescription:
+      "Optimisez vos pages avec un bon title, une meta description qui clique et des balises Open Graph/Twitter. Exemples + outil SimplePlate pour générer vite.",
+    keywords: ['générateur SEO meta', 'meta tags', 'meta description', 'title SEO', 'open graph', 'twitter card'],
+    publishedAt: '2025-12-17',
+    readingTime: '9 min',
+    cover: {
+      src: '/blog/generateur-seo-meta.svg',
+      alt: 'Illustration : génération de meta tags SEO (title, description, Open Graph)',
+    },
+    excerpt:
+      "Un bon title + une meta description claire = plus de clics. Voici une méthode simple (avec templates) et l’outil SimplePlate pour produire vos meta tags rapidement.",
+    bodyMarkdown: `## Pourquoi vos meta tags font (vraiment) la différence
+
+Entre deux résultats proches, la différence se joue souvent sur **le clic**:
+- votre **title** (promesse + mot-clé)
+- votre **meta description** (raison de cliquer)
+- votre **preview social** (Open Graph / Twitter)
+
+Générez des meta tags propres en 30 secondes:
+- [Générateur SEO meta](/tool/generateur-seo-meta)
+
+## 1) Title SEO: règles simples qui marchent
+
+Checklist:
+- 1 mot-clé principal (au début si possible)
+- bénéfice clair (résultat, “comment faire”, gain de temps)
+- spécificité (chiffre, audience, contexte)
+
+Templates (à adapter):
+- \`{mot-clé} : {bénéfice} (guide + exemples)\`
+- \`Comment {faire X} : méthode simple + checklist\`
+
+## 2) Meta description: écrire pour le clic
+
+Structure efficace:
+1) bénéfice
+2) preuve (exemples, checklist)
+3) action (essayez l’outil)
+
+Exemple:
+> “Générez un title et une meta description optimisés en 1 minute. Templates + Open Graph. Essayez SimplePlate gratuitement.”
+
+## 3) Open Graph & Twitter: votre aperçu sur les réseaux
+
+Visez:
+- image 16:9 lisible
+- texte court
+- cohérence avec la page
+
+## Bonus: maillage interne utile
+
+Deux liens qui aident souvent:
+- URLs propres: [Générateur de slug](/tool/generateur-slug)
+- Landing page rapide: [Générateur de site web](/tool/generateur-site-web)
+
+## À lire aussi
+
+- [Générateur de slug](/blog/generateur-de-slug-seo)
+- [Générateur de site web](/blog/generateur-site-web)
+- [Outils IA](/blog/top-10-outils-ia)
+`,
+    relatedSlugs: ['generateur-de-slug-seo', 'generateur-site-web', 'top-10-outils-ia'],
+  },
+  {
+    slug: 'generateur-prompt-pro',
+    h1: 'Générateur prompt pro',
+    title: 'Générateur prompt pro : 12 templates qui sortent des réponses utiles (pas du blabla)',
+    metaDescription:
+      "Apprenez à écrire des prompts efficaces: contexte, contraintes, format, exemples. 12 templates prêts à copier + l’outil SimplePlate pour générer des prompts pro.",
+    keywords: ['prompt engineering', 'générateur de prompt', 'prompt chatgpt', 'templates prompt', 'IA', 'copywriting'],
+    publishedAt: '2025-12-16',
+    readingTime: '10 min',
+    cover: {
+      src: '/blog/generateur-prompt-pro.svg',
+      alt: 'Illustration : templates de prompt engineering pour obtenir de meilleures réponses IA',
+    },
+    excerpt:
+      "La différence entre “moyen” et “excellent” avec une IA, c’est souvent le prompt. Voici une méthode simple + 12 templates pro à copier/coller.",
+    bodyMarkdown: `## Prompts vagues = réponses vagues
+
+Pour obtenir du concret, donnez:
+- **contexte**
+- **objectif**
+- **contraintes**
+- **format de sortie**
+- **critères de qualité**
+
+Générez un prompt complet automatiquement:
+- [Générateur prompt pro](/tool/generateur-prompt-pro)
+
+## La structure d’un prompt qui marche (copier/coller)
+
+1) Rôle: “Tu es…”
+2) Contexte: “Voici la situation…”
+3) Objectif: “Je veux obtenir…”
+4) Contraintes: “Respecte…”
+5) Format: “Réponds en…”
+6) Vérification: “Si info manquante, pose 3 questions.”
+
+## 12 templates pro
+
+### 1) Article SEO
+- mot-clé: …
+- public: …
+- intention: …
+- plan H2/H3 + FAQ + exemples
+
+### 2) Landing page
+- problème → solution → preuves → FAQ → CTA
+
+### 3) Audit SEO rapide
+- 15 actions classées par impact
+
+### 4) Email commercial
+- objection principale + CTA
+
+### 5) Script vidéo
+- hook + structure + punchlines
+
+### 6) Post LinkedIn
+- angle + storytelling + CTA soft
+
+### 7) Fiche produit
+- bénéfices + objections + mini‑FAQ
+
+### 8) Tableau / checklist
+- format Markdown
+
+### 9) Prompt “anti-hallucination”
+- “Si tu ne sais pas, dis-le. Liste les hypothèses.”
+
+### 10) Réécriture plus naturelle
+- ton + vocabulaire + variations de rythme
+
+### 11) Génération d’exemples
+- 20 exemples classés
+
+### 12) Version courte / version longue
+- 2 rendus pour choisir
+
+## Astuce: rendre le texte plus naturel
+
+- [Humaniseur de texte](/tool/humaniseur-texte)
+- [Détecteur de texte IA](/tool/detecteur-texte-ia)
+
+## À lire aussi
+
+- [Humaniseur de texte IA](/blog/humaniseur-texte-ia)
+- [Détecteur de texte IA](/blog/detecteur-texte-ia)
+`,
+    relatedSlugs: ['humaniseur-texte-ia', 'detecteur-texte-ia', 'generateur-seo-meta'],
+  },
+  {
+    slug: 'humaniseur-texte-ia',
+    h1: 'Humaniseur de texte IA',
+    title: 'Humaniseur de texte IA : rendre un texte ChatGPT plus naturel (méthode + exemples)',
+    metaDescription:
+      "Transformez un texte “trop IA” en texte naturel: rythme, variations, exemples, vocabulaire et ton. Méthode simple + Humaniseur SimplePlate pour reformuler vite.",
+    keywords: ['humaniseur de texte', 'humaniser texte chatgpt', 'reformuler texte', 'texte naturel', 'style rédaction', 'IA'],
+    publishedAt: '2025-12-15',
+    readingTime: '9 min',
+    cover: {
+      src: '/blog/humaniseur-texte-ia.svg',
+      alt: 'Illustration : reformulation pour rendre un texte IA plus naturel et fluide',
+    },
+    excerpt:
+      "Un texte peut être “correct” et pourtant sonner artificiel. Voici une checklist pour le rendre humain (sans perdre l’idée), plus l’outil SimplePlate.",
+    bodyMarkdown: `## Pourquoi un texte “sonne IA”
+
+Les signaux fréquents:
+- phrases trop régulières (même longueur)
+- vocabulaire trop générique
+- manque d’exemples concrets
+
+Reformulez rapidement:
+- [Humaniseur de texte](/tool/humaniseur-texte)
+
+## Checklist de réécriture (rapide)
+
+### 1) Ajoutez du concret
+Remplacez 1 phrase abstraite par:
+- un exemple
+- un mini-cas
+- un chiffre (si vous en avez)
+
+### 2) Variez le rythme
+Mélangez phrases courtes + phrases plus longues.
+
+### 3) Remettez du point de vue
+Ajoutez:
+- “si vous débutez…”
+- “erreur classique: …”
+
+### 4) Simplifiez le vocabulaire
+Préférez des mots simples et précis.
+
+## Workflow SimplePlate (en 2 minutes)
+
+1) Générer un plan: [Générateur prompt pro](/tool/generateur-prompt-pro)
+2) Humaniser: [Humaniseur](/tool/humaniseur-texte)
+3) Vérifier: [Détecteur IA](/tool/detecteur-texte-ia)
+4) Optimiser le snippet: [Générateur SEO meta](/tool/generateur-seo-meta)
+
+## À lire aussi
+
+- [Détecteur de texte IA](/blog/detecteur-texte-ia)
+- [Générateur prompt pro](/blog/generateur-prompt-pro)
+`,
+    relatedSlugs: ['detecteur-texte-ia', 'generateur-prompt-pro', 'generateur-seo-meta'],
+  },
+  {
+    slug: 'csv-vers-json-en-ligne',
+    h1: 'CSV vers JSON',
+    title: 'CSV vers JSON en ligne : convertir proprement (exemples, erreurs fréquentes, guide)',
+    metaDescription:
+      "Convertissez un CSV en JSON propre: délimiteurs, guillemets, types, encodage. Guide + exemples + convertisseur CSV→JSON SimplePlate en ligne.",
+    keywords: ['csv vers json', 'convertisseur csv json', 'csv to json', 'json', 'api', 'dev'],
+    publishedAt: '2025-12-14',
+    readingTime: '8 min',
+    cover: {
+      src: '/blog/csv-vers-json-en-ligne.svg',
+      alt: 'Illustration : conversion de données CSV vers JSON pour API et développement',
+    },
+    excerpt:
+      "Le CSV est pratique, mais dès qu’on parle API, le JSON gagne. Voici comment convertir proprement (et éviter les erreurs classiques) avec SimplePlate.",
+    bodyMarkdown: `## Quand convertir CSV → JSON
+
+Cas typiques:
+- importer des données (produits, leads, inventaire)
+- préparer un payload d’API
+- transformer un export Excel/Sheets
+
+Outil:
+- [CSV vers JSON](/tool/csv-vers-json)
+
+## Les 5 erreurs fréquentes
+
+1) mauvais séparateur (virgule vs point-virgule)
+2) guillemets mal fermés
+3) colonnes décalées
+4) encodage (accents)
+5) types (tout en string)
+
+## Vérifier / nettoyer le JSON
+
+Après conversion:
+- [Formateur JSON](/tool/formateur-json)
+
+## Bonus SEO: documentez votre format
+
+- slugs propres: [Générateur de slug](/tool/generateur-slug)
+- meta tags: [Générateur SEO meta](/tool/generateur-seo-meta)
+
+## À lire aussi
+
+- [Formateur JSON](/blog/formateur-json-en-ligne)
+- [Générateur de slug](/blog/generateur-de-slug-seo)
+`,
+    relatedSlugs: ['formateur-json-en-ligne', 'generateur-de-slug-seo', 'generateur-seo-meta'],
+  },
+  {
+    slug: 'analyseur-texte-compteur-mots',
+    h1: 'Analyseur de texte',
+    title: 'Analyseur de texte : compteur de mots, lisibilité et optimisation (guide)',
+    metaDescription:
+      "Analysez un texte: mots, caractères, répétitions, lisibilité et structure. Guide simple + Analyseur de texte SimplePlate pour auditer en 1 clic avant publication.",
+    keywords: ['analyseur de texte', 'compteur de mots', 'nombre de caractères', 'lisibilité', 'audit contenu', 'seo contenu'],
+    publishedAt: '2025-12-13',
+    readingTime: '8 min',
+    cover: {
+      src: '/blog/analyseur-texte-compteur-mots.svg',
+      alt: 'Illustration : analyse de texte (mots, caractères, lisibilité) pour améliorer un contenu',
+    },
+    excerpt:
+      "Avant de publier, auditez votre texte: longueur, structure, répétitions et lisibilité. Voici quoi regarder + l’outil SimplePlate pour mesurer vite.",
+    bodyMarkdown: `## Pourquoi analyser un texte avant publication
+
+Deux objectifs:
+- **clarté** (l’utilisateur comprend vite)
+- **structure** (scannable: titres, listes, FAQ)
+
+Outil:
+- [Analyseur de texte](/tool/analyseur-texte)
+
+## 1) Longueur: mots et caractères
+
+Vérifiez:
+- trop court: répond-il vraiment à l’intention ?
+- trop long: manque de structure ?
+
+## 2) Structure: titres, listes, étapes
+
+Un bon contenu se lit en diagonale:
+- H2/H3 utiles
+- listes actionnables
+- exemples
+
+## Workflow SimplePlate
+
+1) Créer un plan: [Générateur prompt pro](/tool/generateur-prompt-pro)
+2) Humaniser: [Humaniseur](/tool/humaniseur-texte)
+3) Mesurer: [Analyseur de texte](/tool/analyseur-texte)
+4) Optimiser le snippet: [Générateur SEO meta](/tool/generateur-seo-meta)
+
+## À lire aussi
+
+- [Humaniseur de texte IA](/blog/humaniseur-texte-ia)
+- [Générateur SEO meta](/blog/generateur-seo-meta)
+`,
+    relatedSlugs: ['humaniseur-texte-ia', 'generateur-seo-meta', 'generateur-prompt-pro'],
+  },
+  {
+    slug: 'detecteur-arnaques-sms',
+    h1: "Détecteur d'arnaques",
+    title: "Détecteur d'arnaques SMS : reconnaître une arnaque et quoi faire (guide + IA)",
+    metaDescription:
+      "Apprenez à repérer une arnaque SMS/téléphone: signaux, exemples, erreurs à éviter. Analysez un message avec le Détecteur d’arnaques SimplePlate en ligne.",
+    keywords: ['arnaque sms', 'détecteur arnaques', 'phishing', 'smishing', 'arnaque colis', 'arnaque bancaire'],
+    publishedAt: '2025-12-12',
+    readingTime: '9 min',
+    cover: {
+      src: '/blog/detecteur-arnaques-sms.svg',
+      alt: "Illustration : détection d'arnaques SMS (phishing/smishing) avec analyse IA",
+    },
+    excerpt:
+      "Les arnaques SMS deviennent crédibles. Voici une checklist simple, des exemples, et comment analyser un message avec l’outil SimplePlate.",
+    bodyMarkdown: `## Les signaux qui reviennent tout le temps
+
+1) urgence (“dernier rappel”, “compte bloqué”)
+2) lien suspect (domaine proche, URL courte)
+3) demande d’infos sensibles (carte, code, identifiants)
+4) ton administratif trop générique
+
+Outil:
+- [Détecteur d'arnaques](/tool/detecteur-arnaques)
+
+## Que faire si vous avez un doute
+
+- ne cliquez pas
+- ne répondez pas avec des infos personnelles
+- vérifiez via le site officiel (URL tapée à la main)
+- conservez une capture si besoin
+
+## À lire aussi
+
+- [Outils IA](/blog/top-10-outils-ia)
+`,
+    relatedSlugs: ['top-10-outils-ia', 'generateur-seo-meta', 'analyseur-texte-compteur-mots'],
+  },
+  {
+    slug: 'simulateur-tjm-freelance',
+    h1: 'Simulateur TJM freelance',
+    title: 'Simulateur TJM freelance : calculer un tarif rentable (charges, congés, objectifs)',
+    metaDescription:
+      "Calculez votre TJM freelance rentable: charges, jours non facturés, objectifs et marge. Méthode claire + simulateur SimplePlate pour estimer rapidement.",
+    keywords: ['simulateur tjm', 'tjm freelance', 'tarif freelance', 'auto-entrepreneur', 'salaire net', 'calcul tjm'],
+    publishedAt: '2025-12-11',
+    readingTime: '9 min',
+    cover: {
+      src: '/blog/simulateur-tjm-freelance.svg',
+      alt: 'Illustration : calcul du TJM freelance (rentabilité, charges, salaire net)',
+    },
+    excerpt:
+      "Un TJM “au feeling” finit souvent trop bas. Voici une méthode simple (jours facturés, charges, marge) + le simulateur SimplePlate.",
+    bodyMarkdown: `## Le piège classique: oublier les jours non facturés
+
+Vous ne facturez pas 220 jours/an. Il faut compter:
+- prospection
+- admin (factures, compta)
+- congés
+- formation
+
+Outil:
+- [Simulateur TJM freelance](/tool/simulateur-tjm-freelance)
+
+## Méthode simple
+
+1) objectif net mensuel
+2) charges/impôts (selon statut)
+3) jours facturés réalistes
+4) marge de sécurité
+
+## Bonus: mesurer un ROI
+
+Pour vos actions marketing:
+- [Calculatrice ROI](/tool/calculatrice-roi)
+
+## À lire aussi
+
+- [Générateur de facture](/blog/generateur-de-facture)
+- [Calculatrice ROI marketing](/blog/calculatrice-roi-marketing)
+`,
+    relatedSlugs: ['generateur-de-facture', 'calculatrice-roi-marketing', 'top-10-outils-ia'],
+  },
+  {
+    slug: 'calculatrice-roi-marketing',
+    h1: 'Calculatrice ROI marketing',
+    title: 'Calculatrice ROI marketing : mesurer une campagne (marge, coût, break-even) facilement',
+    metaDescription:
+      "Mesurez le ROI d’une campagne: coût, revenus, marge, break-even et décisions. Méthode simple + calculatrice ROI SimplePlate pour optimiser vos investissements.",
+    keywords: ['calculatrice roi', 'roi marketing', 'break even', 'marge', 'rentabilité', 'acquisition'],
+    publishedAt: '2025-12-10',
+    readingTime: '8 min',
+    cover: {
+      src: '/blog/calculatrice-roi-marketing.svg',
+      alt: 'Illustration : calcul du ROI marketing et du break-even pour optimiser une campagne',
+    },
+    excerpt:
+      "Sans ROI clair, vous “espérez”. Voici comment calculer la rentabilité (marge, coûts, break-even) et décider quoi couper / amplifier.",
+    bodyMarkdown: `## Le ROI: la question la plus simple (et la plus ignorée)
+
+ROI = “est-ce que ça rapporte plus que ça coûte?”
+
+Outil:
+- [Calculatrice ROI](/tool/calculatrice-roi)
+
+## 1) Les variables à poser
+
+- coût total (ads + créa + outils)
+- revenus attribués
+- marge (si e‑commerce)
+- période (7j / 30j / 90j)
+
+## 2) Break-even: à partir de quand c’est rentable
+
+Le break-even aide à décider:
+- couper trop tôt (erreur)
+- continuer une campagne perdante (erreur)
+
+## 3) Décider: stop, itérer, scaler
+
+Règle simple:
+- ROI négatif → itérer (offre, créa, cible)
+- ROI positif → scaler progressivement
+
+## À lire aussi
+
+- [Simulateur TJM freelance](/blog/simulateur-tjm-freelance)
+- [Générateur de facture](/blog/generateur-de-facture)
+`,
+    relatedSlugs: ['simulateur-tjm-freelance', 'generateur-de-facture', 'top-10-outils-ia'],
+  },
 ];
 
 export function getBlogPostBySlug(slug: string) {
