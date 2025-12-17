@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Générateur de facture SimplePlate">
+  <rect width="1200" height="630" fill="#FDE047"/>
+  <rect x="72" y="72" width="1056" height="486" rx="24" fill="#0B0B0B"/>
+  <text x="110" y="170" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" font-size="56" font-weight="900" fill="#FFFFFF">Générateur de facture</text>
+  <text x="110" y="230" font-family="ui-sans-serif, system-ui" font-size="28" font-weight="700" fill="#E5E7EB">Modèle clair, prêt à envoyer</text>
+
+  <rect x="110" y="280" width="980" height="250" rx="16" fill="#111827" stroke="#FFFFFF" stroke-width="2"/>
+  <rect x="140" y="310" width="220" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="870" y="310" width="180" height="14" rx="7" fill="#86EFAC"/>
+
+  <rect x="140" y="350" width="910" height="12" rx="6" fill="#374151"/>
+  <rect x="140" y="378" width="910" height="12" rx="6" fill="#374151"/>
+  <rect x="140" y="406" width="910" height="12" rx="6" fill="#374151"/>
+
+  <rect x="820" y="450" width="230" height="40" rx="12" fill="#A78BFA"/>
+  <text x="935" y="477" text-anchor="middle" font-family="ui-sans-serif, system-ui" font-size="18" font-weight="900" fill="#0B0B0B">TOTAL</text>
+</svg>

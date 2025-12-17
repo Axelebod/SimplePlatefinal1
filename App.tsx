@@ -18,6 +18,8 @@ const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Con
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 const Sitemap = lazy(() => import('./pages/Sitemap').then(m => ({ default: m.Sitemap })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const Blog = lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
+const BlogPost = lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
 
 // Composant de chargement simple
 const LoadingFallback = () => (
@@ -46,6 +48,8 @@ function App() {
               <Route path="/login" element={<Auth />} />
               <Route path="/signup" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/sitemap" element={<Sitemap />} />
               <Route path="/dashboard" element={<Dashboard />} />
               
