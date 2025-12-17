@@ -902,6 +902,78 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/analyseur-texte-compteur-mots" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/calculatrice-roi-marketing" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/calculatrice-roi-marketing?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/calculatrice-roi-marketing" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/csv-vers-json-en-ligne" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/detecteur-arnaques-sms" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/detecteur-arnaques-sms?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/detecteur-arnaques-sms" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://simpleplate.dev/blog/detecteur-texte-ia?lang=fr</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/detecteur-texte-ia?lang=fr" />
     <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/detecteur-texte-ia?lang=en" />
@@ -992,6 +1064,24 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://simpleplate.dev/blog/generateur-prompt-pro?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-prompt-pro?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-prompt-pro?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/generateur-prompt-pro" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/generateur-prompt-pro?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-prompt-pro?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-prompt-pro?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/generateur-prompt-pro" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://simpleplate.dev/blog/generateur-qr-code?lang=fr</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-qr-code?lang=fr" />
     <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-qr-code?lang=en" />
@@ -1010,6 +1100,24 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://simpleplate.dev/blog/generateur-seo-meta?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-seo-meta?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-seo-meta?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/generateur-seo-meta" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/generateur-seo-meta?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-seo-meta?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-seo-meta?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/generateur-seo-meta" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://simpleplate.dev/blog/generateur-site-web?lang=fr</loc>
     <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-site-web?lang=fr" />
     <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-site-web?lang=en" />
@@ -1023,6 +1131,24 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/generateur-site-web?lang=fr" />
     <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/generateur-site-web?lang=en" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/generateur-site-web" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/humaniseur-texte-ia?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/humaniseur-texte-ia?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/humaniseur-texte-ia?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/humaniseur-texte-ia" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/humaniseur-texte-ia?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/humaniseur-texte-ia?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/humaniseur-texte-ia?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/humaniseur-texte-ia" />
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1059,6 +1185,24 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/simpleplate-cest-quoi?lang=fr" />
     <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/simpleplate-cest-quoi?lang=en" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/simpleplate-cest-quoi" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/simulateur-tjm-freelance" />
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://simpleplate.dev/blog/simulateur-tjm-freelance?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://simpleplate.dev/blog/simulateur-tjm-freelance" />
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
