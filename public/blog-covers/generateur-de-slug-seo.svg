@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Générateur de slug SEO SimplePlate">
+  <rect width="1200" height="630" fill="#A78BFA"/>
+  <rect x="72" y="72" width="1056" height="486" rx="24" fill="#FFFFFF"/>
+  <text x="110" y="170" font-family="ui-sans-serif, system-ui" font-size="56" font-weight="900" fill="#0B0B0B">Générateur de slug</text>
+  <text x="110" y="230" font-family="ui-sans-serif, system-ui" font-size="28" font-weight="700" fill="#374151">URLs propres, courtes, SEO</text>
+
+  <rect x="110" y="290" width="980" height="70" rx="16" fill="#0B0B0B"/>
+  <text x="140" y="336" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas" font-size="26" font-weight="800" fill="#FDE047">/blog/top-10-outils-ia</text>
+
+  <rect x="110" y="390" width="980" height="140" rx="16" fill="#F3F4F6" stroke="#0B0B0B" stroke-width="2"/>
+  <text x="140" y="442" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas" font-size="22" font-weight="800" fill="#0B0B0B">Minuscules " sans accents " tirets</text>
+  <text x="140" y="482" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas" font-size="22" font-weight="800" fill="#0B0B0B">mots-clés " lisible " partage</text>
+</svg>

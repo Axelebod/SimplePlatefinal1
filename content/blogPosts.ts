@@ -26,7 +26,7 @@ export const BLOG_POSTS: BlogPost[] = [
     publishedAt: '2025-12-17',
     readingTime: '6 min',
     cover: {
-      src: '/blog/simpleplate-cest-quoi.svg',
+      src: '/blog-covers/simpleplate-cest-quoi.svg',
       alt: "Illustration SimplePlate : une boîte à outils IA tout-en-un",
     },
     excerpt:
@@ -70,7 +70,7 @@ Pour commencer, allez sur la page d'accueil et choisissez un outil:
     publishedAt: '2025-12-17',
     readingTime: '8 min',
     cover: {
-      src: '/blog/top-10-outils-ia.svg',
+      src: '/blog-covers/top-10-outils-ia.svg',
       alt: "Illustration : sélection des meilleurs outils IA de SimplePlate",
     },
     excerpt:
@@ -143,7 +143,7 @@ Pour titre + description + OpenGraph:
     publishedAt: '2025-12-17',
     readingTime: '7 min',
     cover: {
-      src: '/blog/generateur-site-web.svg',
+      src: '/blog-covers/generateur-site-web.svg',
       alt: "Illustration : création rapide d'une landing page avec SimplePlate",
     },
     excerpt:
@@ -195,7 +195,7 @@ Décrivez:
     publishedAt: '2025-12-17',
     readingTime: '7 min',
     cover: {
-      src: '/blog/generateur-de-cv.svg',
+      src: '/blog-covers/generateur-de-cv.svg',
       alt: "Illustration : CV structuré et optimisé généré avec SimplePlate",
     },
     excerpt:
@@ -237,7 +237,7 @@ Créez aussi une URL propre pour votre page:
     publishedAt: '2025-12-17',
     readingTime: '6 min',
     cover: {
-      src: '/blog/generateur-de-facture.svg',
+      src: '/blog-covers/generateur-de-facture.svg',
       alt: "Illustration : facture professionnelle générée avec SimplePlate",
     },
     excerpt:
@@ -279,7 +279,7 @@ Outil:
     publishedAt: '2025-12-17',
     readingTime: '6 min',
     cover: {
-      src: '/blog/generateur-de-slug-seo.svg',
+      src: '/blog-covers/generateur-de-slug-seo.svg',
       alt: "Illustration : URL SEO propre générée (slug) avec SimplePlate",
     },
     excerpt:
@@ -322,7 +322,7 @@ Outil:
     publishedAt: '2025-12-17',
     readingTime: '5 min',
     cover: {
-      src: '/blog/formateur-json-en-ligne.svg',
+      src: '/blog-covers/formateur-json-en-ligne.svg',
       alt: "Illustration : JSON propre et indenté grâce à SimplePlate",
     },
     excerpt:
@@ -359,7 +359,7 @@ Si votre JSON vient d'un CSV:
     publishedAt: '2025-12-17',
     readingTime: '5 min',
     cover: {
-      src: '/blog/generateur-qr-code.svg',
+      src: '/blog-covers/generateur-qr-code.svg',
       alt: "Illustration : QR code prêt à télécharger généré avec SimplePlate",
     },
     excerpt:
@@ -395,7 +395,7 @@ Si votre JSON vient d'un CSV:
     publishedAt: '2025-12-17',
     readingTime: '7 min',
     cover: {
-      src: '/blog/detecteur-texte-ia.svg',
+      src: '/blog-covers/detecteur-texte-ia.svg',
       alt: "Illustration : analyse d'un texte et score IA avec SimplePlate",
     },
     excerpt:
@@ -436,7 +436,7 @@ Si votre JSON vient d'un CSV:
     publishedAt: '2025-12-17',
     readingTime: '6 min',
     cover: {
-      src: '/blog/pixel-vers-rem.svg',
+      src: '/blog-covers/pixel-vers-rem.svg',
       alt: "Illustration : conversion px vers rem pour CSS avec SimplePlate",
     },
     excerpt:
@@ -472,7 +472,7 @@ Si votre JSON vient d'un CSV:
     publishedAt: '2025-12-17',
     readingTime: '9 min',
     cover: {
-      src: '/blog/generateur-seo-meta.svg',
+      src: '/blog-covers/generateur-seo-meta.svg',
       alt: 'Illustration : génération de meta tags SEO (title, description, Open Graph)',
     },
     excerpt:
@@ -539,7 +539,7 @@ Deux liens qui aident souvent:
     publishedAt: '2025-12-16',
     readingTime: '10 min',
     cover: {
-      src: '/blog/generateur-prompt-pro.svg',
+      src: '/blog-covers/generateur-prompt-pro.svg',
       alt: 'Illustration : templates de prompt engineering pour obtenir de meilleures réponses IA',
     },
     excerpt:
@@ -628,7 +628,7 @@ Générez un prompt complet automatiquement:
     publishedAt: '2025-12-15',
     readingTime: '9 min',
     cover: {
-      src: '/blog/humaniseur-texte-ia.svg',
+      src: '/blog-covers/humaniseur-texte-ia.svg',
       alt: 'Illustration : reformulation pour rendre un texte IA plus naturel et fluide',
     },
     excerpt:
@@ -686,7 +686,7 @@ Préférez des mots simples et précis.
     publishedAt: '2025-12-14',
     readingTime: '8 min',
     cover: {
-      src: '/blog/csv-vers-json-en-ligne.svg',
+      src: '/blog-covers/csv-vers-json-en-ligne.svg',
       alt: 'Illustration : conversion de données CSV vers JSON pour API et développement',
     },
     excerpt:
@@ -736,7 +736,7 @@ Après conversion:
     publishedAt: '2025-12-13',
     readingTime: '8 min',
     cover: {
-      src: '/blog/analyseur-texte-compteur-mots.svg',
+      src: '/blog-covers/analyseur-texte-compteur-mots.svg',
       alt: 'Illustration : analyse de texte (mots, caractères, lisibilité) pour améliorer un contenu',
     },
     excerpt:
@@ -787,7 +787,7 @@ Un bon contenu se lit en diagonale:
     publishedAt: '2025-12-12',
     readingTime: '9 min',
     cover: {
-      src: '/blog/detecteur-arnaques-sms.svg',
+      src: '/blog-covers/detecteur-arnaques-sms.svg',
       alt: "Illustration : détection d'arnaques SMS (phishing/smishing) avec analyse IA",
     },
     excerpt:
@@ -825,7 +825,7 @@ Outil:
     publishedAt: '2025-12-11',
     readingTime: '9 min',
     cover: {
-      src: '/blog/simulateur-tjm-freelance.svg',
+      src: '/blog-covers/simulateur-tjm-freelance.svg',
       alt: 'Illustration : calcul du TJM freelance (rentabilité, charges, salaire net)',
     },
     excerpt:
@@ -870,7 +870,7 @@ Pour vos actions marketing:
     publishedAt: '2025-12-10',
     readingTime: '8 min',
     cover: {
-      src: '/blog/calculatrice-roi-marketing.svg',
+      src: '/blog-covers/calculatrice-roi-marketing.svg',
       alt: 'Illustration : calcul du ROI marketing et du break-even pour optimiser une campagne',
     },
     excerpt:
