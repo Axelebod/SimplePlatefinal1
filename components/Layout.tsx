@@ -328,6 +328,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm font-bold underline dark:text-gray-300">
             <Link to="/contact" className="hover:text-neo-violet">Nous Contacter</Link>
+            <Link to="/blog">Blog</Link>
             <Link to="/legal">Mentions Légales</Link>
             <Link to="/pricing">{t('nav.pricing')}</Link>
             <Link to="/sitemap">Plan du Site</Link>

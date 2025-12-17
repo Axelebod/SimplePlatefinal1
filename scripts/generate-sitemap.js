@@ -17,6 +17,7 @@ const LANGS = /** @type {const} */ (['fr', 'en']);
 const staticPages = [
   { path: '/', priority: '1.0', changefreq: 'daily' },
   { path: '/pricing', priority: '0.9', changefreq: 'weekly' },
+  { path: '/blog', priority: '0.7', changefreq: 'weekly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },
   { path: '/legal', priority: '0.5', changefreq: 'monthly' },
   { path: '/privacy', priority: '0.5', changefreq: 'monthly' },
@@ -61,6 +62,17 @@ function extractToolSlugsFromSource() {
   return Array.from(slugs).filter(Boolean).sort();
 }
 
+function extractBlogSlugsFromSource() {
+  const blogPath = path.join(__dirname, '../content/blogPosts.ts');
+  const content = fs.readFileSync(blogPath, 'utf8');
+
+  const slugs = new Set();
+  for (const m of content.matchAll(/slug:\s*'([^']+)'/g)) {
+    slugs.add(m[1]);
+  }
+  return Array.from(slugs).filter(Boolean).sort();
+}
+
 function renderUrlNode({ loc, lastmod, changefreq, priority, alternates }) {
   const altLinks = alternates
     .map((a) => `    <xhtml:link rel="alternate" hreflang="${a.hreflang}" href="${a.href}" />`)
@@ -76,6 +88,7 @@ ${altLinks ? `${altLinks}\n` : ''}    <lastmod>${lastmod}</lastmod>
 
 function generateSitemap() {
   const toolSlugs = extractToolSlugsFromSource();
+  const blogSlugs = extractBlogSlugsFromSource();
 
   const entries = [];
 
@@ -108,6 +121,11 @@ function generateSitemap() {
     addPath(`/tool/${slug}`, 'weekly', '0.8');
   }
 
+  // Blog posts
+  for (const slug of blogSlugs) {
+    addPath(`/blog/${slug}`, 'monthly', '0.6');
+  }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -123,6 +141,8 @@ ${entries.join('\n')}
   console.log(`   - ${staticPages.length} static pages x ${LANGS.length} langs`);
   // eslint-disable-next-line no-console
   console.log(`   - ${toolSlugs.length} tools x ${LANGS.length} langs`);
+  // eslint-disable-next-line no-console
+  console.log(`   - ${blogSlugs.length} blog posts x ${LANGS.length} langs`);
 }
 
 generateSitemap();

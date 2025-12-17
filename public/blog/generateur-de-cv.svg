@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Générateur de CV SimplePlate">
+  <rect width="1200" height="630" fill="#86EFAC"/>
+  <rect x="72" y="72" width="1056" height="486" rx="24" fill="#FFFFFF"/>
+  <text x="110" y="170" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" font-size="56" font-weight="900" fill="#0B0B0B">Générateur de CV</text>
+  <text x="110" y="230" font-family="ui-sans-serif, system-ui" font-size="28" font-weight="700" fill="#374151">Structure pro, lisible, ATS-friendly</text>
+
+  <rect x="110" y="280" width="980" height="250" rx="16" fill="#F3F4F6" stroke="#0B0B0B" stroke-width="2"/>
+  <rect x="140" y="310" width="260" height="18" rx="9" fill="#0B0B0B"/>
+  <rect x="140" y="346" width="420" height="10" rx="5" fill="#9CA3AF"/>
+  <rect x="140" y="368" width="380" height="10" rx="5" fill="#9CA3AF"/>
+
+  <rect x="140" y="408" width="160" height="16" rx="8" fill="#A78BFA"/>
+  <rect x="320" y="408" width="140" height="16" rx="8" fill="#93C5FD"/>
+  <rect x="480" y="408" width="150" height="16" rx="8" fill="#FDE047"/>
+
+  <rect x="690" y="310" width="360" height="10" rx="5" fill="#9CA3AF"/>
+  <rect x="690" y="332" width="320" height="10" rx="5" fill="#9CA3AF"/>
+  <rect x="690" y="354" width="340" height="10" rx="5" fill="#9CA3AF"/>
+</svg>
