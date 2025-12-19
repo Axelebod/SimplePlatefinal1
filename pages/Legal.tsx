@@ -45,7 +45,7 @@ export const Legal: React.FC = () => {
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Accès :</strong> L'accès au site nécessite une inscription. Les fonctionnalités utilisent un système de crédits.</li>
             <li><strong>Crédits :</strong> Les utilisateurs gratuits disposent de 5 crédits gratuits par semaine (non cumulables). Les utilisateurs PRO disposent de 100 crédits payants par mois qui s'accumulent.</li>
-            <li><strong>SimplePlate Studio :</strong> La plateforme communautaire SimplePlate Studio permet de soumettre des projets Micro-SaaS, obtenir des audits IA (50 crédits) et recevoir des retours. Les utilisateurs peuvent gagner 0.5 crédit par avis valide (>100 caractères), avec un maximum de 3 crédits par jour (6 avis).</li>
+              <li><strong>SimplePlate Studio :</strong> La plateforme communautaire SimplePlate Studio permet de soumettre des projets Micro-SaaS, obtenir des audits IA (50 crédits) et recevoir des retours. Les utilisateurs peuvent gagner 0.5 crédit par avis valide (&gt;100 caractères), avec un maximum de 3 crédits par jour (6 avis).</li>
             <li><strong>Usage :</strong> Vous vous engagez à ne pas utiliser nos outils pour générer du contenu illégal, haineux ou diffamatoire.</li>
             <li><strong>Contenu utilisateur :</strong> Les projets soumis sur SimplePlate Studio (logos, screenshots, descriptions, liens) sont publics et peuvent être partagés. Vous garantissez avoir les droits sur tout contenu soumis.</li>
             <li><strong>Responsabilité :</strong> SimplePlate n'est pas responsable des contenus générés par l'IA ou des projets soumis par les utilisateurs. Vérifiez toujours les informations.</li>
