@@ -739,24 +739,38 @@ export async function unlockProjectAudit(
       generated_at: cleanAuditResult.generated_at,
     });
     
-    const { error: updateError } = await supabase
-      .from('projects')
-      .update({
-        is_audit_unlocked: true,
-        ai_score: cleanAuditResult,
-      })
-      .eq('id', projectId);
+    // Try using RPC function first (more reliable for JSONB)
+    const { data: rpcResult, error: rpcError } = await supabase.rpc('save_audit_result', {
+      p_project_id: projectId,
+      p_user_id: user.id,
+      p_audit_data: cleanAuditResult,
+    });
 
-    if (updateError) {
-      console.error('Error updating project:', updateError);
-      console.error('Update error details:', {
-        message: updateError.message,
-        details: updateError.details,
-        hint: updateError.hint,
-        code: updateError.code,
-      });
-      console.error('Audit data that failed:', JSON.stringify(cleanAuditResult, null, 2));
-      throw new Error(`Failed to save audit: ${updateError.message}`);
+    if (rpcError || !rpcResult?.success) {
+      console.warn('RPC save_audit_result failed, trying direct update:', rpcError);
+      
+      // Fallback to direct update
+      const { error: updateError } = await supabase
+        .from('projects')
+        .update({
+          is_audit_unlocked: true,
+          ai_score: cleanAuditResult,
+        })
+        .eq('id', projectId);
+
+      if (updateError) {
+        console.error('Error updating project:', updateError);
+        console.error('Update error details:', {
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code,
+        });
+        console.error('Audit data that failed:', JSON.stringify(cleanAuditResult, null, 2));
+        throw new Error(`Failed to save audit: ${updateError.message}`);
+      }
+    } else {
+      console.log('Audit saved successfully via RPC');
     }
 
     // Get updated credits to return accurate remaining amount
