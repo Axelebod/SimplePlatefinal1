@@ -54,18 +54,18 @@ export const Dashboard: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('last_credit_reset, created_at')
+        .select('last_weekly_refill, created_at')
         .eq('id', user.id)
         .single();
 
       if (!error && data) {
-        // Calculer la prochaine date de recharge (1 mois après le dernier reset ou la création)
-        const lastReset = data.last_credit_reset 
-          ? new Date(data.last_credit_reset) 
+        // Calculer la prochaine date de recharge hebdomadaire (7 jours après le dernier reset ou la création)
+        const lastReset = data.last_weekly_refill 
+          ? new Date(data.last_weekly_refill) 
           : new Date(data.created_at);
         
         const nextReset = new Date(lastReset);
-        nextReset.setMonth(nextReset.getMonth() + 1);
+        nextReset.setDate(nextReset.getDate() + 7); // 7 jours pour le reset hebdomadaire
         
         setNextResetDate(nextReset);
       }
