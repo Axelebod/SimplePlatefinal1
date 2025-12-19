@@ -3,10 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
-import { Zap, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock, Rocket, ExternalLink, User, Edit2, Check, X, Trash2 } from 'lucide-react';
-import { getRecentActivity } from '../services/toolHistoryService';
-import { ToolResult } from '../types/toolHistory';
-import { getTools } from '../tools-config';
+import { Zap, CreditCard, Settings, LogOut, AlertTriangle, Package, Clock, Rocket, ExternalLink, User, Edit2, Check, X, Trash2 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { getUserProjects, deleteProject } from '../services/studioService';
@@ -21,12 +18,9 @@ export const Dashboard: React.FC = () => {
   const [usernameError, setUsernameError] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { t, language } = useTranslation();
-  const tools = React.useMemo(() => getTools(language), [language]);
   const { success, error: showError } = useToast();
   const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  const [recentActivity, setRecentActivity] = useState<ToolResult[]>([]);
-  const [activityLoading, setActivityLoading] = useState(true);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
@@ -82,18 +76,9 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      loadRecentActivity();
       loadMyProjects();
     }
   }, [user]);
-
-  const loadRecentActivity = async () => {
-    if (!user) return;
-    setActivityLoading(true);
-    const data = await getRecentActivity(6);
-    setRecentActivity(data);
-    setActivityLoading(false);
-  };
 
   const loadMyProjects = async () => {
     if (!user) return;
@@ -327,10 +312,9 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* SECTION HISTORIQUE / STATS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* COLONNE GAUCHE : INFO COMPTE */}
+      {/* SECTION INFO COMPTE */}
+      <div className="grid grid-cols-1 gap-8">
+          {/* INFO COMPTE */}
           <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2 dark:text-white">
                   <Settings className="w-5 h-5" /> {t('dashboard.accountDetails')}
@@ -417,61 +401,6 @@ export const Dashboard: React.FC = () => {
                   </li>
               </ul>
           </div>
-
-        {/* COLONNE DROITE : STATS */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg flex items-center gap-2 dark:text-white">
-                  <TrendingUp className="w-5 h-5" /> {t('dashboard.recentActivity')}
-              </h3>
-              <button
-                onClick={loadRecentActivity}
-                className="text-xs font-bold px-3 py-1 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                {t('dashboard.refresh')}
-              </button>
-            </div>
-
-            {activityLoading ? (
-              <p className="text-gray-500 dark:text-gray-400 text-sm">{t('dashboard.activityLoading')}</p>
-            ) : recentActivity.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                {t('dashboard.noRecentActivity')}
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {recentActivity.map((activity) => {
-                  const toolMeta = tools.find(t => t.id === activity.tool_id);
-                  return (
-                    <div
-                      key={activity.id}
-                      className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border border-gray-200 dark:border-gray-500 rounded-lg p-4"
-                    >
-                      <div>
-                        <p className="font-bold text-sm dark:text-white">{toolMeta?.title || activity.tool_id}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(activity.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <span className="text-gray-500 dark:text-gray-300">
-                          -{activity.credits_used || 0} {(activity.credits_used || 0) > 1 ? t('tools.credits') : t('tools.credit')}
-                        </span>
-                        {toolMeta && (
-                          <Link
-                            to={`/tool/${toolMeta.slug || toolMeta.id}`}
-                            className="px-3 py-1 bg-neo-black dark:bg-white text-white dark:text-black rounded-md font-bold text-xs hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-                          >
-                            {t('common.open')}
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-        </div>
       </div>
 
       <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-md flex gap-4 items-start">
