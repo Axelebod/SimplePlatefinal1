@@ -143,18 +143,20 @@ export const StudioProject: React.FC = () => {
     }
   };
 
-  // Load free audits remaining count
+  // Load free audits remaining count for current user
   const loadFreeAuditsRemaining = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('free_audits_counter')
-        .select('current_count, max_free_audits')
-        .eq('id', 1)
-        .single();
+    if (!user) {
+      setFreeAuditsRemaining(0);
+      return;
+    }
 
-      if (!error && data) {
-        const remaining = Math.max(0, data.max_free_audits - data.current_count);
-        setFreeAuditsRemaining(remaining);
+    try {
+      const { data, error } = await supabase.rpc('get_free_audits_remaining', {
+        p_user_id: user.id
+      });
+
+      if (!error && data !== null) {
+        setFreeAuditsRemaining(data);
       }
     } catch (err) {
       console.warn('Error loading free audits count:', err);

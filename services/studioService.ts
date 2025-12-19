@@ -623,16 +623,18 @@ export async function unlockProjectAudit(
   const userCredits = profile?.credits || 0;
   const auditCost = 50;
 
-  // Check if free audit is available (first 50 audits are free)
+  // Check if free audit is available (50 free audits per user)
   let isFreeAudit = false;
   if (!skipCreditCheck) {
     try {
-      const { data: freeAuditAvailable, error: freeAuditError } = await supabase.rpc('check_free_audit_available');
+      const { data: freeAuditAvailable, error: freeAuditError } = await supabase.rpc('check_free_audit_available', {
+        p_user_id: user.id
+      });
       if (!freeAuditError && freeAuditAvailable === true) {
         isFreeAudit = true;
-        console.log('Free audit available! This audit will be free.');
+        console.log('Free audit available for this user! This audit will be free.');
       } else {
-        console.log('No free audits left, will charge credits');
+        console.log('User has used all free audits, will charge credits');
       }
     } catch (err) {
       console.warn('Error checking free audit availability:', err);
