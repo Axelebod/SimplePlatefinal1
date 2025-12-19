@@ -66,16 +66,14 @@ export async function performCompleteAudit(
 
 RÈGLES STRICTES:
 1. Analyse EN PROFONDEUR TOUS les aspects: Design/UI, Copywriting, Technical, SEO, UX, Accessibility, Performance, Business
-2. Pour CHAQUE problème détecté, tu DOIS suggérer un outil SimplePlate spécifique qui peut le RÉPARER
-3. Format de réponse: JSON strict avec cette structure:
+2. Format de réponse: JSON strict avec cette structure:
 {
   "overall_score": 75,
   "categories": [
     {
       "name": "Design & UI",
       "score": 80,
-      "issues": ["Problème détaillé 1", "Problème détaillé 2", "Problème détaillé 3"],
-      "suggested_tools": ["tool-id-1", "tool-id-2"]
+      "issues": ["Problème détaillé 1", "Problème détaillé 2", "Problème détaillé 3"]
     }
   ]
 }
@@ -90,18 +88,13 @@ RÈGLES STRICTES:
    - Business & Marketing (positionnement, message, proposition de valeur)
    - Performance (vitesse, optimisation, ressources)
 
-5. Pour chaque problème, trouve l'outil SimplePlate le plus adapté dans cette liste:
-${toolsList}
-
-6. Sois ULTRA-PRÉCIS et ACTIONNABLE:
+5. Sois ULTRA-PRÉCIS et ACTIONNABLE:
    - Détecte au moins 3-5 problèmes par catégorie
    - Chaque problème doit être spécifique et mesurable
-   - Chaque problème doit avoir un outil SimplePlate pour le corriger
-   - Les outils suggérés doivent être pertinents (ex: problème JSON → json-formatter)
 
 7. Score: 0-100 pour chaque catégorie et overall_score (sois sévère mais juste)
 
-8. IMPORTANT: 
+6. IMPORTANT: 
    - Analyse le site réellement (pas de réponse générique)
    - Sois exhaustif: plus de problèmes = meilleur audit
    - Réponds UNIQUEMENT avec le JSON, sans texte avant/après
@@ -110,16 +103,14 @@ ${toolsList}
 
 STRICT RULES:
 1. Analyze ALL aspects: Design/UI, Copywriting, Technical, SEO, UX, Accessibility, Performance
-2. For EACH detected issue, you MUST suggest a specific SimplePlate tool
-3. Response format: Strict JSON with this structure:
+2. Response format: Strict JSON with this structure:
 {
   "overall_score": 75,
   "categories": [
     {
       "name": "Design & UI",
       "score": 80,
-      "issues": ["Issue 1", "Issue 2"],
-      "suggested_tools": ["tool-id-1", "tool-id-2"]
+      "issues": ["Issue 1", "Issue 2"]
     }
   ]
 }
@@ -133,12 +124,11 @@ STRICT RULES:
    - Accessibility (a11y, contrast, readability)
    - Business & Marketing (positioning, messaging)
 
-5. For each issue, find the most appropriate SimplePlate tool from this list:
-${toolsList}
+5. Be PRECISE and ACTIONABLE:
+   - Detect at least 3-5 issues per category
+   - Each issue must be specific and measurable
 
-6. Be PRECISE and ACTIONABLE. Each issue must have a SimplePlate solution.
-
-7. Score: 0-100 for each category and overall_score
+6. Score: 0-100 for each category and overall_score
 
 IMPORTANT: Respond ONLY with JSON, no text before/after.`;
 
@@ -156,17 +146,14 @@ INSTRUCTIONS D'AUDIT:
 1. Visite le site ${projectUrl} et analyse-le réellement
 2. Analyse la description fournie: clarté, proposition de valeur, copywriting, cohérence
 3. Détecte TOUS les problèmes possibles dans chaque catégorie
-4. Pour chaque problème, suggère l'outil SimplePlate qui peut le corriger
-5. Sois exhaustif: minimum 20 problèmes au total
-6. Sois spécifique: "Les meta tags manquent" → seo-meta-generator
-7. Sois actionnable: chaque problème doit avoir une solution SimplePlate
-8. Évalue la qualité de la description: est-elle claire? Convaincante? Optimisée SEO?
+4. Sois exhaustif: minimum 20 problèmes au total
+5. Sois spécifique et actionnable: chaque problème doit être clair et mesurable
+6. Évalue la qualité de la description: est-elle claire? Convaincante? Optimisée SEO?
 
 Fournis un audit ULTRA-COMPLET avec:
 - Score global (0-100) - sois sévère mais juste
 - 7-8 catégories minimum avec scores individuels
 - 3-5 problèmes détaillés par catégorie
-- Outils SimplePlate suggérés pour chaque problème (minimum 1 outil par problème)
 - Inclus une catégorie "Description & Messaging" si la description est faible
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant/après.`
@@ -183,17 +170,14 @@ AUDIT INSTRUCTIONS:
 1. Visit the site ${projectUrl} and analyze it thoroughly
 2. Analyze the provided description: clarity, value proposition, copywriting, consistency
 3. Detect ALL possible issues in each category
-4. For each issue, suggest the SimplePlate tool that can fix it
-5. Be exhaustive: minimum 20 issues total
-6. Be specific: "Meta tags missing" → seo-meta-generator
-7. Be actionable: each issue must have a SimplePlate solution
-8. Evaluate description quality: is it clear? Convincing? SEO optimized?
+4. Be exhaustive: minimum 20 issues total
+5. Be specific and actionable: each issue must be clear and measurable
+6. Evaluate description quality: is it clear? Convincing? SEO optimized?
 
 Provide an ULTRA-COMPLETE audit with:
 - Overall score (0-100) - be strict but fair
 - Minimum 7-8 categories with individual scores
 - 3-5 detailed issues per category
-- Suggested SimplePlate tools for each issue (minimum 1 tool per issue)
 - Include a "Description & Messaging" category if description is weak
 
 Respond ONLY with valid JSON, no text before/after.`;
@@ -267,23 +251,11 @@ function enrichAuditWithToolMapping(
   tools: any[]
 ): AIAuditResult {
   const enrichedCategories = (auditData.categories || []).map((category: any) => {
-    let suggestedTools = category.suggested_tools || [];
-    
-    // Si pas d'outils suggérés, essayer de les déduire des problèmes
-    if (suggestedTools.length === 0 && category.issues) {
-      suggestedTools = inferToolsFromIssues(category.issues, category.name, tools);
-    }
-    
-    // Valider que les outils existent
-    const validTools = suggestedTools.filter((toolId: string) =>
-      tools.some(t => t.id === toolId)
-    );
-    
     return {
       name: category.name,
       score: Math.max(0, Math.min(100, category.score || 0)),
       issues: category.issues || [],
-      suggested_tools: validTools.length > 0 ? validTools : getDefaultToolsForCategory(category.name, tools),
+      suggested_tools: [], // No tools suggested
     };
   });
   
@@ -447,7 +419,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Vérifiez la cohérence des composants UI' : 'Check UI component consistency',
           language === 'fr' ? 'Optimisez les tailles et espacements (px/rem)' : 'Optimize sizes and spacing (px/rem)',
         ],
-        suggested_tools: [findTool('website-generator'), findTool('px-rem-converter'), findTool('hex-color-display')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'Copywriting & Content' : 'Copywriting & Content',
@@ -459,7 +431,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Améliorez la clarté et la concision de vos textes' : 'Improve clarity and conciseness of your texts',
           language === 'fr' ? 'Vérifiez la cohérence du ton et du style rédactionnel' : 'Check consistency of tone and writing style',
         ],
-        suggested_tools: [findTool('business-plan-pro'), findTool('pro-prompt-gen'), findTool('text-analyzer')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'Technical & Code' : 'Technical & Code',
@@ -471,7 +443,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Vérifiez l\'absence d\'erreurs JavaScript/console' : 'Check for JavaScript/console errors',
           language === 'fr' ? 'Optimisez la structure des fichiers et l\'organisation du code' : 'Optimize file structure and code organization',
         ],
-        suggested_tools: [findTool('json-formatter'), findTool('csv-to-json')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
@@ -483,7 +455,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Vérifiez la présence d\'un sitemap.xml et robots.txt' : 'Check for sitemap.xml and robots.txt',
           language === 'fr' ? 'Optimisez les images (alt tags, compression, formats)' : 'Optimize images (alt tags, compression, formats)',
         ],
-        suggested_tools: [findTool('seo-meta-generator'), findTool('slug-gen')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'UX & Usability' : 'UX & Usability',
@@ -495,7 +467,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Améliorez la lisibilité et la hiérarchie de l\'information' : 'Improve readability and information hierarchy',
           language === 'fr' ? 'Optimisez les formulaires et les interactions utilisateur' : 'Optimize forms and user interactions',
         ],
-        suggested_tools: [findTool('website-generator'), findTool('business-plan-pro')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'Accessibility (a11y)' : 'Accessibility (a11y)',
@@ -507,7 +479,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Ajoutez des labels ARIA pour les éléments interactifs' : 'Add ARIA labels for interactive elements',
           language === 'fr' ? 'Vérifiez la lisibilité et la taille des polices' : 'Check readability and font sizes',
         ],
-        suggested_tools: [findTool('text-analyzer'), findTool('px-rem-converter')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'Business & Marketing' : 'Business & Marketing',
@@ -519,7 +491,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Vérifiez la cohérence de votre branding et de votre identité' : 'Check consistency of your branding and identity',
           language === 'fr' ? 'Optimisez vos stratégies de conversion et vos CTA' : 'Optimize your conversion strategies and CTAs',
         ],
-        suggested_tools: [findTool('business-plan-pro'), findTool('hashtag-gen'), findTool('brand-name-gen')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
       {
         name: language === 'fr' ? 'Performance & Optimisation' : 'Performance & Optimization',
@@ -531,7 +503,7 @@ function generateFallbackAudit(
           language === 'fr' ? 'Optimisez le code JavaScript et CSS (minification)' : 'Optimize JavaScript and CSS code (minification)',
           language === 'fr' ? 'Vérifiez les performances sur mobile et les connexions lentes' : 'Check performance on mobile and slow connections',
         ],
-        suggested_tools: [findTool('json-formatter')].filter(Boolean) as string[],
+              suggested_tools: [],
       },
     ],
     generated_at: new Date().toISOString(),

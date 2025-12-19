@@ -681,30 +681,6 @@ export const StudioProject: React.FC = () => {
                         </div>
                       )}
                       
-                      {category.suggested_tools && category.suggested_tools.length > 0 && (
-                        <div className="mt-4 pt-4 border-t-2 border-gray-300 dark:border-white">
-                          <p className="font-bold text-sm mb-3 dark:text-white flex items-center gap-2">
-                            <Zap className="w-4 h-4 text-neo-violet" />
-                            {language === 'fr' ? '🛠️ Outils SimplePlate pour corriger:' : '🛠️ SimplePlate tools to fix:'}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {category.suggested_tools.map((toolId) => {
-                              const tool = tools.find(t => t.id === toolId);
-                              if (!tool) return null;
-                              return (
-                                <Link
-                                  key={toolId}
-                                  to={getToolLink(toolId)}
-                                  className="group px-4 py-2 bg-neo-violet text-white text-sm font-bold rounded-md hover:bg-neo-violet/90 transition-all border-2 border-neo-violet hover:border-black dark:hover:border-white shadow-[2px_2px_0px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                                >
-                                  {tool.title}
-                                  <ArrowRight className="w-3 h-3 inline-block ml-1 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   );
                 })}

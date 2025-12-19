@@ -760,7 +760,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez l\'espacement et la mise en page' : 'Optimize spacing and layout',
                 language === 'fr' ? 'Améliorez la typographie' : 'Improve typography',
               ],
-              suggested_tools: ['website-generator', 'px-rem-converter'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Copywriting & Content' : 'Copywriting & Content',
@@ -770,7 +770,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez vos CTA' : 'Optimize your CTAs',
                 language === 'fr' ? 'Renforcez votre proposition de valeur' : 'Strengthen your value proposition',
               ],
-              suggested_tools: ['business-plan-pro'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
@@ -780,7 +780,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez vos URLs' : 'Optimize your URLs',
                 language === 'fr' ? 'Ajoutez des balises sémantiques' : 'Add semantic tags',
               ],
-              suggested_tools: ['seo-meta-generator', 'slug-gen'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Technical & Code' : 'Technical & Code',
@@ -790,7 +790,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez les performances' : 'Optimize performance',
                 language === 'fr' ? 'Validez vos formats de données' : 'Validate your data formats',
               ],
-              suggested_tools: ['json-formatter'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'UX & Usability' : 'UX & Usability',
@@ -800,7 +800,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez le parcours utilisateur' : 'Optimize user journey',
                 language === 'fr' ? 'Vérifiez la clarté des informations' : 'Check information clarity',
               ],
-              suggested_tools: ['website-generator'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Accessibility' : 'Accessibility',
@@ -810,7 +810,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Vérifiez le contraste des couleurs' : 'Check color contrast',
                 language === 'fr' ? 'Assurez-vous que le site est navigable au clavier' : 'Ensure keyboard navigation',
               ],
-              suggested_tools: ['text-analyzer'],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Business & Marketing' : 'Business & Marketing',
@@ -820,7 +820,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez votre message marketing' : 'Optimize your marketing message',
                 language === 'fr' ? 'Améliorez votre stratégie de contenu' : 'Improve your content strategy',
               ],
-              suggested_tools: ['business-plan-pro', 'hashtag-gen'],
+              suggested_tools: [],
             },
           ],
           generated_at: new Date().toISOString(),
