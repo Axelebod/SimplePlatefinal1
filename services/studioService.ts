@@ -481,7 +481,12 @@ export async function submitReview(data: SubmitReviewData): Promise<Review | nul
 }
 
 export async function getProjectReviews(projectId: string): Promise<Review[]> {
-  const { data, error } = await supabase
+  // Try multiple foreign key naming conventions
+  let data: any[] | null = null;
+  let error: any = null;
+
+  // Try with explicit foreign key name first
+  const { data: data1, error: error1 } = await supabase
     .from('reviews')
     .select(`
       *,
@@ -490,16 +495,82 @@ export async function getProjectReviews(projectId: string): Promise<Review[]> {
     .eq('project_id', projectId)
     .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching reviews:', error);
-    throw error;
+  if (!error1 && data1) {
+    data = data1;
+  } else {
+    // Try alternative foreign key naming
+    const { data: data2, error: error2 } = await supabase
+      .from('reviews')
+      .select(`
+        *,
+        profiles!author_id(email, username)
+      `)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+
+    if (!error2 && data2) {
+      data = data2;
+    } else {
+      // Fallback: fetch reviews and profiles separately
+      const { data: reviewsData, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false });
+
+      if (reviewsError) {
+        console.error('Error fetching reviews:', reviewsError);
+        throw reviewsError;
+      }
+
+      // Fetch profiles for all authors
+      const authorIds = [...new Set((reviewsData || []).map((r: any) => r.author_id))];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, username')
+        .in('id', authorIds);
+
+      if (profilesError) {
+        console.warn('Error fetching profiles:', profilesError);
+      }
+
+      // Map reviews with profiles
+      const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+      data = (reviewsData || []).map((review: any) => {
+        const profile = profilesMap.get(review.author_id);
+        return {
+          ...review,
+          profiles: profile || null,
+        };
+      });
+    }
   }
 
-  return (data || []).map((review) => ({
-    ...review,
-    author_email: review.profiles?.email,
-    author_username: review.profiles?.username,
-  })) as Review[];
+  // Map reviews and ensure username is properly extracted
+  const mappedReviews = (data || []).map((review: any) => {
+    const profile = review.profiles || {};
+    const authorEmail = profile.email || null;
+    const authorUsername = profile.username || null;
+    
+    // Debug log
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Review mapping:', {
+        reviewId: review.id,
+        authorId: review.author_id,
+        authorEmail,
+        authorUsername,
+        profile: profile,
+      });
+    }
+    
+    return {
+      ...review,
+      author_email: authorEmail,
+      author_username: authorUsername,
+    };
+  }) as Review[];
+
+  return mappedReviews;
 }
 
 // ============================================
