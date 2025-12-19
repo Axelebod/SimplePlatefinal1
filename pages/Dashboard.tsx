@@ -30,6 +30,7 @@ export const Dashboard: React.FC = () => {
   const [activityLoading, setActivityLoading] = useState(true);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
 
   useSEO({
     title: language === 'fr' ? 'Tableau de bord | SimplePlate AI' : 'Dashboard | SimplePlate AI',
