@@ -153,7 +153,7 @@ export const Dashboard: React.FC = () => {
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
                 {t('dashboard.welcome')},{' '}
-                <span className="font-bold text-black dark:text-white">{user.email.split('@')[0]}</span>.
+                <span className="font-bold text-black dark:text-white">{user.username || user.email.split('@')[0]}</span>.
             </p>
         </div>
         <button 

@@ -212,7 +212,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700 flex items-center gap-3">
                         <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors">
                             <div className="flex flex-col items-end leading-none">
-                                <span className="text-xs font-bold dark:text-gray-300 group-hover:text-neo-violet transition-colors">{user.email.split('@')[0]}</span>
+                                <span className="text-xs font-bold dark:text-gray-300 group-hover:text-neo-violet transition-colors">{user.username || user.email.split('@')[0]}</span>
                             </div>
                             <div className="bg-black dark:bg-white rounded-full p-1">
                                 <UserIcon className="w-3 h-3 text-white dark:text-black" />

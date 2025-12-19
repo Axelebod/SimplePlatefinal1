@@ -803,7 +803,7 @@ export const StudioProject: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold dark:text-white">{review.author_username || review.author_email || 'Anonymous'}</span>
+                    <span className="font-bold dark:text-white">{review.author_username || review.author_email?.split('@')[0] || 'Utilisateur'}</span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       {new Date(review.created_at).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}
                     </span>

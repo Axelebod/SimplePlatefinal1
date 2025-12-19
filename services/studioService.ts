@@ -498,6 +498,7 @@ export async function getProjectReviews(projectId: string): Promise<Review[]> {
   return (data || []).map((review) => ({
     ...review,
     author_email: review.profiles?.email,
+    author_username: review.profiles?.username,
   })) as Review[];
 }
 
