@@ -30,6 +30,7 @@ export const StudioProject: React.FC = () => {
   const [showPromoCodeInput, setShowPromoCodeInput] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [applyingPromoCode, setApplyingPromoCode] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const tools = React.useMemo(() => getTools(language), [language]);
 
   useSEO({
