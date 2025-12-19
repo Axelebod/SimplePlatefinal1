@@ -72,11 +72,27 @@ export const Studio: React.FC = () => {
 
     setVoting(projectId);
     try {
+      // Optimistically update UI
+      setProjects(prevProjects => 
+        prevProjects.map(project => {
+          if (project.id === projectId) {
+            const wasVoted = project.user_voted;
+            return {
+              ...project,
+              user_voted: !wasVoted,
+              votes_count: wasVoted ? project.votes_count - 1 : project.votes_count + 1,
+            };
+          }
+          return project;
+        })
+      );
+
       await voteProject(projectId);
-      await loadProjects(); // Reload to update vote counts
       success(language === 'fr' ? 'Vote enregistré !' : 'Vote recorded!');
     } catch (error) {
       console.error('Error voting:', error);
+      // Revert optimistic update on error
+      await loadProjects();
       showError(language === 'fr' ? 'Erreur lors du vote' : 'Error voting');
     } finally {
       setVoting(null);

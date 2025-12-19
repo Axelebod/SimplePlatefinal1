@@ -118,11 +118,20 @@ export const StudioProject: React.FC = () => {
 
     setVoting(true);
     try {
+      // Optimistically update UI
+      const wasVoted = project.user_voted;
+      setProject({
+        ...project,
+        user_voted: !wasVoted,
+        votes_count: wasVoted ? project.votes_count - 1 : project.votes_count + 1,
+      });
+
       await voteProject(project.id);
-      await loadProject();
       success(language === 'fr' ? 'Vote enregistré !' : 'Vote recorded!');
     } catch (error) {
       console.error('Error voting:', error);
+      // Revert optimistic update on error
+      await loadProject();
       showError(language === 'fr' ? 'Erreur lors du vote' : 'Error voting');
     } finally {
       setVoting(false);
