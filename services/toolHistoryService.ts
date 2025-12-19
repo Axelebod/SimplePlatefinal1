@@ -164,7 +164,7 @@ export const getRecentActivity = async (limit: number = 5): Promise<ToolResult[]
 
   const { data, error } = await supabase
     .from('tool_results')
-    .select('id, tool_id, created_at, credits_used, metadata')
+    .select('id, tool_id, created_at, credits_used, metadata, user_id, output_type')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -174,7 +174,18 @@ export const getRecentActivity = async (limit: number = 5): Promise<ToolResult[]
     return [];
   }
 
-  return data || [];
+  // Map to ToolResult format with defaults for missing fields
+  return (data || []).map((item: any) => ({
+    id: item.id,
+    user_id: item.user_id || user.id,
+    tool_id: item.tool_id,
+    inputs: {}, // Not needed for recent activity display
+    output: '', // Not needed for recent activity display
+    output_type: item.output_type || 'text',
+    credits_used: item.credits_used || 0,
+    created_at: item.created_at,
+    metadata: item.metadata || {},
+  })) as ToolResult[];
 };
 
 // ============================================

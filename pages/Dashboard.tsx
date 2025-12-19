@@ -457,7 +457,7 @@ export const Dashboard: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-3 text-sm">
                         <span className="text-gray-500 dark:text-gray-300">
-                          -{activity.credits_used} {activity.credits_used > 1 ? t('tools.credits') : t('tools.credit')}
+                          -{activity.credits_used || 0} {(activity.credits_used || 0) > 1 ? t('tools.credits') : t('tools.credit')}
                         </span>
                         {toolMeta && (
                           <Link
