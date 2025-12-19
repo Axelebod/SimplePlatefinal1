@@ -196,7 +196,15 @@ export const StudioProject: React.FC = () => {
   };
 
   const handleUnlockAudit = async () => {
-    if (!user || !project) return;
+    if (!user || !project) {
+      showError(language === 'fr' ? 'Vous devez être connecté pour débloquer l\'audit' : 'You must be logged in to unlock the audit');
+      return;
+    }
+
+    if (!project.user_owns) {
+      showError(language === 'fr' ? 'Seul le propriétaire du projet peut débloquer l\'audit' : 'Only the project owner can unlock the audit');
+      return;
+    }
 
     if (credits < 50) {
       warning(language === 'fr' 
@@ -208,19 +216,45 @@ export const StudioProject: React.FC = () => {
 
     setUnlocking(true);
     try {
+      console.log('Starting audit unlock for project:', project.id, 'User:', user.id, 'Credits:', credits);
       const result = await unlockProjectAudit(project.id, language);
+      console.log('Audit unlock result:', result);
+      
       if (result.success) {
         await loadProject();
         await refreshCredits();
         success(language === 'fr' ? 'Audit débloqué avec succès! Analyse complète générée.' : 'Audit unlocked successfully! Complete analysis generated.');
       } else {
         const errorMsg = result.error || (language === 'fr' ? 'Erreur lors du déblocage' : 'Error unlocking');
-        console.error('Audit unlock failed:', errorMsg);
+        console.error('Audit unlock failed:', errorMsg, result);
         showError(errorMsg);
       }
     } catch (error: any) {
       console.error('Error unlocking audit:', error);
-      const errorMsg = error?.message || (language === 'fr' ? 'Erreur lors du déblocage de l\'audit. Veuillez réessayer.' : 'Error unlocking audit. Please try again.');
+      console.error('Error stack:', error?.stack);
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+      });
+      
+      // Provide more specific error messages
+      let errorMsg = error?.message || (language === 'fr' ? 'Erreur lors du déblocage de l\'audit' : 'Error unlocking audit');
+      
+      if (error?.message?.includes('not owned by user') || error?.message?.includes('not found')) {
+        errorMsg = language === 'fr' 
+          ? 'Projet introuvable ou vous n\'êtes pas le propriétaire'
+          : 'Project not found or you are not the owner';
+      } else if (error?.message?.includes('credits')) {
+        errorMsg = language === 'fr'
+          ? 'Erreur lors de la déduction des crédits. L\'audit a peut-être été généré quand même.'
+          : 'Error deducting credits. The audit may have been generated anyway.';
+      } else if (error?.message?.includes('API') || error?.message?.includes('clé')) {
+        errorMsg = language === 'fr'
+          ? 'Erreur de configuration API. Veuillez contacter le support.'
+          : 'API configuration error. Please contact support.';
+      }
+      
       showError(errorMsg);
     } finally {
       setUnlocking(false);
@@ -554,14 +588,24 @@ export const StudioProject: React.FC = () => {
               <button
                 onClick={handleUnlockAudit}
                 disabled={unlocking || !user}
-                className="flex items-center gap-2 px-4 py-2 bg-neo-yellow border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+                className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50 ${
+                  credits >= 50 
+                    ? 'bg-neo-yellow text-black' 
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                }`}
               >
                 {unlocking ? (
-                  language === 'fr' ? 'Déblocage...' : 'Unlocking...'
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+                    {language === 'fr' ? 'Génération de l\'audit...' : 'Generating audit...'}
+                  </>
                 ) : (
                   <>
                     <Unlock className="w-4 h-4" />
-                    {language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)'}
+                    {credits >= 50 
+                      ? (language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)')
+                      : (language === 'fr' ? `Débloquer l'audit (50 crédits - Vous avez ${credits})` : `Unlock audit (50 credits - You have ${credits})`)
+                    }
                   </>
                 )}
               </button>

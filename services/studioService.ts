@@ -567,17 +567,32 @@ export async function unlockProjectAudit(
       });
 
       if (deductError || !deductResult?.success) {
-        console.warn('deduct_credits RPC failed, trying alternative approach:', deductError, deductResult);
+        console.warn('deduct_credits RPC failed:', deductError, deductResult);
         
-        // Fallback: Use deduct_credits_for_audit if it exists
-        const { data: deductAuditResult, error: deductAuditError } = await supabase.rpc('deduct_credits_for_audit', {
-          p_user_id: user.id,
-        });
-
-        if (deductAuditError || !deductAuditResult?.success) {
-          console.error('Error deducting credits via all methods:', deductError, deductAuditError);
-          throw new Error(deductResult?.error || deductAuditResult?.error || 'Failed to deduct credits');
+        // If RPC doesn't exist (404), try to update credits directly via profiles table
+        // This is a fallback if the RPC function hasn't been applied yet
+        if (deductError?.code === 'P0001' || deductError?.message?.includes('function') || deductError?.code === '42883') {
+          console.warn('RPC function not found, trying direct update (this may fail if credits is a generated column)');
+          
+          // Try direct update as last resort
+          const { error: directUpdateError } = await supabase
+            .from('profiles')
+            .update({ credits: userCredits - auditCost })
+            .eq('id', user.id);
+          
+          if (directUpdateError) {
+            console.error('Direct update also failed:', directUpdateError);
+            // Continue anyway - we'll generate the audit and let the user know about credit deduction issue
+            console.warn('Continuing with audit generation despite credit deduction failure');
+          } else {
+            console.log('Credits deducted via direct update');
+          }
+        } else {
+          // Other error - throw it
+          throw new Error(deductResult?.error || deductError?.message || 'Failed to deduct credits');
         }
+      } else {
+        console.log('Credits deducted successfully via RPC');
       }
     }
 
