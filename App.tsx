@@ -7,24 +7,51 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './contexts/ToastContext';
 
+// Helper function pour gérer les erreurs de chargement avec retry
+const lazyWithRetry = (componentImport: () => Promise<any>, retries = 3) => {
+  return lazy(async () => {
+    let lastError: Error | null = null;
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        const module = await componentImport();
+        return module;
+      } catch (error: any) {
+        lastError = error;
+        console.warn(`Failed to load module (attempt ${i + 1}/${retries}):`, error);
+        
+        // Si c'est une erreur de réseau, attendre avant de réessayer
+        if (i < retries - 1 && (error?.message?.includes('fetch') || error?.message?.includes('Failed to fetch'))) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        } else {
+          break;
+        }
+      }
+    }
+    
+    // Si tous les essais ont échoué, re-lancer l'erreur
+    throw lastError || new Error('Failed to load module after retries');
+  });
+};
+
 // Lazy load des pages pour améliorer les performances (code splitting)
-const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
-const ToolPage = lazy(() => import('./pages/ToolPage').then(m => ({ default: m.ToolPage })));
-const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
-const Legal = lazy(() => import('./pages/Legal').then(m => ({ default: m.Legal })));
-const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
-const Auth = lazy(() => import('./pages/Auth').then(m => ({ default: m.Auth })));
-const ResetPassword = lazy(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })));
-const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
-const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
-const Sitemap = lazy(() => import('./pages/Sitemap').then(m => ({ default: m.Sitemap })));
-const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
-const Blog = lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
-const BlogPost = lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
-const Studio = lazy(() => import('./pages/Studio').then(m => ({ default: m.Studio })));
-const StudioSubmit = lazy(() => import('./pages/StudioSubmit').then(m => ({ default: m.StudioSubmit })));
-const StudioProject = lazy(() => import('./pages/StudioProject').then(m => ({ default: m.StudioProject })));
-const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })));
+const Home = lazyWithRetry(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const ToolPage = lazyWithRetry(() => import('./pages/ToolPage').then(m => ({ default: m.ToolPage })));
+const Pricing = lazyWithRetry(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
+const Legal = lazyWithRetry(() => import('./pages/Legal').then(m => ({ default: m.Legal })));
+const Privacy = lazyWithRetry(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
+const Auth = lazyWithRetry(() => import('./pages/Auth').then(m => ({ default: m.Auth })));
+const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })));
+const Contact = lazyWithRetry(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
+const Sitemap = lazyWithRetry(() => import('./pages/Sitemap').then(m => ({ default: m.Sitemap })));
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const Blog = lazyWithRetry(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
+const Studio = lazyWithRetry(() => import('./pages/Studio').then(m => ({ default: m.Studio })));
+const StudioSubmit = lazyWithRetry(() => import('./pages/StudioSubmit').then(m => ({ default: m.StudioSubmit })));
+const StudioProject = lazyWithRetry(() => import('./pages/StudioProject').then(m => ({ default: m.StudioProject })));
+const About = lazyWithRetry(() => import('./pages/About').then(m => ({ default: m.About })));
 
 // Composant de chargement simple
 const LoadingFallback = () => (

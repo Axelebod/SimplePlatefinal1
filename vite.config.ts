@@ -53,9 +53,17 @@ export default defineConfig(({ mode }) => {
               'ui-vendor': ['lucide-react', 'react-markdown'],
               'store-vendor': ['zustand', '@supabase/supabase-js'],
             },
+            // Améliorer la stabilité des noms de chunks
+            chunkFileNames: 'assets/[name]-[hash].js',
+            entryFileNames: 'assets/[name]-[hash].js',
+            assetFileNames: 'assets/[name]-[hash].[ext]',
           },
         },
         chunkSizeWarningLimit: 1000, // Augmenter la limite pour éviter les warnings
+        // Améliorer la gestion des erreurs de chargement
+        commonjsOptions: {
+          include: [/node_modules/],
+        },
       },
     };
 });
