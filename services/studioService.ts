@@ -632,16 +632,11 @@ export async function unlockProjectAudit(
   }
 
   try {
-    // Perform complete AI audit
-    const auditResult = await performCompleteAudit(
-      project.url,
-      project.name,
-      project.description || '',
-      language
-    );
-
-    // Deduct credits only if not skipping credit check
+    // IMPORTANT: Deduct credits FIRST, before generating the audit
+    // This ensures credits are deducted even if audit generation fails
     if (!skipCreditCheck) {
+      console.log('Deducting credits before audit generation...');
+      
       // Try deduct_credits RPC first
       const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
         p_user_id: user.id,
@@ -649,34 +644,54 @@ export async function unlockProjectAudit(
       });
 
       if (deductError || !deductResult?.success) {
-        console.warn('deduct_credits RPC failed:', deductError, deductResult);
+        console.error('deduct_credits RPC failed:', deductError, deductResult);
         
-        // If RPC doesn't exist (404), try to update credits directly via profiles table
-        // This is a fallback if the RPC function hasn't been applied yet
+        // If RPC doesn't exist, try unlock_project_audit RPC (which handles credit deduction)
         if (deductError?.code === 'P0001' || deductError?.message?.includes('function') || deductError?.code === '42883') {
-          console.warn('RPC function not found, trying direct update (this may fail if credits is a generated column)');
+          console.warn('deduct_credits RPC not found, trying unlock_project_audit RPC');
           
-          // Try direct update as last resort
-          const { error: directUpdateError } = await supabase
-            .from('profiles')
-            .update({ credits: userCredits - auditCost })
-            .eq('id', user.id);
+          const { data: unlockResult, error: unlockError } = await supabase.rpc('unlock_project_audit', {
+            p_project_id: projectId,
+            p_user_id: user.id,
+          });
           
-          if (directUpdateError) {
-            console.error('Direct update also failed:', directUpdateError);
-            // Continue anyway - we'll generate the audit and let the user know about credit deduction issue
-            console.warn('Continuing with audit generation despite credit deduction failure');
-          } else {
-            console.log('Credits deducted via direct update');
+          if (unlockError || !unlockResult?.success) {
+            console.error('unlock_project_audit RPC also failed:', unlockError, unlockResult);
+            throw new Error(unlockResult?.error || unlockError?.message || 'Failed to deduct credits');
+          }
+          
+          // If unlock_project_audit succeeded, it already unlocked the audit in the database
+          // We still need to generate and save the audit result
+          console.log('Credits deducted via unlock_project_audit RPC, audit unlocked in DB');
+          
+          // Re-fetch project to check if it's already unlocked
+          const { data: updatedProject } = await supabase
+            .from('projects')
+            .select('is_audit_unlocked')
+            .eq('id', projectId)
+            .single();
+          
+          if (updatedProject?.is_audit_unlocked) {
+            // Audit was already unlocked by the RPC, just generate and save the result
+            console.log('Audit already unlocked by RPC, generating audit result...');
           }
         } else {
-          // Other error - throw it
+          // Other error - throw it (don't generate audit if credits can't be deducted)
           throw new Error(deductResult?.error || deductError?.message || 'Failed to deduct credits');
         }
       } else {
-        console.log('Credits deducted successfully via RPC');
+        console.log('Credits deducted successfully via deduct_credits RPC');
       }
     }
+
+    // Now generate the audit (credits already deducted)
+    console.log('Generating audit...');
+    const auditResult = await performCompleteAudit(
+      project.url,
+      project.name,
+      project.description || '',
+      language
+    );
 
     // Update project with audit result
     const { error: updateError } = await supabase
@@ -692,9 +707,18 @@ export async function unlockProjectAudit(
       throw new Error('Failed to save audit');
     }
 
+    // Get updated credits to return accurate remaining amount
+    const { data: updatedProfile } = await supabase
+      .from('profiles')
+      .select('credits')
+      .eq('id', user.id)
+      .single();
+
+    const remainingCredits = updatedProfile?.credits || (skipCreditCheck ? userCredits : userCredits - auditCost);
+
     return {
       success: true,
-      credits_remaining: skipCreditCheck ? userCredits : userCredits - auditCost,
+      credits_remaining: remainingCredits,
     };
   } catch (error: any) {
     console.error('Error performing audit:', error);
