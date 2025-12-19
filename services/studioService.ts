@@ -891,7 +891,7 @@ export async function unlockProjectAudit(
         .from('projects')
         .update({
           is_audit_unlocked: true,
-          ai_score: fallbackAudit,
+          ai_score: JSON.parse(JSON.stringify(fallbackAudit)) as any, // Ensure valid JSON serialization
         })
         .eq('id', projectId);
       
