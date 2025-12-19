@@ -712,17 +712,21 @@ export async function unlockProjectAudit(
     );
 
     // Update project with audit result
+    // Ensure auditResult is a valid JSON-serializable object
+    const auditData = JSON.parse(JSON.stringify(auditResult)); // Deep clone and ensure serializable
+    
     const { error: updateError } = await supabase
       .from('projects')
       .update({
         is_audit_unlocked: true,
-        ai_score: auditResult,
+        ai_score: auditData as any, // Supabase will handle JSONB serialization
       })
       .eq('id', projectId);
 
     if (updateError) {
       console.error('Error updating project:', updateError);
-      throw new Error('Failed to save audit');
+      console.error('Update error details:', updateError.message, updateError.details, updateError.hint);
+      throw new Error(`Failed to save audit: ${updateError.message}`);
     }
 
     // Get updated credits to return accurate remaining amount
