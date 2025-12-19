@@ -227,8 +227,8 @@ export const StudioProject: React.FC = () => {
     }
 
     if (!confirm(language === 'fr' 
-      ? 'Boostez ce projet pour 24h avec 100 crédits ? Il apparaîtra en haut du classement.'
-      : 'Boost this project for 24h with 100 credits? It will appear at the top of the leaderboard.')) {
+      ? 'Boostez ce projet pour 1 semaine avec 100 crédits ? Il apparaîtra en haut du classement.'
+      : 'Boost this project for 1 week with 100 credits? It will appear at the top of the leaderboard.')) {
       return;
     }
 
@@ -238,7 +238,7 @@ export const StudioProject: React.FC = () => {
       if (result.success) {
         await loadProject();
         await refreshCredits();
-        success(language === 'fr' ? 'Projet boosté pour 24h !' : 'Project boosted for 24h!');
+        success(language === 'fr' ? 'Projet boosté pour 1 semaine !' : 'Project boosted for 1 week!');
       } else {
         showError(result.error || (language === 'fr' ? 'Erreur lors du boost' : 'Error boosting'));
       }
@@ -429,6 +429,13 @@ export const StudioProject: React.FC = () => {
           </div>
 
           <div className="flex-1">
+            {/* Boost Badge - Above project name */}
+            {project.is_boosted && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-neo-yellow border-2 border-black rounded-md text-xs font-bold mb-2 w-fit">
+                <Crown className="w-3 h-3" />
+                {language === 'fr' ? 'BOOSTÉ' : 'BOOSTED'}
+              </div>
+            )}
             <h1 className="font-display text-3xl md:text-4xl font-bold dark:text-white mb-2">
               {project.name}
             </h1>
@@ -472,7 +479,7 @@ export const StudioProject: React.FC = () => {
                     <Crown className="w-4 h-4" />
                     {boosting 
                       ? (language === 'fr' ? 'Boost...' : 'Boosting...')
-                      : (language === 'fr' ? 'Boost 24h (100 crédits)' : 'Boost 24h (100 credits)')}
+                      : (language === 'fr' ? 'Boost 1 semaine (100 crédits)' : 'Boost 1 week (100 credits)')}
                   </button>
                 )}
                 {project.is_boosted && project.boosted_until && (

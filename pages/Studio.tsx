@@ -97,8 +97,8 @@ export const Studio: React.FC = () => {
     }
 
     if (!confirm(language === 'fr' 
-      ? 'Boostez ce projet pour 24h avec 100 crédits ?'
-      : 'Boost this project for 24h with 100 credits?')) {
+      ? 'Boostez ce projet pour 1 semaine avec 100 crédits ?'
+      : 'Boost this project for 1 week with 100 credits?')) {
       return;
     }
 
@@ -108,7 +108,7 @@ export const Studio: React.FC = () => {
       if (result.success) {
         await loadProjects();
         await refreshCredits();
-        success(language === 'fr' ? 'Projet boosté pour 24h !' : 'Project boosted for 24h!');
+        success(language === 'fr' ? 'Projet boosté pour 1 semaine !' : 'Project boosted for 1 week!');
       } else {
         showError(result.error || (language === 'fr' ? 'Erreur lors du boost' : 'Error boosting'));
       }
@@ -229,14 +229,6 @@ export const Studio: React.FC = () => {
                   : 'border-black dark:border-white'
               }`}
             >
-              {/* Boost Badge */}
-              {project.is_boosted && (
-                <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-neo-yellow border-2 border-black rounded-md text-xs font-bold">
-                  <Crown className="w-3 h-3" />
-                  {language === 'fr' ? 'BOOSTÉ' : 'BOOSTED'}
-                </div>
-              )}
-
               {/* Project Header */}
               <div className="flex items-start justify-between mb-4 gap-4">
                 {(() => {
@@ -257,6 +249,13 @@ export const Studio: React.FC = () => {
                   ) : null;
                 })()}
                 <div className="flex-1">
+                  {/* Boost Badge - Above project name */}
+                  {project.is_boosted && (
+                    <div className="flex items-center gap-1 px-2 py-1 bg-neo-yellow border-2 border-black rounded-md text-xs font-bold mb-2 w-fit">
+                      <Crown className="w-3 h-3" />
+                      {language === 'fr' ? 'BOOSTÉ' : 'BOOSTED'}
+                    </div>
+                  )}
                   <h3 className="font-display font-bold text-xl dark:text-white mb-1 line-clamp-2">
                     {project.name}
                   </h3>
