@@ -205,6 +205,8 @@ export const StudioProject: React.FC = () => {
         message: error?.message,
         code: error?.code,
         details: error?.details,
+        hint: error?.hint,
+        response: error?.response,
       });
       
       // Provide more specific error messages
@@ -222,6 +224,10 @@ export const StudioProject: React.FC = () => {
         errorMsg = language === 'fr'
           ? 'Erreur de configuration API. Veuillez contacter le support.'
           : 'API configuration error. Please contact support.';
+      } else if (error?.message?.includes('json') || error?.message?.includes('JSON') || error?.message?.includes('invalid input syntax')) {
+        errorMsg = language === 'fr'
+          ? 'Erreur de format des données. Veuillez réessayer ou contacter le support.'
+          : 'Data format error. Please try again or contact support.';
       }
       
       showError(errorMsg);
