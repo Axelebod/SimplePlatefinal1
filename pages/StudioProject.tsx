@@ -101,9 +101,9 @@ export const StudioProject: React.FC = () => {
   };
 
   const loadReviews = async () => {
-    if (!id) return;
+    if (!project) return;
     try {
-      const data = await getProjectReviews(id);
+      const data = await getProjectReviews(project.id);
       setReviews(data);
     } catch (error) {
       console.error('Error loading reviews:', error);
@@ -298,6 +298,7 @@ export const StudioProject: React.FC = () => {
 
   const handleSubmitReview = async () => {
     if (!user || !project) {
+      showError(language === 'fr' ? 'Vous devez être connecté pour publier un avis' : 'You must be logged in to submit a review');
       return;
     }
 
@@ -315,12 +316,18 @@ export const StudioProject: React.FC = () => {
     try {
       const reviewData: SubmitReviewData = {
         project_id: project.id,
-        content: reviewContent,
+        content: reviewContent.trim(), // Trim whitespace
         rating: reviewRating,
       };
+      
+      console.log('Submitting review:', reviewData);
       const review = await submitReview(reviewData);
+      console.log('Review submitted successfully:', review);
+      
       if (review) {
-        setReviews([review, ...reviews]);
+        // Reload all reviews to get the latest data with usernames
+        await loadReviews();
+        
         setReviewContent('');
         setReviewRating(5);
         setShowReviewForm(false);
@@ -333,14 +340,40 @@ export const StudioProject: React.FC = () => {
             : `Review published! You earned ${creditsEarned} credit${creditsEarned > 1 ? 's' : ''}.`);
         } else {
           success(language === 'fr' 
-            ? 'Avis publié ! (Limite quotidienne de crédits atteinte)' 
-            : 'Review published! (Daily credit limit reached)');
+            ? 'Avis publié avec succès !' 
+            : 'Review published successfully!');
         }
         await refreshCredits();
+      } else {
+        throw new Error('Review submission returned null');
       }
     } catch (error: any) {
       console.error('Error submitting review:', error);
-      showError(error?.message || (language === 'fr' ? 'Erreur lors de la publication de l\'avis' : 'Error publishing review'));
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+      });
+      
+      let errorMsg = error?.message || (language === 'fr' ? 'Erreur lors de la publication de l\'avis' : 'Error publishing review');
+      
+      // Provide more specific error messages
+      if (error?.message?.includes('duplicate') || error?.code === '23505') {
+        errorMsg = language === 'fr' 
+          ? 'Vous avez déjà publié un avis pour ce projet. Vous pouvez le modifier en publiant un nouvel avis.'
+          : 'You have already reviewed this project. You can update it by submitting a new review.';
+      } else if (error?.message?.includes('permission') || error?.code === '42501') {
+        errorMsg = language === 'fr' 
+          ? 'Vous n\'avez pas la permission de publier un avis. Vérifiez que vous êtes connecté.'
+          : 'You do not have permission to submit a review. Please check that you are logged in.';
+      } else if (error?.message?.includes('length') || error?.message?.includes('100')) {
+        errorMsg = language === 'fr' 
+          ? 'Le commentaire doit contenir au moins 100 caractères.'
+          : 'Review must contain at least 100 characters.';
+      }
+      
+      showError(errorMsg);
     } finally {
       setSubmittingReview(false);
     }

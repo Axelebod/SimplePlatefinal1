@@ -453,7 +453,7 @@ export async function submitReview(data: SubmitReviewData): Promise<Review | nul
     .insert({
       project_id: data.project_id,
       author_id: user.id,
-      content: data.content,
+      content: data.content.trim(), // Ensure trimmed content
       rating: data.rating,
     })
     .select()
@@ -461,7 +461,18 @@ export async function submitReview(data: SubmitReviewData): Promise<Review | nul
 
   if (error) {
     console.error('Error submitting review:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     throw error;
+  }
+
+  if (!review) {
+    console.error('Review insertion returned no data');
+    throw new Error('Failed to create review - no data returned');
   }
 
   // Earn credits from review (via RPC function)
