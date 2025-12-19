@@ -214,11 +214,14 @@ export const StudioProject: React.FC = () => {
         await refreshCredits();
         success(language === 'fr' ? 'Audit débloqué avec succès! Analyse complète générée.' : 'Audit unlocked successfully! Complete analysis generated.');
       } else {
-        showError(result.error || (language === 'fr' ? 'Erreur lors du déblocage' : 'Error unlocking'));
+        const errorMsg = result.error || (language === 'fr' ? 'Erreur lors du déblocage' : 'Error unlocking');
+        console.error('Audit unlock failed:', errorMsg);
+        showError(errorMsg);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error unlocking audit:', error);
-      showError(language === 'fr' ? 'Erreur lors du déblocage' : 'Error unlocking');
+      const errorMsg = error?.message || (language === 'fr' ? 'Erreur lors du déblocage de l\'audit. Veuillez réessayer.' : 'Error unlocking audit. Please try again.');
+      showError(errorMsg);
     } finally {
       setUnlocking(false);
     }

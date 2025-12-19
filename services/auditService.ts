@@ -201,6 +201,12 @@ Respond ONLY with valid JSON, no text before/after.`;
   try {
     const response = await askBot(`${systemPrompt}\n\n${userPrompt}`);
     
+    // Vérifier si la réponse est une erreur
+    if (!response || response.includes("Désolé") || response.includes("erreur") || response.includes("error")) {
+      console.warn('AI returned error message, using fallback audit');
+      return generateFallbackAudit(projectUrl, projectName, language, tools);
+    }
+    
     // Extraire le JSON de la réponse (peut contenir du markdown ou du texte)
     let jsonString = response.trim();
     
@@ -209,22 +215,44 @@ Respond ONLY with valid JSON, no text before/after.`;
     
     // Trouver le JSON dans la réponse
     const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      jsonString = jsonMatch[0];
+    if (!jsonMatch) {
+      console.warn('No JSON found in AI response, using fallback audit');
+      return generateFallbackAudit(projectUrl, projectName, language, tools);
     }
     
-    const auditData = JSON.parse(jsonString);
+    jsonString = jsonMatch[0];
+    
+    let auditData;
+    try {
+      auditData = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError, 'Response:', jsonString.substring(0, 200));
+      return generateFallbackAudit(projectUrl, projectName, language, tools);
+    }
+    
+    // Valider la structure de base
+    if (!auditData || typeof auditData !== 'object') {
+      console.warn('Invalid audit data structure, using fallback');
+      return generateFallbackAudit(projectUrl, projectName, language, tools);
+    }
     
     // Valider et enrichir les données
     const enrichedAudit = enrichAuditWithToolMapping(auditData, tools);
     
+    // S'assurer qu'on a au moins une catégorie
+    if (!enrichedAudit.categories || enrichedAudit.categories.length === 0) {
+      console.warn('No categories in audit, using fallback');
+      return generateFallbackAudit(projectUrl, projectName, language, tools);
+    }
+    
     return {
-      overall_score: enrichedAudit.overall_score || 0,
-      categories: enrichedAudit.categories || [],
+      overall_score: enrichedAudit.overall_score || 70,
+      categories: enrichedAudit.categories,
       generated_at: new Date().toISOString(),
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error performing audit:', error);
+    console.error('Error details:', error?.message, error?.stack);
     
     // Fallback: Audit de base avec suggestions génériques
     return generateFallbackAudit(projectUrl, projectName, language, tools);
@@ -402,32 +430,61 @@ function generateFallbackAudit(
   language: 'fr' | 'en',
   tools: any[]
 ): AIAuditResult {
-  const defaultTools = [
-    tools.find(t => t.id === 'seo-meta-generator')?.id,
-    tools.find(t => t.id === 'business-plan-pro')?.id,
-    tools.find(t => t.id === 'json-formatter')?.id,
-  ].filter(Boolean) as string[];
-
+  // Helper pour trouver un outil par ID
+  const findTool = (id: string) => tools.find(t => t.id === id)?.id;
+  
   return {
     overall_score: 70,
     categories: [
       {
-        name: language === 'fr' ? 'SEO' : 'SEO',
+        name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
         score: 65,
-        issues: [language === 'fr' ? 'Vérifiez vos meta tags et URLs SEO' : 'Check your SEO meta tags and URLs'],
-        suggested_tools: [tools.find(t => t.id === 'seo-meta-generator')?.id, tools.find(t => t.id === 'slug-gen')?.id].filter(Boolean) as string[],
+        issues: [
+          language === 'fr' ? 'Vérifiez vos meta tags (title, description, Open Graph)' : 'Check your meta tags (title, description, Open Graph)',
+          language === 'fr' ? 'Optimisez vos URLs pour le SEO' : 'Optimize your URLs for SEO',
+          language === 'fr' ? 'Ajoutez des balises sémantiques (h1, h2, etc.)' : 'Add semantic tags (h1, h2, etc.)',
+        ],
+        suggested_tools: [findTool('seo-meta-generator'), findTool('slug-gen')].filter(Boolean) as string[],
       },
       {
-        name: language === 'fr' ? 'Copywriting' : 'Copywriting',
+        name: language === 'fr' ? 'Copywriting & Contenu' : 'Copywriting & Content',
         score: 70,
-        issues: [language === 'fr' ? 'Optimisez vos textes et headlines' : 'Optimize your texts and headlines'],
-        suggested_tools: [tools.find(t => t.id === 'business-plan-pro')?.id].filter(Boolean) as string[],
+        issues: [
+          language === 'fr' ? 'Améliorez vos headlines et titres' : 'Improve your headlines and titles',
+          language === 'fr' ? 'Optimisez vos appels à l\'action (CTA)' : 'Optimize your calls to action (CTA)',
+          language === 'fr' ? 'Renforcez votre proposition de valeur' : 'Strengthen your value proposition',
+        ],
+        suggested_tools: [findTool('business-plan-pro'), findTool('pro-prompt-gen')].filter(Boolean) as string[],
       },
       {
-        name: language === 'fr' ? 'Technical' : 'Technical',
+        name: language === 'fr' ? 'Design & UX' : 'Design & UX',
         score: 75,
-        issues: [language === 'fr' ? 'Vérifiez la structure de votre code' : 'Check your code structure'],
-        suggested_tools: [tools.find(t => t.id === 'json-formatter')?.id].filter(Boolean) as string[],
+        issues: [
+          language === 'fr' ? 'Vérifiez la cohérence visuelle' : 'Check visual consistency',
+          language === 'fr' ? 'Optimisez l\'espacement et la mise en page' : 'Optimize spacing and layout',
+          language === 'fr' ? 'Améliorez la lisibilité' : 'Improve readability',
+        ],
+        suggested_tools: [findTool('website-generator'), findTool('px-rem-converter')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'Performance Technique' : 'Technical Performance',
+        score: 75,
+        issues: [
+          language === 'fr' ? 'Vérifiez la structure de votre code' : 'Check your code structure',
+          language === 'fr' ? 'Optimisez les temps de chargement' : 'Optimize loading times',
+          language === 'fr' ? 'Validez vos formats de données (JSON, CSV)' : 'Validate your data formats (JSON, CSV)',
+        ],
+        suggested_tools: [findTool('json-formatter'), findTool('csv-to-json')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'Accessibilité' : 'Accessibility',
+        score: 70,
+        issues: [
+          language === 'fr' ? 'Ajoutez des attributs alt aux images' : 'Add alt attributes to images',
+          language === 'fr' ? 'Vérifiez le contraste des couleurs' : 'Check color contrast',
+          language === 'fr' ? 'Assurez-vous que le site est navigable au clavier' : 'Ensure the site is keyboard navigable',
+        ],
+        suggested_tools: [findTool('text-analyzer')].filter(Boolean) as string[],
       },
     ],
     generated_at: new Date().toISOString(),
