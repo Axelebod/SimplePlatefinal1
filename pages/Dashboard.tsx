@@ -14,6 +14,7 @@ import { useSEO } from '../hooks/useSEO';
 import { getUserProjects, deleteProject } from '../services/studioService';
 import type { Project } from '../types/studio';
 import { useToast } from '../contexts/ToastContext';
+import { getProjectImageUrl } from '../utils/faviconUtils';
 
 export const Dashboard: React.FC = () => {
   const { user, credits, logout, refreshCredits, updateUsername } = useUserStore();
@@ -247,7 +248,23 @@ export const Dashboard: React.FC = () => {
                 key={project.id}
                 className="border-2 border-black dark:border-white rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
               >
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between mb-2 gap-3">
+                  {(() => {
+                    const imageUrl = getProjectImageUrl(project);
+                    return imageUrl ? (
+                      <img 
+                        src={imageUrl} 
+                        alt={`${project.name}`} 
+                        className="w-12 h-12 object-contain border-2 border-black dark:border-white rounded-md flex-shrink-0"
+                        onError={(e) => {
+                          if (project.logo_url || project.screenshot_url) {
+                            const target = e.target as HTMLImageElement;
+                            target.src = getProjectImageUrl({ url: project.url });
+                          }
+                        }}
+                      />
+                    ) : null;
+                  })()}
                   <Link
                     to={`/studio/project/${project.slug || project.id}`}
                     className="flex-1"

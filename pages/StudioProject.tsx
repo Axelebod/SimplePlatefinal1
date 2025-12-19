@@ -9,6 +9,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { getTools } from '../tools-config';
 import { useToast } from '../contexts/ToastContext';
+import { getProjectImageUrl, getFaviconUrl } from '../utils/faviconUtils';
 
 export const StudioProject: React.FC = () => {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -391,12 +392,40 @@ export const StudioProject: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           {/* Logo and Screenshot */}
           <div className="flex flex-col gap-4">
-            {project.logo_url && (
-              <img src={project.logo_url} alt={`${project.name} logo`} className="w-24 h-24 object-contain border-2 border-black dark:border-white rounded-md" />
-            )}
-            {project.screenshot_url && (
-              <img src={project.screenshot_url} alt={`${project.name} screenshot`} className="w-full md:w-96 h-48 object-cover border-2 border-black dark:border-white rounded-md" />
-            )}
+            {(() => {
+              const logoUrl = project.logo_url || getFaviconUrl(project.url, 128);
+              return logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt={`${project.name} ${project.logo_url ? 'logo' : 'favicon'}`} 
+                  className="w-24 h-24 object-contain border-2 border-black dark:border-white rounded-md"
+                  onError={(e) => {
+                    // Fallback to favicon if logo fails to load
+                    if (project.logo_url) {
+                      const target = e.target as HTMLImageElement;
+                      target.src = getFaviconUrl(project.url, 128);
+                    }
+                  }}
+                />
+              ) : null;
+            })()}
+            {(() => {
+              const screenshotUrl = project.screenshot_url || getFaviconUrl(project.url, 256);
+              return screenshotUrl ? (
+                <img 
+                  src={screenshotUrl} 
+                  alt={`${project.name} ${project.screenshot_url ? 'screenshot' : 'favicon'}`} 
+                  className="w-full md:w-96 h-48 object-cover border-2 border-black dark:border-white rounded-md"
+                  onError={(e) => {
+                    // Fallback to favicon if screenshot fails to load
+                    if (project.screenshot_url) {
+                      const target = e.target as HTMLImageElement;
+                      target.src = getFaviconUrl(project.url, 256);
+                    }
+                  }}
+                />
+              ) : null;
+            })()}
           </div>
 
           <div className="flex-1">

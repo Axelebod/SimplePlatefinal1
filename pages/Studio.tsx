@@ -9,6 +9,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { useToast } from '../contexts/ToastContext';
 import { ProjectCardSkeleton } from '../components/LoadingSkeleton';
+import { getProjectImageUrl } from '../utils/faviconUtils';
 
 export const Studio: React.FC = () => {
   const { user, credits } = useUserStore();
@@ -238,9 +239,23 @@ export const Studio: React.FC = () => {
 
               {/* Project Header */}
               <div className="flex items-start justify-between mb-4 gap-4">
-                {project.logo_url && (
-                  <img src={project.logo_url} alt={`${project.name} logo`} className="w-16 h-16 object-contain border-2 border-black dark:border-white rounded-md flex-shrink-0" />
-                )}
+                {(() => {
+                  const imageUrl = getProjectImageUrl(project);
+                  return imageUrl ? (
+                    <img 
+                      src={imageUrl} 
+                      alt={`${project.name} ${project.logo_url ? 'logo' : project.screenshot_url ? 'screenshot' : 'favicon'}`} 
+                      className="w-16 h-16 object-contain border-2 border-black dark:border-white rounded-md flex-shrink-0"
+                      onError={(e) => {
+                        // Fallback to favicon if image fails to load
+                        if (project.logo_url || project.screenshot_url) {
+                          const target = e.target as HTMLImageElement;
+                          target.src = getProjectImageUrl({ url: project.url });
+                        }
+                      }}
+                    />
+                  ) : null;
+                })()}
                 <div className="flex-1">
                   <h3 className="font-display font-bold text-xl dark:text-white mb-1 line-clamp-2">
                     {project.name}
