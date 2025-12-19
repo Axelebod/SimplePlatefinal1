@@ -91,6 +91,8 @@ RÈGLES STRICTES:
 5. Sois ULTRA-PRÉCIS et ACTIONNABLE:
    - Détecte au moins 3-5 problèmes par catégorie
    - Chaque problème doit être spécifique et mesurable
+   - Suggère des outils SimplePlate UNIQUEMENT si vraiment pertinent (pas systématique)
+   - Si le score est bon (>80), ne suggère pas d'outils
 
 7. Score: 0-100 pour chaque catégorie et overall_score (sois sévère mais juste)
 
@@ -110,7 +112,8 @@ STRICT RULES:
     {
       "name": "Design & UI",
       "score": 80,
-      "issues": ["Issue 1", "Issue 2"]
+      "issues": ["Issue 1", "Issue 2"],
+      "suggested_tools": ["tool-id-1"] // Optional: suggest 1-2 tools ONLY if really relevant
     }
   ]
 }
@@ -127,6 +130,8 @@ STRICT RULES:
 5. Be PRECISE and ACTIONABLE:
    - Detect at least 3-5 issues per category
    - Each issue must be specific and measurable
+   - Suggest SimplePlate tools ONLY if really relevant (not systematic)
+   - If score is good (>80), don't suggest tools
 
 6. Score: 0-100 for each category and overall_score
 
@@ -251,11 +256,28 @@ function enrichAuditWithToolMapping(
   tools: any[]
 ): AIAuditResult {
   const enrichedCategories = (auditData.categories || []).map((category: any) => {
+    let suggestedTools = category.suggested_tools || [];
+    
+    // Si pas d'outils suggérés par l'IA, essayer de les déduire intelligemment
+    if (suggestedTools.length === 0 && category.issues) {
+      suggestedTools = inferToolsFromIssues(category.issues, category.name, tools);
+    }
+    
+    // Valider que les outils existent
+    const validTools = suggestedTools.filter((toolId: string) =>
+      tools.some(t => t.id === toolId)
+    );
+    
+    // Proposer des outils seulement si c'est pertinent (score < 80 ou problèmes critiques)
+    const shouldSuggestTools = (category.score || 0) < 80 || validTools.length > 0;
+    
     return {
       name: category.name,
       score: Math.max(0, Math.min(100, category.score || 0)),
       issues: category.issues || [],
-      suggested_tools: [], // No tools suggested
+      suggested_tools: shouldSuggestTools && validTools.length > 0 
+        ? validTools.slice(0, 2) // Limiter à 2 outils max par catégorie
+        : [],
     };
   });
   
