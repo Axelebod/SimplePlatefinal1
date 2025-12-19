@@ -712,65 +712,24 @@ export async function unlockProjectAudit(
     );
 
     // Update project with audit result
-    // Ensure auditResult is a valid JSON-serializable object
-    // Remove any undefined values and ensure all fields are properly typed
-    const cleanAuditResult = {
-      overall_score: Number(auditResult.overall_score) || 70,
-      categories: (auditResult.categories || []).map((cat: any) => ({
-        name: String(cat.name || ''),
-        score: Number(cat.score) || 0,
-        issues: Array.isArray(cat.issues) ? cat.issues.map((i: any) => String(i || '')) : [],
-        suggested_tools: Array.isArray(cat.suggested_tools) ? cat.suggested_tools.map((t: any) => String(t || '')) : [],
-      })),
-      generated_at: String(auditResult.generated_at || new Date().toISOString()),
-    };
-    
-    // Validate JSON serialization before sending
-    try {
-      JSON.stringify(cleanAuditResult);
-    } catch (jsonError) {
-      console.error('JSON serialization error:', jsonError);
-      throw new Error('Audit data is not valid JSON');
-    }
-    
-    console.log('Saving audit with structure:', {
-      overall_score: cleanAuditResult.overall_score,
-      categories_count: cleanAuditResult.categories.length,
-      generated_at: cleanAuditResult.generated_at,
-    });
-    
-    // Try using RPC function first (more reliable for JSONB)
-    const { data: rpcResult, error: rpcError } = await supabase.rpc('save_audit_result', {
-      p_project_id: projectId,
-      p_user_id: user.id,
-      p_audit_data: cleanAuditResult,
-    });
+    // Simple approach: let Supabase handle JSONB serialization automatically
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({
+        is_audit_unlocked: true,
+        ai_score: auditResult,
+      })
+      .eq('id', projectId);
 
-    if (rpcError || !rpcResult?.success) {
-      console.warn('RPC save_audit_result failed, trying direct update:', rpcError);
-      
-      // Fallback to direct update
-      const { error: updateError } = await supabase
-        .from('projects')
-        .update({
-          is_audit_unlocked: true,
-          ai_score: cleanAuditResult,
-        })
-        .eq('id', projectId);
-
-      if (updateError) {
-        console.error('Error updating project:', updateError);
-        console.error('Update error details:', {
-          message: updateError.message,
-          details: updateError.details,
-          hint: updateError.hint,
-          code: updateError.code,
-        });
-        console.error('Audit data that failed:', JSON.stringify(cleanAuditResult, null, 2));
-        throw new Error(`Failed to save audit: ${updateError.message}`);
-      }
-    } else {
-      console.log('Audit saved successfully via RPC');
+    if (updateError) {
+      console.error('Error updating project:', updateError);
+      console.error('Update error details:', {
+        message: updateError.message,
+        details: updateError.details,
+        hint: updateError.hint,
+        code: updateError.code,
+      });
+      throw new Error(`Failed to save audit: ${updateError.message}`);
     }
 
     // Get updated credits to return accurate remaining amount
@@ -931,31 +890,11 @@ export async function unlockProjectAudit(
         };
       
       // Update project with fallback audit
-      // Clean and validate fallback audit data
-      const cleanFallbackAudit = {
-        overall_score: Number(fallbackAudit.overall_score) || 70,
-        categories: (fallbackAudit.categories || []).map((cat: any) => ({
-          name: String(cat.name || ''),
-          score: Number(cat.score) || 0,
-          issues: Array.isArray(cat.issues) ? cat.issues.map((i: any) => String(i || '')) : [],
-          suggested_tools: Array.isArray(cat.suggested_tools) ? cat.suggested_tools.map((t: any) => String(t || '')) : [],
-        })),
-        generated_at: String(fallbackAudit.generated_at || new Date().toISOString()),
-      };
-      
-      // Validate JSON serialization
-      try {
-        JSON.stringify(cleanFallbackAudit);
-      } catch (jsonError) {
-        console.error('Fallback audit JSON serialization error:', jsonError);
-        throw jsonError;
-      }
-      
       const { error: updateError } = await supabase
         .from('projects')
         .update({
           is_audit_unlocked: true,
-          ai_score: cleanFallbackAudit,
+          ai_score: fallbackAudit,
         })
         .eq('id', projectId);
       
