@@ -917,11 +917,31 @@ export async function unlockProjectAudit(
         };
       
       // Update project with fallback audit
+      // Clean and validate fallback audit data
+      const cleanFallbackAudit = {
+        overall_score: Number(fallbackAudit.overall_score) || 70,
+        categories: (fallbackAudit.categories || []).map((cat: any) => ({
+          name: String(cat.name || ''),
+          score: Number(cat.score) || 0,
+          issues: Array.isArray(cat.issues) ? cat.issues.map((i: any) => String(i || '')) : [],
+          suggested_tools: Array.isArray(cat.suggested_tools) ? cat.suggested_tools.map((t: any) => String(t || '')) : [],
+        })),
+        generated_at: String(fallbackAudit.generated_at || new Date().toISOString()),
+      };
+      
+      // Validate JSON serialization
+      try {
+        JSON.stringify(cleanFallbackAudit);
+      } catch (jsonError) {
+        console.error('Fallback audit JSON serialization error:', jsonError);
+        throw jsonError;
+      }
+      
       const { error: updateError } = await supabase
         .from('projects')
         .update({
           is_audit_unlocked: true,
-          ai_score: JSON.parse(JSON.stringify(fallbackAudit)) as any, // Ensure valid JSON serialization
+          ai_score: cleanFallbackAudit,
         })
         .eq('id', projectId);
       
