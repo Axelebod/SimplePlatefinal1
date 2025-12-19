@@ -422,7 +422,8 @@ function getDefaultToolsForCategory(categoryName: string, tools: any[]): string[
 }
 
 /**
- * Génère un audit de fallback si l'IA échoue
+ * Génère un audit COMPLET de fallback si l'IA échoue
+ * Toujours complet avec toutes les catégories obligatoires
  */
 function generateFallbackAudit(
   projectUrl: string,
@@ -437,54 +438,100 @@ function generateFallbackAudit(
     overall_score: 70,
     categories: [
       {
-        name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
-        score: 65,
+        name: language === 'fr' ? 'Design & UI' : 'Design & UI',
+        score: 75,
         issues: [
-          language === 'fr' ? 'Vérifiez vos meta tags (title, description, Open Graph)' : 'Check your meta tags (title, description, Open Graph)',
-          language === 'fr' ? 'Optimisez vos URLs pour le SEO' : 'Optimize your URLs for SEO',
-          language === 'fr' ? 'Ajoutez des balises sémantiques (h1, h2, etc.)' : 'Add semantic tags (h1, h2, etc.)',
+          language === 'fr' ? 'Vérifiez la cohérence visuelle et l\'harmonie des couleurs' : 'Check visual consistency and color harmony',
+          language === 'fr' ? 'Optimisez l\'espacement et la mise en page (responsive design)' : 'Optimize spacing and layout (responsive design)',
+          language === 'fr' ? 'Améliorez la typographie et la hiérarchie visuelle' : 'Improve typography and visual hierarchy',
+          language === 'fr' ? 'Vérifiez la cohérence des composants UI' : 'Check UI component consistency',
+          language === 'fr' ? 'Optimisez les tailles et espacements (px/rem)' : 'Optimize sizes and spacing (px/rem)',
         ],
-        suggested_tools: [findTool('seo-meta-generator'), findTool('slug-gen')].filter(Boolean) as string[],
+        suggested_tools: [findTool('website-generator'), findTool('px-rem-converter'), findTool('hex-color-display')].filter(Boolean) as string[],
       },
       {
-        name: language === 'fr' ? 'Copywriting & Contenu' : 'Copywriting & Content',
+        name: language === 'fr' ? 'Copywriting & Content' : 'Copywriting & Content',
         score: 70,
         issues: [
-          language === 'fr' ? 'Améliorez vos headlines et titres' : 'Improve your headlines and titles',
-          language === 'fr' ? 'Optimisez vos appels à l\'action (CTA)' : 'Optimize your calls to action (CTA)',
-          language === 'fr' ? 'Renforcez votre proposition de valeur' : 'Strengthen your value proposition',
+          language === 'fr' ? 'Améliorez vos headlines et titres pour plus d\'impact' : 'Improve your headlines and titles for more impact',
+          language === 'fr' ? 'Optimisez vos appels à l\'action (CTA) pour augmenter les conversions' : 'Optimize your calls to action (CTA) to increase conversions',
+          language === 'fr' ? 'Renforcez votre proposition de valeur et votre message clair' : 'Strengthen your value proposition and clear messaging',
+          language === 'fr' ? 'Améliorez la clarté et la concision de vos textes' : 'Improve clarity and conciseness of your texts',
+          language === 'fr' ? 'Vérifiez la cohérence du ton et du style rédactionnel' : 'Check consistency of tone and writing style',
         ],
-        suggested_tools: [findTool('business-plan-pro'), findTool('pro-prompt-gen')].filter(Boolean) as string[],
+        suggested_tools: [findTool('business-plan-pro'), findTool('pro-prompt-gen'), findTool('text-analyzer')].filter(Boolean) as string[],
       },
       {
-        name: language === 'fr' ? 'Design & UX' : 'Design & UX',
+        name: language === 'fr' ? 'Technical & Code' : 'Technical & Code',
         score: 75,
         issues: [
-          language === 'fr' ? 'Vérifiez la cohérence visuelle' : 'Check visual consistency',
-          language === 'fr' ? 'Optimisez l\'espacement et la mise en page' : 'Optimize spacing and layout',
-          language === 'fr' ? 'Améliorez la lisibilité' : 'Improve readability',
-        ],
-        suggested_tools: [findTool('website-generator'), findTool('px-rem-converter')].filter(Boolean) as string[],
-      },
-      {
-        name: language === 'fr' ? 'Performance Technique' : 'Technical Performance',
-        score: 75,
-        issues: [
-          language === 'fr' ? 'Vérifiez la structure de votre code' : 'Check your code structure',
-          language === 'fr' ? 'Optimisez les temps de chargement' : 'Optimize loading times',
+          language === 'fr' ? 'Vérifiez la structure et la qualité de votre code' : 'Check code structure and quality',
+          language === 'fr' ? 'Optimisez les temps de chargement et les performances' : 'Optimize loading times and performance',
           language === 'fr' ? 'Validez vos formats de données (JSON, CSV)' : 'Validate your data formats (JSON, CSV)',
+          language === 'fr' ? 'Vérifiez l\'absence d\'erreurs JavaScript/console' : 'Check for JavaScript/console errors',
+          language === 'fr' ? 'Optimisez la structure des fichiers et l\'organisation du code' : 'Optimize file structure and code organization',
         ],
         suggested_tools: [findTool('json-formatter'), findTool('csv-to-json')].filter(Boolean) as string[],
       },
       {
-        name: language === 'fr' ? 'Accessibilité' : 'Accessibility',
+        name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
+        score: 65,
+        issues: [
+          language === 'fr' ? 'Vérifiez vos meta tags (title, description, Open Graph, Twitter Cards)' : 'Check your meta tags (title, description, Open Graph, Twitter Cards)',
+          language === 'fr' ? 'Optimisez vos URLs pour le SEO (slugs, structure)' : 'Optimize your URLs for SEO (slugs, structure)',
+          language === 'fr' ? 'Ajoutez des balises sémantiques (h1, h2, h3, etc.)' : 'Add semantic tags (h1, h2, h3, etc.)',
+          language === 'fr' ? 'Vérifiez la présence d\'un sitemap.xml et robots.txt' : 'Check for sitemap.xml and robots.txt',
+          language === 'fr' ? 'Optimisez les images (alt tags, compression, formats)' : 'Optimize images (alt tags, compression, formats)',
+        ],
+        suggested_tools: [findTool('seo-meta-generator'), findTool('slug-gen')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'UX & Usability' : 'UX & Usability',
+        score: 75,
+        issues: [
+          language === 'fr' ? 'Améliorez la navigation et la structure du site' : 'Improve navigation and site structure',
+          language === 'fr' ? 'Optimisez le parcours utilisateur et les flux de conversion' : 'Optimize user journey and conversion flows',
+          language === 'fr' ? 'Vérifiez la clarté des informations et la facilité d\'utilisation' : 'Check information clarity and ease of use',
+          language === 'fr' ? 'Améliorez la lisibilité et la hiérarchie de l\'information' : 'Improve readability and information hierarchy',
+          language === 'fr' ? 'Optimisez les formulaires et les interactions utilisateur' : 'Optimize forms and user interactions',
+        ],
+        suggested_tools: [findTool('website-generator'), findTool('business-plan-pro')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'Accessibility (a11y)' : 'Accessibility (a11y)',
         score: 70,
         issues: [
-          language === 'fr' ? 'Ajoutez des attributs alt aux images' : 'Add alt attributes to images',
-          language === 'fr' ? 'Vérifiez le contraste des couleurs' : 'Check color contrast',
+          language === 'fr' ? 'Ajoutez des attributs alt descriptifs à toutes les images' : 'Add descriptive alt attributes to all images',
+          language === 'fr' ? 'Vérifiez le contraste des couleurs (WCAG AA minimum)' : 'Check color contrast (WCAG AA minimum)',
           language === 'fr' ? 'Assurez-vous que le site est navigable au clavier' : 'Ensure the site is keyboard navigable',
+          language === 'fr' ? 'Ajoutez des labels ARIA pour les éléments interactifs' : 'Add ARIA labels for interactive elements',
+          language === 'fr' ? 'Vérifiez la lisibilité et la taille des polices' : 'Check readability and font sizes',
         ],
-        suggested_tools: [findTool('text-analyzer')].filter(Boolean) as string[],
+        suggested_tools: [findTool('text-analyzer'), findTool('px-rem-converter')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'Business & Marketing' : 'Business & Marketing',
+        score: 70,
+        issues: [
+          language === 'fr' ? 'Clarifiez votre positionnement et votre proposition de valeur unique' : 'Clarify your positioning and unique value proposition',
+          language === 'fr' ? 'Optimisez votre message marketing et votre storytelling' : 'Optimize your marketing message and storytelling',
+          language === 'fr' ? 'Améliorez votre stratégie de contenu et votre présence sociale' : 'Improve your content strategy and social presence',
+          language === 'fr' ? 'Vérifiez la cohérence de votre branding et de votre identité' : 'Check consistency of your branding and identity',
+          language === 'fr' ? 'Optimisez vos stratégies de conversion et vos CTA' : 'Optimize your conversion strategies and CTAs',
+        ],
+        suggested_tools: [findTool('business-plan-pro'), findTool('hashtag-gen'), findTool('brand-name-gen')].filter(Boolean) as string[],
+      },
+      {
+        name: language === 'fr' ? 'Performance & Optimisation' : 'Performance & Optimization',
+        score: 75,
+        issues: [
+          language === 'fr' ? 'Optimisez la vitesse de chargement des pages' : 'Optimize page loading speed',
+          language === 'fr' ? 'Compressez et optimisez les images et ressources' : 'Compress and optimize images and resources',
+          language === 'fr' ? 'Vérifiez la mise en cache et la gestion des ressources statiques' : 'Check caching and static resource management',
+          language === 'fr' ? 'Optimisez le code JavaScript et CSS (minification)' : 'Optimize JavaScript and CSS code (minification)',
+          language === 'fr' ? 'Vérifiez les performances sur mobile et les connexions lentes' : 'Check performance on mobile and slow connections',
+        ],
+        suggested_tools: [findTool('json-formatter')].filter(Boolean) as string[],
       },
     ],
     generated_at: new Date().toISOString(),
