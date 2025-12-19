@@ -71,10 +71,6 @@ export const BlogPost: React.FC = () => {
       <h1 className="font-display text-4xl md:text-5xl font-bold dark:text-white">{post.h1}</h1>
       <p className="mt-3 text-gray-600 dark:text-gray-300">{post.excerpt}</p>
 
-      <div className="mt-6 overflow-hidden rounded-lg border-2 border-black dark:border-gray-600 bg-white dark:bg-gray-800 shadow-neo dark:shadow-none">
-        <img src={post.cover.src} alt={post.cover.alt} className="w-full h-auto" />
-      </div>
-
       <div className="mt-8 prose prose-sm max-w-none markdown-body dark:prose-invert">
         <ReactMarkdown>{post.bodyMarkdown}</ReactMarkdown>
       </div>
@@ -105,14 +101,6 @@ export const BlogPost: React.FC = () => {
                 to={`/blog/${p.slug}`}
                 className="group bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden shadow-neo dark:shadow-none hover:-translate-y-0.5 transition-transform"
               >
-                <div className="aspect-[16/9] bg-gray-50 dark:bg-gray-900 border-b-2 border-black dark:border-gray-600">
-                  <img
-                    src={p.cover.src}
-                    alt={p.cover.alt}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between gap-4 text-xs font-bold text-gray-500 dark:text-gray-400">
                     <span>{p.publishedAt}</span>

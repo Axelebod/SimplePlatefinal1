@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
-import { ToolResult, ToolTemplate, ToolStats, ExportOptions } from '../types/toolHistory';
+import { ToolResult, ToolStats, ExportOptions } from '../types/toolHistory';
 
 // ============================================
 // HISTORIQUE DES RÉSULTATS
@@ -135,79 +135,6 @@ export const toggleFavorite = async (resultId: string, isFavorite: boolean, isPr
     .eq('user_id', user.id);
 
   return { success: !error };
-};
-
-// ============================================
-// TEMPLATES / PRÉSETS
-// ============================================
-
-export const saveTemplate = async (
-  toolId: string,
-  name: string,
-  inputs: Record<string, any>,
-  description?: string,
-  isPublic: boolean = false
-): Promise<ToolTemplate | null> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data, error } = await supabase
-    .from('tool_templates')
-    .insert({
-      user_id: user.id,
-      tool_id: toolId,
-      name,
-      description,
-      inputs,
-      is_public: isPublic,
-      usage_count: 0
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error saving template:', error);
-    return null;
-  }
-
-  return data;
-};
-
-export const getTemplates = async (
-  toolId: string,
-  includePublic: boolean = true
-): Promise<ToolTemplate[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  let query = supabase
-    .from('tool_templates')
-    .select('*')
-    .eq('tool_id', toolId)
-    .order('usage_count', { ascending: false });
-
-  if (includePublic) {
-    query = query.or(`user_id.eq.${user.id},is_public.eq.true`);
-  } else {
-    query = query.eq('user_id', user.id);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('Error fetching templates:', error);
-    return [];
-  }
-
-  return data || [];
-};
-
-export const useTemplate = async (templateId: string): Promise<boolean> => {
-  const { error } = await supabase.rpc('increment_template_usage', {
-    p_template_id: templateId
-  });
-
-  return !error;
 };
 
 // ============================================

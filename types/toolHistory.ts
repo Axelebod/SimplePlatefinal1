@@ -15,18 +15,6 @@ export interface ToolResult {
   metadata?: Record<string, any>; // Données additionnelles (ex: temps de génération, modèle utilisé)
 }
 
-export interface ToolTemplate {
-  id: string;
-  user_id: string;
-  tool_id: string;
-  name: string;
-  description?: string;
-  inputs: Record<string, any>; // Template des inputs
-  is_public: boolean;
-  created_at: string;
-  usage_count: number;
-}
-
 export interface ToolFavorite {
   id: string;
   user_id: string;
@@ -40,7 +28,6 @@ export interface ToolStats {
   total_credits_spent: number;
   last_used?: string;
   favorite_count: number;
-  template_count: number;
 }
 
 export interface ExportOptions {

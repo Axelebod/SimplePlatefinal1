@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Eye, FileText, Mail, Database, Cookie, UserCheck } from 'lucide-react';
+import { Shield, Lock, Eye, FileText, Mail, Database, Cookie, UserCheck, Rocket } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 
@@ -74,7 +74,24 @@ export const Privacy: React.FC = () => {
                 <li>Nombre de crédits utilisés et restants</li>
                 <li>Statut d'abonnement PRO</li>
                 <li>Préférences (mode sombre/clair)</li>
+                <li>Pseudo/username (optionnel, visible publiquement)</li>
               </ul>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+              <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                <Rocket className="w-5 h-5" /> Données SimplePlate Studio
+              </h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Projets soumis (nom, URL, description, logo, screenshot, liens sociaux)</li>
+                <li>Avis et commentaires sur les projets (contenu, note)</li>
+                <li>Votes sur les projets</li>
+                <li>Résultats d'audit IA (scores, analyses)</li>
+                <li>Crédits gagnés via les avis (historique quotidien)</li>
+              </ul>
+              <p className="text-sm mt-2 text-gray-600">
+                <strong>Note :</strong> Les projets soumis sont publics et visibles par tous. Vos avis et votes sont également publics mais anonymisés (pseudo visible).
+              </p>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
@@ -118,6 +135,7 @@ export const Privacy: React.FC = () => {
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Gestion de votre compte :</strong> Création, authentification, gestion des crédits</li>
             <li><strong>Fourniture des services :</strong> Accès aux outils IA et utilitaires</li>
+            <li><strong>SimplePlate Studio :</strong> Publication de projets, génération d'audits IA, gestion des avis et votes, classements communautaires</li>
             <li><strong>Facturation :</strong> Gestion des paiements et abonnements</li>
             <li><strong>Support client :</strong> Réponse à vos demandes et assistance</li>
             <li><strong>Amélioration du service :</strong> Analyse statistique anonymisée de l'utilisation</li>
@@ -130,6 +148,7 @@ export const Privacy: React.FC = () => {
           <h2 className="text-2xl font-bold border-b-2 border-black pb-2 mb-4">5. Durée de conservation</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Données de compte :</strong> Conservées pendant la durée de votre compte, puis 3 ans après suppression</li>
+            <li><strong>SimplePlate Studio :</strong> Les projets, avis et votes sont conservés indéfiniment sauf demande de suppression. Les audits IA sont conservés avec les projets.</li>
             <li><strong>Données de transaction :</strong> Conservées 10 ans (obligation comptable)</li>
             <li><strong>Données techniques :</strong> Conservées 13 mois maximum</li>
             <li><strong>Cookies :</strong> Voir notre <Link to="/legal" className="text-neo-violet font-bold underline">politique de cookies</Link></li>

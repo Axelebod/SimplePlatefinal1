@@ -9,6 +9,7 @@ import { StatsCounter } from '../components/StatsCounter';
 import { HomeCTA } from '../components/HomeCTA';
 import { TrustBadges } from '../components/TrustBadges';
 import { WelcomeModal } from '../components/WelcomeModal';
+import { StudioBanner } from '../components/StudioBanner';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 
@@ -62,6 +63,9 @@ export const Home: React.FC = () => {
 
       {/* CTA pour non-connectés */}
       <HomeCTA />
+
+      {/* Studio Banner */}
+      <StudioBanner />
 
       {/* Stats Counter */}
       <StatsCounter className="max-w-4xl mx-auto" />

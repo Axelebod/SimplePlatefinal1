@@ -1,34 +1,46 @@
 
 import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { SITE_CONFIG } from '../constants';
 import { supabase } from '../lib/supabaseClient';
-import { Zap, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock } from 'lucide-react';
+import { Zap, CreditCard, Settings, LogOut, TrendingUp, AlertTriangle, Package, Clock, Rocket, ExternalLink, User, Edit2, Check, X, Trash2 } from 'lucide-react';
 import { getRecentActivity } from '../services/toolHistoryService';
 import { ToolResult } from '../types/toolHistory';
 import { getTools } from '../tools-config';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
+import { getUserProjects, deleteProject } from '../services/studioService';
+import type { Project } from '../types/studio';
+import { useToast } from '../contexts/ToastContext';
 
 export const Dashboard: React.FC = () => {
-  const { user, credits, logout, refreshCredits } = useUserStore();
+  const { user, credits, logout, refreshCredits, updateUsername } = useUserStore();
+  const [isEditingUsername, setIsEditingUsername] = React.useState(false);
+  const [newUsername, setNewUsername] = React.useState('');
+  const [usernameError, setUsernameError] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { t, language } = useTranslation();
   const tools = React.useMemo(() => getTools(language), [language]);
+  const { success, error: showError } = useToast();
   const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [recentActivity, setRecentActivity] = useState<ToolResult[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [myProjects, setMyProjects] = useState<Project[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
 
   useSEO({
     title: language === 'fr' ? 'Tableau de bord | SimplePlate AI' : 'Dashboard | SimplePlate AI',
-    description:
-      language === 'fr'
-        ? 'Espace membre (crédits, activité récente, compte).'
-        : 'Member area (credits, recent activity, account).',
+    description: language === 'fr'
+      ? 'Gérez vos crédits, consultez votre historique d\'outils et vos projets SimplePlate Studio.'
+      : 'Manage your credits, view your tools history and SimplePlate Studio projects.',
     language,
-    noindex: true,
+    keywords: language === 'fr'
+      ? ['tableau de bord', 'crédits', 'historique', 'projets', 'SimplePlate Studio']
+      : ['dashboard', 'credits', 'history', 'projects', 'SimplePlate Studio'],
+    noindex: true, // Private page
   });
 
   useEffect(() => {
@@ -71,6 +83,7 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     if (user) {
       loadRecentActivity();
+      loadMyProjects();
     }
   }, [user]);
 
@@ -80,6 +93,19 @@ export const Dashboard: React.FC = () => {
     const data = await getRecentActivity(6);
     setRecentActivity(data);
     setActivityLoading(false);
+  };
+
+  const loadMyProjects = async () => {
+    if (!user) return;
+    setProjectsLoading(true);
+    try {
+      const data = await getUserProjects(user.id);
+      setMyProjects(data);
+    } catch (error) {
+      console.error('Error loading projects:', error);
+    } finally {
+      setProjectsLoading(false);
+    }
   };
 
   // Timer en temps réel
@@ -199,6 +225,92 @@ export const Dashboard: React.FC = () => {
 
       </div>
 
+      {/* SECTION PHASE 2: MY PROJECTS */}
+      {myProjects.length > 0 && (
+        <div className="mb-12 bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
+              <Rocket className="w-6 h-6 text-neo-violet" />
+              {language === 'fr' ? 'Mes Projets (Studio)' : 'My Projects (Studio)'}
+            </h2>
+            <Link
+              to="/studio"
+              className="text-sm font-bold text-neo-violet hover:underline"
+            >
+              {language === 'fr' ? 'Voir le Studio →' : 'View Studio →'}
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {myProjects.slice(0, 4).map((project) => (
+              <div
+                key={project.id}
+                className="border-2 border-black dark:border-white rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <Link
+                    to={`/studio/project/${project.slug || project.id}`}
+                    className="flex-1"
+                  >
+                    <h3 className="font-bold dark:text-white line-clamp-1 hover:underline">{project.name}</h3>
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded">
+                      {project.votes_count} {language === 'fr' ? 'votes' : 'votes'}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(language === 'fr' 
+                          ? 'Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.'
+                          : 'Are you sure you want to delete this project? This action cannot be undone.')) {
+                          return;
+                        }
+                        
+                        setDeletingProjectId(project.id);
+                        try {
+                          const result = await deleteProject(project.id);
+                          if (result.success) {
+                            setMyProjects(myProjects.filter(p => p.id !== project.id));
+                            success(language === 'fr' ? 'Projet supprimé avec succès' : 'Project deleted successfully');
+                          } else {
+                            showError(result.message || (language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project'));
+                          }
+                        } catch (error) {
+                          console.error('Error deleting project:', error);
+                          showError(language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project');
+                        } finally {
+                          setDeletingProjectId(null);
+                        }
+                      }}
+                      disabled={deletingProjectId === project.id}
+                      className="p-1.5 text-neo-red hover:bg-neo-red/10 rounded transition-colors disabled:opacity-50"
+                      title={language === 'fr' ? 'Supprimer le projet' : 'Delete project'}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-neo-violet hover:underline"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  {project.url}
+                </a>
+                {!project.is_audit_unlocked && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    {language === 'fr' 
+                      ? `💡 ${credits >= 50 ? 'Débloquez l\'audit IA (50 crédits)' : 'Besoin de 50 crédits pour l\'audit'}`
+                      : `💡 ${credits >= 50 ? 'Unlock AI audit (50 credits)' : 'Need 50 credits for audit'}`}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* SECTION HISTORIQUE / STATS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
@@ -208,6 +320,77 @@ export const Dashboard: React.FC = () => {
                   <Settings className="w-5 h-5" /> {t('dashboard.accountDetails')}
               </h3>
               <ul className="space-y-3 text-sm">
+                  <li className="flex justify-between items-center dark:text-gray-300">
+                      <span className="text-gray-500 flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          {language === 'fr' ? 'Pseudo' : 'Username'}
+                      </span>
+                      {!isEditingUsername ? (
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold">{user.username || (language === 'fr' ? 'Non défini' : 'Not set')}</span>
+                          <button
+                            onClick={() => {
+                              setIsEditingUsername(true);
+                              setNewUsername(user.username || '');
+                              setUsernameError(null);
+                            }}
+                            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-400 rounded transition-colors"
+                            title={language === 'fr' ? 'Modifier le pseudo' : 'Edit username'}
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={newUsername}
+                            onChange={(e) => {
+                              setNewUsername(e.target.value);
+                              setUsernameError(null);
+                            }}
+                            placeholder={language === 'fr' ? 'Votre pseudo' : 'Your username'}
+                            className="px-2 py-1 border-2 border-black dark:border-white rounded text-sm font-bold bg-white dark:bg-gray-600 dark:text-white max-w-[120px]"
+                            maxLength={20}
+                            pattern="[a-z0-9_-]+"
+                          />
+                          <button
+                            onClick={async () => {
+                              if (!newUsername.trim()) {
+                                setUsernameError(language === 'fr' ? 'Le pseudo ne peut pas être vide' : 'Username cannot be empty');
+                                return;
+                              }
+                              try {
+                                await updateUsername(newUsername.trim());
+                                setIsEditingUsername(false);
+                                setUsernameError(null);
+                                await refreshCredits();
+                              } catch (error: any) {
+                                setUsernameError(error.message || (language === 'fr' ? 'Erreur lors de la mise à jour' : 'Error updating'));
+                              }
+                            }}
+                            className="p-1 hover:bg-green-200 dark:hover:bg-green-600 rounded transition-colors"
+                            title={language === 'fr' ? 'Valider' : 'Save'}
+                          >
+                            <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEditingUsername(false);
+                              setNewUsername('');
+                              setUsernameError(null);
+                            }}
+                            className="p-1 hover:bg-red-200 dark:hover:bg-red-600 rounded transition-colors"
+                            title={language === 'fr' ? 'Annuler' : 'Cancel'}
+                          >
+                            <X className="w-3 h-3 text-red-600 dark:text-red-400" />
+                          </button>
+                        </div>
+                      )}
+                  </li>
+                  {usernameError && (
+                    <li className="text-xs text-red-600 dark:text-red-400 font-bold">{usernameError}</li>
+                  )}
                   <li className="flex justify-between dark:text-gray-300">
                       <span className="text-gray-500">{t('contact.email')}</span>
                       <span className="font-bold">{user.email}</span>

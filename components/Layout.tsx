@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
-import { Zap, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock, Languages } from 'lucide-react';
+import { Zap, Menu, X, LogIn, LogOut, User as UserIcon, Moon, Sun, ArrowUp, LayoutDashboard, Clock, Languages, Rocket } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
 import { useTranslation } from '../hooks/useTranslation';
 import { SimpleBot } from './SimpleBot';
@@ -173,6 +173,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
              </button>
 
              <Link 
+               to="/studio" 
+               className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white flex items-center gap-1"
+             >
+               <Rocket className="w-4 h-4" />
+               {language === 'fr' ? 'Studio' : 'Studio'}
+             </Link>
+             <Link 
                to="/pricing" 
                className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white"
              >
@@ -257,7 +264,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                          <div className="w-8 h-8 bg-neo-blue rounded-full flex items-center justify-center border border-black">
                             <UserIcon className="w-4 h-4 text-black" />
                          </div>
-                         <span className="font-bold dark:text-white">{user.email}</span>
+                         <span className="font-bold dark:text-white">{user.username || user.email}</span>
                     </div>
                     <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-gray-600 rounded-md bg-neo-yellow text-black font-bold">
                         <LayoutDashboard className="w-4 h-4" /> Mon Tableau de Bord
@@ -298,6 +305,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none">
                         Se connecter / S'inscrire
                     </Link>
+                    <Link to="/studio" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white flex items-center justify-center gap-2">
+                        <Rocket className="w-4 h-4" />
+                        {language === 'fr' ? 'Studio' : 'Studio'}
+                    </Link>
                     <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white">
                         {t('nav.pricing')}
                     </Link>
@@ -329,6 +340,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex flex-wrap justify-center gap-6 text-sm font-bold underline dark:text-gray-300">
             <Link to="/contact" className="hover:text-neo-violet">Nous Contacter</Link>
             <Link to="/blog">Blog</Link>
+            <Link to="/studio" className="flex items-center gap-1">
+              <Rocket className="w-3 h-3" />
+              Studio
+            </Link>
             <Link to="/legal">Mentions Légales</Link>
             <Link to="/pricing">{t('nav.pricing')}</Link>
             <Link to="/sitemap">Plan du Site</Link>

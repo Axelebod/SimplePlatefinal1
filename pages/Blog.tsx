@@ -39,14 +39,6 @@ export const Blog: React.FC = () => {
             to={`/blog/${post.slug}`}
             className="group bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden shadow-neo dark:shadow-none hover:-translate-y-0.5 transition-transform"
           >
-            <div className="aspect-[16/9] bg-gray-50 dark:bg-gray-900 border-b-2 border-black dark:border-gray-600">
-              <img
-                src={post.cover.src}
-                alt={post.cover.alt}
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div className="p-5">
               <div className="flex items-center justify-between gap-4 text-xs font-bold text-gray-500 dark:text-gray-400">
                 <span>{post.publishedAt}</span>

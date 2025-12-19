@@ -40,7 +40,7 @@ export const useUserStore = create<UserState>()(
         
         // Vérifier et recharger les crédits gratuits hebdomadaires (pour TOUS les utilisateurs, y compris PRO)
         try {
-          await supabase.rpc('reset_weekly_free_credits', { p_user_id: user.id });
+          await supabase.rpc('check_weekly_refill', { p_user_id: user.id });
         } catch (err) {
           console.warn("Erreur lors de la vérification du reset hebdomadaire:", err);
         }
@@ -55,7 +55,7 @@ export const useUserStore = create<UserState>()(
         // FORCER la synchronisation depuis Supabase (ignore localStorage)
         const { data, error } = await supabase
           .from('profiles')
-          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at')
+          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at, username')
           .eq('id', user.id)
           .single();
 
@@ -70,7 +70,11 @@ export const useUserStore = create<UserState>()(
           const isProFromDB = data?.is_pro ?? false;
           const freeCreditsResetDate = data?.free_credits_reset_date ? new Date(data.free_credits_reset_date) : null;
           
+          // Update user with username if available
+          const updatedUser = { ...user, username: data?.username || undefined };
+          
           set({ 
+            user: updatedUser,
             credits: creditsFromDB,
             creditsFree: creditsFreeFromDB,
             creditsPaid: creditsPaidFromDB,
@@ -84,7 +88,7 @@ export const useUserStore = create<UserState>()(
             ...currentStorage.state,
             credits: creditsFromDB,
             isPro: isProFromDB,
-            user: user
+            user: updatedUser
           };
           localStorage.setItem('simpleplate-storage', JSON.stringify(currentStorage));
         }
@@ -96,7 +100,7 @@ export const useUserStore = create<UserState>()(
         
         // Vérifier et recharger les crédits gratuits hebdomadaires (pour TOUS les utilisateurs, y compris PRO)
         try {
-          await supabase.rpc('reset_weekly_free_credits', { p_user_id: user.id });
+          await supabase.rpc('check_weekly_refill', { p_user_id: user.id });
         } catch (err) {
           console.warn("Erreur lors de la vérification du reset hebdomadaire:", err);
         }
@@ -111,7 +115,7 @@ export const useUserStore = create<UserState>()(
         // Rafraîchir les crédits depuis Supabase
         const { data, error } = await supabase
           .from('profiles')
-          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at')
+          .select('credits, credits_free, credits_paid, is_pro, free_credits_reset_date, created_at, username')
           .eq('id', user.id)
           .single();
 
@@ -122,13 +126,27 @@ export const useUserStore = create<UserState>()(
           const isProFromDB = data.is_pro ?? false;
           const freeCreditsResetDate = data.free_credits_reset_date ? new Date(data.free_credits_reset_date) : null;
           
-          set({ 
-            credits: creditsFromDB,
-            creditsFree: creditsFreeFromDB,
-            creditsPaid: creditsPaidFromDB,
-            isPro: isProFromDB,
-            freeCreditsResetDate: freeCreditsResetDate
-          });
+          // Update user with username if available
+          const currentUser = get().user;
+          if (currentUser) {
+            const updatedUser = { ...currentUser, username: data?.username || undefined };
+            set({ 
+              user: updatedUser,
+              credits: creditsFromDB,
+              creditsFree: creditsFreeFromDB,
+              creditsPaid: creditsPaidFromDB,
+              isPro: isProFromDB,
+              freeCreditsResetDate: freeCreditsResetDate
+            });
+          } else {
+            set({ 
+              credits: creditsFromDB,
+              creditsFree: creditsFreeFromDB,
+              creditsPaid: creditsPaidFromDB,
+              isPro: isProFromDB,
+              freeCreditsResetDate: freeCreditsResetDate
+            });
+          }
           
           // Forcer la mise à jour du localStorage aussi
           const currentStorage = JSON.parse(localStorage.getItem('simpleplate-storage') || '{}');
@@ -346,12 +364,43 @@ export const useUserStore = create<UserState>()(
               }
               return { isDarkMode: newDarkMode };
           });
-      }
-      };
-    },
-    {
-      name: 'simpleplate-storage',
-      storage: createJSONStorage(() => localStorage),
+      },
+
+      updateUsername: async (username: string) => {
+        const { user } = get();
+        if (!user) throw new Error('User must be logged in');
+
+        const { data, error } = await supabase.rpc('update_username', {
+          p_user_id: user.id,
+          p_username: username,
+        });
+
+        if (error) {
+          console.error('Error updating username:', error);
+          throw error;
+        }
+
+        if (data && data.success) {
+          // Update user in store
+          const updatedUser = { ...user, username: data.username };
+          set({ user: updatedUser });
+          
+          // Update localStorage
+          const currentStorage = JSON.parse(localStorage.getItem('simpleplate-storage') || '{}');
+          currentStorage.state = {
+            ...currentStorage.state,
+            user: updatedUser
+          };
+          localStorage.setItem('simpleplate-storage', JSON.stringify(currentStorage));
+        } else {
+          throw new Error(data?.error || 'Failed to update username');
+        }
+      },
     }
-  )
+  },
+  {
+    name: 'simpleplate-storage',
+    storage: createJSONStorage(() => localStorage),
+  }
+)
 );

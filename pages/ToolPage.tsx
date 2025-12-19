@@ -9,7 +9,6 @@ import { getLoadingMessages } from '../constants';
 import ReactMarkdown from 'react-markdown';
 import { generateToolSEOContent } from '../utils/toolContentGenerator';
 import { ToolHistory } from '../components/ToolHistory';
-import { ToolTemplates } from '../components/ToolTemplates';
 import { saveToolResult } from '../services/toolHistoryService';
 import { incrementGenerationCounter } from '../services/generationCounterService';
 import { RichTextEditor } from '../components/RichTextEditor';
@@ -1086,14 +1085,9 @@ export const ToolPage: React.FC = () => {
         )}
       </div>
 
-      {/* HISTORIQUE ET TEMPLATES - Micro SaaS Features */}
+      {/* HISTORIQUE - Micro SaaS Features */}
       {isLoggedIn && (
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ToolTemplates 
-            toolId={tool.id} 
-            currentInputs={inputs}
-            onLoadTemplate={handleLoadTemplate}
-          />
+        <div className="mt-8">
           <ToolHistory toolId={tool.id} onLoadTemplate={handleLoadTemplate} />
         </div>
       )}
