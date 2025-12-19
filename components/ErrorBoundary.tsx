@@ -23,6 +23,16 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Si c'est une erreur de chargement de module, essayer de recharger après un délai
+    if (error?.message?.includes('Failed to fetch dynamically imported module') || 
+        error?.message?.includes('Loading chunk') ||
+        error?.message?.includes('ChunkLoadError')) {
+      // Attendre un peu puis recharger
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
   }
 
   private handleReset = () => {
@@ -43,9 +53,15 @@ export class ErrorBoundary extends Component<Props, State> {
             <h2 className="text-xl font-bold dark:text-white mb-2">
               Oups ! Une erreur s'est produite
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
               {this.state.error?.message || 'Une erreur inattendue est survenue.'}
             </p>
+            {(this.state.error?.message?.includes('Failed to fetch dynamically imported module') || 
+               this.state.error?.message?.includes('Loading chunk')) && (
+              <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                Le rechargement automatique va se faire dans quelques secondes...
+              </p>
+            )}
             <button
               onClick={this.handleReset}
               className="px-4 py-2 bg-neo-violet text-white rounded-lg font-bold hover:bg-purple-600 transition-colors flex items-center gap-2 mx-auto"
