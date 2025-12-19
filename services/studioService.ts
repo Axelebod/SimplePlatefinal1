@@ -713,19 +713,49 @@ export async function unlockProjectAudit(
 
     // Update project with audit result
     // Ensure auditResult is a valid JSON-serializable object
-    const auditData = JSON.parse(JSON.stringify(auditResult)); // Deep clone and ensure serializable
+    // Remove any undefined values and ensure all fields are properly typed
+    const cleanAuditResult = {
+      overall_score: Number(auditResult.overall_score) || 70,
+      categories: (auditResult.categories || []).map((cat: any) => ({
+        name: String(cat.name || ''),
+        score: Number(cat.score) || 0,
+        issues: Array.isArray(cat.issues) ? cat.issues.map((i: any) => String(i || '')) : [],
+        suggested_tools: Array.isArray(cat.suggested_tools) ? cat.suggested_tools.map((t: any) => String(t || '')) : [],
+      })),
+      generated_at: String(auditResult.generated_at || new Date().toISOString()),
+    };
+    
+    // Validate JSON serialization before sending
+    try {
+      JSON.stringify(cleanAuditResult);
+    } catch (jsonError) {
+      console.error('JSON serialization error:', jsonError);
+      throw new Error('Audit data is not valid JSON');
+    }
+    
+    console.log('Saving audit with structure:', {
+      overall_score: cleanAuditResult.overall_score,
+      categories_count: cleanAuditResult.categories.length,
+      generated_at: cleanAuditResult.generated_at,
+    });
     
     const { error: updateError } = await supabase
       .from('projects')
       .update({
         is_audit_unlocked: true,
-        ai_score: auditData as any, // Supabase will handle JSONB serialization
+        ai_score: cleanAuditResult,
       })
       .eq('id', projectId);
 
     if (updateError) {
       console.error('Error updating project:', updateError);
-      console.error('Update error details:', updateError.message, updateError.details, updateError.hint);
+      console.error('Update error details:', {
+        message: updateError.message,
+        details: updateError.details,
+        hint: updateError.hint,
+        code: updateError.code,
+      });
+      console.error('Audit data that failed:', JSON.stringify(cleanAuditResult, null, 2));
       throw new Error(`Failed to save audit: ${updateError.message}`);
     }
 
