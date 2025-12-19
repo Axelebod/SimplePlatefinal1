@@ -22,9 +22,9 @@ export const fr = {
     seo: {
       title: 'SimplePlate AI - 50+ Outils IA Professionnels (Dev, Image, Business)',
       description:
-        "Plateforme SaaS avec 50+ outils IA professionnels : Générateur de Business Plan, Convertisseurs, Analyse d'image, et bien plus. Système de crédits disponible.",
+        "Générateur de Business Plan IA, outils de développement web, analyse d'image IA, convertisseurs JSON/CSV, générateur de texte IA, outils SEO, correcteur de style, et 50+ outils professionnels gratuits. Plateforme SaaS avec système de crédits. Créez, codez et produisez plus vite avec l'intelligence artificielle.",
       keywords:
-        'outils ia professionnels, générateur texte ia, outils dev en ligne, saas, intelligence artificielle, crédits ia',
+        'générateur business plan ia, outils développement web, analyse image ia, générateur texte ia, outils seo, convertisseur json csv, correcteur style, outils dev en ligne, saas outils ia, intelligence artificielle, crédits ia, outils productivité, micro-saas',
       ogTitle: 'SimplePlate AI - La Boîte à Outils Ultime',
     },
     hero: {

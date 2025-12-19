@@ -22,9 +22,9 @@ export const en = {
     seo: {
       title: 'SimplePlate AI - 50+ Professional AI Tools (Dev, Image, Business)',
       description:
-        'SaaS platform with 50+ professional AI tools: Business Plan Generator, Converters, Image Analysis, and more. Credit system available.',
+        'AI Business Plan Generator, web development tools, AI image analysis, JSON/CSV converters, AI text generator, SEO tools, style corrector, and 50+ professional free tools. SaaS platform with credit system. Create, code and produce faster with artificial intelligence.',
       keywords:
-        'professional ai tools, ai text generator, online dev tools, ai saas, artificial intelligence, ai credits',
+        'ai business plan generator, web development tools, ai image analysis, ai text generator, seo tools, json csv converter, style corrector, online dev tools, ai saas tools, artificial intelligence, ai credits, productivity tools, micro-saas',
       ogTitle: 'SimplePlate AI - The Ultimate Toolbox',
     },
     hero: {

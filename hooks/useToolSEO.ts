@@ -27,8 +27,13 @@ export const useToolSEO = (tool: ToolConfig | undefined) => {
 
     const isEn = language === 'en';
     const title = isEn ? `${tool.title} | SimplePlate AI` : tool.seo.title;
-    const description = isEn ? tool.description : tool.seo.description;
-    const keywords = isEn ? [tool.title, 'AI tool', 'generator', tool.category, 'SimplePlate AI'] : tool.seo.keywords;
+    // Enrichir la description avec plus de mots-clés et bénéfices
+    const baseDescription = isEn ? tool.description : tool.seo.description;
+    const enrichedDescription = isEn 
+      ? `${baseDescription} Free online ${tool.category.toLowerCase()} tool. Professional results, instant generation. Use ${tool.title} to boost productivity and save time.`
+      : `${baseDescription} Outil ${tool.category.toLowerCase()} gratuit en ligne. Résultats professionnels, génération instantanée. Utilisez ${tool.title} pour booster votre productivité et gagner du temps.`;
+    const description = enrichedDescription.length > 160 ? baseDescription : enrichedDescription; // Limiter à 160 caractères pour SEO
+    const keywords = isEn ? [tool.title, 'AI tool', 'generator', tool.category, 'SimplePlate AI', 'free online tool', 'productivity'] : tool.seo.keywords;
 
     document.title = title;
 

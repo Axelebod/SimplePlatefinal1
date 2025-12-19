@@ -171,6 +171,79 @@ export const Home: React.FC = () => {
          </div>
       </section>
 
+      {/* SEO-RICH THEMATIC SECTIONS */}
+      <section className="py-12 border-t-2 border-black dark:border-white">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <h2 className="text-center font-display text-3xl font-bold mb-8 dark:text-white">
+            {language === 'fr' ? 'Outils par Catégorie' : 'Tools by Category'}
+          </h2>
+          
+          {/* Générateur Business Plan IA */}
+          <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <h3 className="font-display text-2xl font-bold mb-3 dark:text-white">
+              {language === 'fr' ? 'Générateur de Business Plan IA' : 'AI Business Plan Generator'}
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              {language === 'fr' 
+                ? 'Créez un business plan professionnel en quelques minutes avec notre générateur de business plan IA. Analysez votre marché, définissez votre stratégie et structurez votre projet avec l\'intelligence artificielle. Parfait pour les entrepreneurs, startups et porteurs de projets Micro-SaaS.'
+                : 'Create a professional business plan in minutes with our AI business plan generator. Analyze your market, define your strategy and structure your project with artificial intelligence. Perfect for entrepreneurs, startups and Micro-SaaS project leaders.'}
+            </p>
+            <Link 
+              to="/tool/business-plan-pro" 
+              className="inline-flex items-center gap-2 text-neo-violet font-bold hover:underline"
+            >
+              {language === 'fr' ? 'Accéder au générateur' : 'Access the generator'} →
+            </Link>
+          </div>
+
+          {/* Outils de Développement Web */}
+          <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <h3 className="font-display text-2xl font-bold mb-3 dark:text-white">
+              {language === 'fr' ? 'Outils de Développement Web' : 'Web Development Tools'}
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              {language === 'fr' 
+                ? 'Collection complète d\'outils pour développeurs : formateur JSON, convertisseur CSV vers JSON, générateur UUID, générateur de slug SEO, convertisseur PX vers REM, et bien plus. Optimisez votre workflow de développement avec nos outils gratuits en ligne.'
+                : 'Complete collection of developer tools: JSON formatter, CSV to JSON converter, UUID generator, SEO slug generator, PX to REM converter, and more. Optimize your development workflow with our free online tools.'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {tools.filter(t => t.category === 'Dev').slice(0, 5).map(tool => (
+                <Link 
+                  key={tool.id}
+                  to={`/tool/${tool.slug || tool.id}`}
+                  className="px-3 py-1 bg-neo-violet text-white text-sm font-bold rounded-md hover:bg-neo-violet/90 transition-colors"
+                >
+                  {tool.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Outils SEO et Copywriting */}
+          <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+            <h3 className="font-display text-2xl font-bold mb-3 dark:text-white">
+              {language === 'fr' ? 'Outils SEO et Copywriting IA' : 'SEO and AI Copywriting Tools'}
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              {language === 'fr' 
+                ? 'Améliorez votre référencement et votre copywriting avec nos outils IA : générateur de meta tags SEO, générateur de slug URL, correcteur de style, analyseur de texte, et outils de rédaction assistée par IA. Optimisez votre contenu pour Google et convertissez mieux vos visiteurs.'
+                : 'Improve your SEO and copywriting with our AI tools: SEO meta tags generator, URL slug generator, style corrector, text analyzer, and AI-assisted writing tools. Optimize your content for Google and convert more visitors.'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {tools.filter(t => t.category === 'SEO' || t.title.toLowerCase().includes('seo') || t.title.toLowerCase().includes('meta')).slice(0, 5).map(tool => (
+                <Link 
+                  key={tool.id}
+                  to={`/tool/${tool.slug || tool.id}`}
+                  className="px-3 py-1 bg-neo-blue text-white text-sm font-bold rounded-md hover:bg-neo-blue/90 transition-colors"
+                >
+                  {tool.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="max-w-3xl mx-auto pb-12">
          <h2 className="text-center font-display text-3xl font-bold mb-8 dark:text-white">{t('homePage.faq.title')}</h2>
