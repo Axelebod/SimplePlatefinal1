@@ -143,17 +143,10 @@ export const StudioProject: React.FC = () => {
     }
   };
 
-  // Load free audits remaining count for current user
+  // Load free audits remaining count (global for entire platform)
   const loadFreeAuditsRemaining = async () => {
-    if (!user) {
-      setFreeAuditsRemaining(0);
-      return;
-    }
-
     try {
-      const { data, error } = await supabase.rpc('get_free_audits_remaining', {
-        p_user_id: user.id
-      });
+      const { data, error } = await supabase.rpc('get_free_audits_remaining');
 
       if (!error && data !== null) {
         setFreeAuditsRemaining(data);
@@ -165,7 +158,7 @@ export const StudioProject: React.FC = () => {
 
   useEffect(() => {
     loadFreeAuditsRemaining();
-  }, []);
+  }, [project]); // Reload when project changes (after audit unlock)
 
   const handleUnlockAudit = async () => {
     if (!user || !project) {
