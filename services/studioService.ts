@@ -623,7 +623,24 @@ export async function unlockProjectAudit(
   const userCredits = profile?.credits || 0;
   const auditCost = 50;
 
-  if (!skipCreditCheck && userCredits < auditCost) {
+  // Check if free audit is available (first 50 audits are free)
+  let isFreeAudit = false;
+  if (!skipCreditCheck) {
+    try {
+      const { data: freeAuditAvailable, error: freeAuditError } = await supabase.rpc('check_free_audit_available');
+      if (!freeAuditError && freeAuditAvailable === true) {
+        isFreeAudit = true;
+        console.log('Free audit available! This audit will be free.');
+      } else {
+        console.log('No free audits left, will charge credits');
+      }
+    } catch (err) {
+      console.warn('Error checking free audit availability:', err);
+      // Continue with normal flow if check fails
+    }
+  }
+
+  if (!skipCreditCheck && !isFreeAudit && userCredits < auditCost) {
     return {
       success: false,
       error: 'Insufficient credits',
@@ -634,7 +651,8 @@ export async function unlockProjectAudit(
   try {
     // IMPORTANT: Deduct credits FIRST, before generating the audit
     // This ensures credits are deducted even if audit generation fails
-    if (!skipCreditCheck) {
+    // Skip if this is a free audit
+    if (!skipCreditCheck && !isFreeAudit) {
       console.log('Deducting credits before audit generation...');
       
       // Try deduct_credits RPC first
@@ -883,43 +901,5 @@ export async function getRandomProject(): Promise<Project | null> {
   } as Project;
 }
 
-// ============================================
-// PROMO CODE SERVICE
-// ============================================
-
-export async function usePromoCode(code: string, projectId?: string): Promise<{ success: boolean; credits_granted?: number; error?: string; message?: string; project_id?: string }> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'User must be authenticated' };
-  }
-
-  // Si un projectId est fourni, utiliser la fonction pour débloquer directement l'audit
-  if (projectId) {
-    const { data, error } = await supabase.rpc('use_promo_code_for_audit', {
-      p_code: code.toUpperCase().trim(),
-      p_user_id: user.id,
-      p_project_id: projectId,
-    });
-
-    if (error) {
-      console.error('Error using promo code for audit:', error);
-      return { success: false, error: error.message || 'Error using promo code' };
-    }
-
-    return data as { success: boolean; error?: string; message?: string; project_id?: string };
-  }
-
-  // Sinon, utiliser le code promo classique pour obtenir des crédits
-  const { data, error } = await supabase.rpc('use_promo_code', {
-    p_code: code.toUpperCase().trim(),
-    p_user_id: user.id,
-  });
-
-  if (error) {
-    console.error('Error using promo code:', error);
-    return { success: false, error: error.message || 'Error using promo code' };
-  }
-
-  return data as { success: boolean; credits_granted?: number; error?: string; message?: string };
-}
+// Promo code service removed - using free audits system instead
 

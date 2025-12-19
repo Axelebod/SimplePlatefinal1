@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Heart, ExternalLink, MessageSquare, Lock, Unlock, Zap, ArrowLeft, Share2, ArrowRight, Crown, Trash2 } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
-import { getProjectById, getProjectBySlug, voteProject, getProjectReviews, submitReview, unlockProjectAudit, boostProject, deleteProject, usePromoCode } from '../services/studioService';
+import { getProjectById, getProjectBySlug, voteProject, getProjectReviews, submitReview, unlockProjectAudit, boostProject, deleteProject } from '../services/studioService';
 import { useUserStore as useUserStoreCredits } from '../store/userStore';
 import type { Project, Review, SubmitReviewData } from '../types/studio';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { getTools } from '../tools-config';
+import { supabase } from '../lib/supabaseClient';
 import { useToast } from '../contexts/ToastContext';
 import { getProjectImageUrl, getFaviconUrl } from '../utils/faviconUtils';
 
@@ -28,10 +29,8 @@ export const StudioProject: React.FC = () => {
   const [reviewRating, setReviewRating] = useState(5);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [boosting, setBoosting] = useState(false);
-  const [showPromoCodeInput, setShowPromoCodeInput] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const [applyingPromoCode, setApplyingPromoCode] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [freeAuditsRemaining, setFreeAuditsRemaining] = useState<number | null>(null);
   const tools = React.useMemo(() => getTools(language), [language]);
 
   useSEO({
@@ -144,62 +143,27 @@ export const StudioProject: React.FC = () => {
     }
   };
 
-  const handleApplyPromoCode = async () => {
-    if (!promoCode.trim()) {
-      warning(language === 'fr' ? 'Veuillez entrer un code promo' : 'Please enter a promo code');
-      return;
-    }
-
-    if (!project) {
-      showError(language === 'fr' ? 'Projet non trouvé' : 'Project not found');
-      return;
-    }
-
-    setApplyingPromoCode(true);
+  // Load free audits remaining count
+  const loadFreeAuditsRemaining = async () => {
     try {
-      // Utiliser le code promo pour débloquer directement l'audit
-      const result = await usePromoCode(promoCode.trim(), project.id);
-      if (result.success) {
-        // Si le code a débloqué l'audit, générer l'audit maintenant (sans déduire de crédits)
-        if (result.project_id) {
-          setUnlocking(true);
-          try {
-            const auditResult = await unlockProjectAudit(project.id, language, true); // skipCreditCheck = true
-            if (auditResult.success) {
-              await loadProject();
-              await refreshCredits();
-              success(language === 'fr' ? 'Code promo appliqué ! Audit débloqué et généré avec succès.' : 'Promo code applied! Audit unlocked and generated successfully.');
-            } else {
-              // Le code a été utilisé mais l'audit n'a pas pu être généré
-              await loadProject();
-              showError(auditResult.error || (language === 'fr' ? 'Erreur lors de la génération de l\'audit' : 'Error generating audit'));
-            }
-          } catch (error) {
-            console.error('Error generating audit:', error);
-            await loadProject();
-            showError(language === 'fr' ? 'Erreur lors de la génération de l\'audit' : 'Error generating audit');
-          } finally {
-            setUnlocking(false);
-          }
-        } else {
-          // Code promo classique (crédits)
-          await refreshCredits();
-          success(result.message || (language === 'fr' 
-            ? `Code promo appliqué ! Vous avez reçu ${result.credits_granted || 0} crédits.`
-            : `Promo code applied! You received ${result.credits_granted || 0} credits.`));
-        }
-        setPromoCode('');
-        setShowPromoCodeInput(false);
-      } else {
-        showError(result.error || (language === 'fr' ? 'Code promo invalide' : 'Invalid promo code'));
+      const { data, error } = await supabase
+        .from('free_audits_counter')
+        .select('current_count, max_free_audits')
+        .eq('id', 1)
+        .single();
+
+      if (!error && data) {
+        const remaining = Math.max(0, data.max_free_audits - data.current_count);
+        setFreeAuditsRemaining(remaining);
       }
-    } catch (error) {
-      console.error('Error applying promo code:', error);
-      showError(language === 'fr' ? 'Erreur lors de l\'application du code' : 'Error applying code');
-    } finally {
-      setApplyingPromoCode(false);
+    } catch (err) {
+      console.warn('Error loading free audits count:', err);
     }
   };
+
+  useEffect(() => {
+    loadFreeAuditsRemaining();
+  }, []);
 
   const handleUnlockAudit = async () => {
     if (!user || !project) {
@@ -229,7 +193,11 @@ export const StudioProject: React.FC = () => {
       if (result.success) {
         await loadProject();
         await refreshCredits();
-        success(language === 'fr' ? 'Audit débloqué avec succès! Analyse complète générée.' : 'Audit unlocked successfully! Complete analysis generated.');
+        await loadFreeAuditsRemaining(); // Refresh free audits count
+        const isFree = freeAuditsRemaining !== null && freeAuditsRemaining > 0;
+        success(language === 'fr' 
+          ? (isFree ? 'Audit débloqué gratuitement! Analyse complète générée.' : 'Audit débloqué avec succès! Analyse complète générée.')
+          : (isFree ? 'Audit unlocked for free! Complete analysis generated.' : 'Audit unlocked successfully! Complete analysis generated.'));
       } else {
         const errorMsg = result.error || (language === 'fr' ? 'Erreur lors du déblocage' : 'Error unlocking');
         console.error('Audit unlock failed:', errorMsg, result);
@@ -648,39 +616,6 @@ export const StudioProject: React.FC = () => {
                   </>
                 )}
               </button>
-              {credits < 50 && user && (
-                <button
-                  onClick={() => setShowPromoCodeInput(!showPromoCodeInput)}
-                  className="text-xs text-neo-violet hover:underline font-bold"
-                >
-                  {language === 'fr' ? 'J\'ai un code promo' : 'I have a promo code'}
-                </button>
-              )}
-              {showPromoCodeInput && user && (
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                    placeholder={language === 'fr' ? 'Code promo' : 'Promo code'}
-                    className="flex-1 px-3 py-2 border-2 border-black dark:border-white rounded-md bg-white dark:bg-gray-500 text-black dark:text-white font-bold text-sm"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleApplyPromoCode();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={handleApplyPromoCode}
-                    disabled={applyingPromoCode || !promoCode.trim()}
-                    className="px-4 py-2 bg-neo-violet text-white font-bold border-2 border-black rounded-md shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
-                  >
-                    {applyingPromoCode 
-                      ? (language === 'fr' ? '...' : '...')
-                      : (language === 'fr' ? 'Appliquer' : 'Apply')}
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
