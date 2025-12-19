@@ -519,93 +519,95 @@ export const StudioProject: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
 
-        {/* AI Audit Section */}
-        <div className="border-t-2 border-black dark:border-white pt-6 mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
-              <Zap className="w-6 h-6 text-neo-violet" />
-              {language === 'fr' ? 'Audit IA' : 'AI Audit'}
-            </h2>
-            {!project.is_audit_unlocked && (
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={handleUnlockAudit}
-                  disabled={unlocking || !user}
-                  className="flex items-center gap-2 px-4 py-2 bg-neo-yellow border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
-                >
-                  {unlocking ? (
-                    language === 'fr' ? 'Déblocage...' : 'Unlocking...'
-                  ) : (
-                    <>
-                      <Unlock className="w-4 h-4" />
-                      {language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)'}
-                    </>
-                  )}
-                </button>
-                {credits < 50 && user && (
+      {/* AI Audit Section - Only visible to project owner */}
+      {project.user_owns && (
+          <div className="border-t-2 border-black dark:border-white pt-6 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
+                <Zap className="w-6 h-6 text-neo-violet" />
+                {language === 'fr' ? 'Audit IA' : 'AI Audit'}
+              </h2>
+              {!project.is_audit_unlocked && (
+                <div className="flex flex-col gap-2">
                   <button
-                    onClick={() => setShowPromoCodeInput(!showPromoCodeInput)}
-                    className="text-xs text-neo-violet hover:underline font-bold"
+                    onClick={handleUnlockAudit}
+                    disabled={unlocking || !user}
+                    className="flex items-center gap-2 px-4 py-2 bg-neo-yellow border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
                   >
-                    {language === 'fr' ? 'J\'ai un code promo' : 'I have a promo code'}
+                    {unlocking ? (
+                      language === 'fr' ? 'Déblocage...' : 'Unlocking...'
+                    ) : (
+                      <>
+                        <Unlock className="w-4 h-4" />
+                        {language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)'}
+                      </>
+                    )}
                   </button>
-                )}
-                {showPromoCodeInput && user && (
-                  <div className="flex gap-2 mt-2">
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      placeholder={language === 'fr' ? 'Code promo' : 'Promo code'}
-                      className="flex-1 px-3 py-2 border-2 border-black dark:border-white rounded-md bg-white dark:bg-gray-500 text-black dark:text-white font-bold text-sm"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleApplyPromoCode();
-                        }
-                      }}
-                    />
+                  {credits < 50 && user && (
                     <button
-                      onClick={handleApplyPromoCode}
-                      disabled={applyingPromoCode || !promoCode.trim()}
-                      className="px-4 py-2 bg-neo-violet text-white font-bold border-2 border-black rounded-md shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+                      onClick={() => setShowPromoCodeInput(!showPromoCodeInput)}
+                      className="text-xs text-neo-violet hover:underline font-bold"
                     >
-                      {applyingPromoCode 
-                        ? (language === 'fr' ? '...' : '...')
-                        : (language === 'fr' ? 'Appliquer' : 'Apply')}
+                      {language === 'fr' ? 'J\'ai un code promo' : 'I have a promo code'}
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                  {showPromoCodeInput && user && (
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        placeholder={language === 'fr' ? 'Code promo' : 'Promo code'}
+                        className="flex-1 px-3 py-2 border-2 border-black dark:border-white rounded-md bg-white dark:bg-gray-500 text-black dark:text-white font-bold text-sm"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleApplyPromoCode();
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={handleApplyPromoCode}
+                        disabled={applyingPromoCode || !promoCode.trim()}
+                        className="px-4 py-2 bg-neo-violet text-white font-bold border-2 border-black rounded-md shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+                      >
+                        {applyingPromoCode 
+                          ? (language === 'fr' ? '...' : '...')
+                          : (language === 'fr' ? 'Appliquer' : 'Apply')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-          {project.is_audit_unlocked && project.ai_score ? (
-            <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
-              {/* Overall Score */}
-              <div className="mb-8 text-center">
-                <div className="inline-block bg-neo-violet text-white px-8 py-4 rounded-lg border-2 border-black dark:border-white shadow-neo">
-                  <div className="text-5xl font-bold mb-1">
-                    {project.ai_score.overall_score}/100
+            {project.is_audit_unlocked && project.ai_score ? (
+              <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
+                {/* Overall Score */}
+                <div className="mb-8 text-center">
+                  <div className="inline-block bg-neo-violet text-white px-8 py-4 rounded-lg border-2 border-black dark:border-white shadow-neo">
+                    <div className="text-5xl font-bold mb-1">
+                      {project.ai_score.overall_score}/100
+                    </div>
+                    <p className="text-sm font-bold opacity-90">
+                      {language === 'fr' ? 'Score Global' : 'Overall Score'}
+                    </p>
                   </div>
-                  <p className="text-sm font-bold opacity-90">
-                    {language === 'fr' ? 'Score Global' : 'Overall Score'}
+                  <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+                    {language === 'fr' 
+                      ? 'Audit complet généré le ' + new Date(project.ai_score.generated_at).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')
+                      : 'Complete audit generated on ' + new Date(project.ai_score.generated_at).toLocaleDateString('en-US')}
                   </p>
                 </div>
-                <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                  {language === 'fr' 
-                    ? 'Audit complet généré le ' + new Date(project.ai_score.generated_at).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')
-                    : 'Complete audit generated on ' + new Date(project.ai_score.generated_at).toLocaleDateString('en-US')}
-                </p>
-              </div>
 
-              {/* Categories */}
-              <div className="space-y-6">
-                {project.ai_score.categories.map((category, idx) => {
-                  const scoreColor = category.score >= 80 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : category.score >= 60 
-                    ? 'text-yellow-600 dark:text-yellow-400' 
+                {/* Categories */}
+                <div className="space-y-6">
+                  {project.ai_score.categories.map((category, idx) => {
+                    const scoreColor = category.score >= 80 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : category.score >= 60 
+                      ? 'text-yellow-600 dark:text-yellow-400' 
                     : 'text-red-600 dark:text-red-400';
                   
                   return (
@@ -676,25 +678,17 @@ export const StudioProject: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 dark:bg-gray-500 border-2 border-dashed border-gray-400 dark:border-white rounded-lg p-6 text-center">
-              <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" />
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {language === 'fr' 
-                  ? 'Débloquez l\'audit IA pour voir l\'analyse détaillée de ce projet.'
-                  : 'Unlock the AI audit to see detailed analysis of this project.'}
-              </p>
-              {!user && (
-                <Link
-                  to="/login"
-                  className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold rounded-md"
-                >
-                  {language === 'fr' ? 'Se connecter' : 'Log in'}
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+              <div className="bg-gray-50 dark:bg-gray-500 border-2 border-dashed border-gray-400 dark:border-white rounded-lg p-6 text-center">
+                <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" />
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {language === 'fr' 
+                    ? 'Débloquez l\'audit IA pour voir l\'analyse détaillée de votre projet.'
+                    : 'Unlock the AI audit to see detailed analysis of your project.'}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
       {/* Reviews Section */}
       <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 md:p-8 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
