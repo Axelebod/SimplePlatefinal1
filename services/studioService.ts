@@ -416,6 +416,13 @@ export async function submitReview(data: SubmitReviewData): Promise<Review | nul
     throw new Error('Review content must be more than 100 characters');
   }
 
+  // Import validation function
+  const { validateReviewContent } = await import('../utils/reviewValidation');
+  const validation = validateReviewContent(data.content);
+  if (!validation.valid) {
+    throw new Error(validation.error || 'Invalid review content');
+  }
+
   // Check if user already reviewed this project
   const { data: existingReview } = await supabase
     .from('reviews')
@@ -458,14 +465,19 @@ export async function submitReview(data: SubmitReviewData): Promise<Review | nul
   }
 
   // Earn credits from review (via RPC function)
+  let creditsEarned = 0;
   try {
-    await supabase.rpc('earn_credits_from_review', { p_user_id: user.id });
+    const { data: creditsData, error: creditsError } = await supabase.rpc('earn_credits_from_review', { p_user_id: user.id });
+    if (!creditsError && creditsData !== null) {
+      creditsEarned = creditsData as number;
+    }
   } catch (err) {
     console.warn('Error earning credits from review:', err);
     // Don't fail the review submission if credit earning fails
   }
 
-  return review;
+  // Add credits earned to review metadata for display
+  return { ...review, credits_earned: creditsEarned } as Review & { credits_earned?: number };
 }
 
 export async function getProjectReviews(projectId: string): Promise<Review[]> {

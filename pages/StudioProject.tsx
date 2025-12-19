@@ -260,10 +260,17 @@ export const StudioProject: React.FC = () => {
   };
 
   const handleSubmitReview = async () => {
-    if (!user || !project || reviewContent.length <= 100) {
-      warning(language === 'fr' 
+    if (!user || !project) {
+      return;
+    }
+
+    // Validate review content
+    const { validateReviewContent } = await import('../utils/reviewValidation');
+    const validation = validateReviewContent(reviewContent);
+    if (!validation.valid) {
+      warning(validation.error || (language === 'fr' 
         ? 'Le commentaire doit contenir plus de 100 caractères'
-        : 'Review must be more than 100 characters');
+        : 'Review must be more than 100 characters'));
       return;
     }
 
@@ -280,7 +287,18 @@ export const StudioProject: React.FC = () => {
         setReviewContent('');
         setReviewRating(5);
         setShowReviewForm(false);
-        success(language === 'fr' ? 'Avis publié ! Vous avez gagné 0.5 crédit.' : 'Review published! You earned 0.5 credits.');
+        
+        // Check if credits were earned
+        const creditsEarned = (review as any).credits_earned || 0;
+        if (creditsEarned > 0) {
+          success(language === 'fr' 
+            ? `Avis publié ! Vous avez gagné ${creditsEarned} crédit${creditsEarned > 1 ? 's' : ''}.` 
+            : `Review published! You earned ${creditsEarned} credit${creditsEarned > 1 ? 's' : ''}.`);
+        } else {
+          success(language === 'fr' 
+            ? 'Avis publié ! (Limite quotidienne de crédits atteinte)' 
+            : 'Review published! (Daily credit limit reached)');
+        }
         await refreshCredits();
       }
     } catch (error: any) {

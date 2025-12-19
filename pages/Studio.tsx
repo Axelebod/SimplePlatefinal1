@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ExternalLink, TrendingUp, Plus, ArrowRight, Zap, Crown, Shuffle } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
@@ -22,6 +22,7 @@ export const Studio: React.FC = () => {
   const [boosting, setBoosting] = useState<string | null>(null);
   const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('all-time');
   const [loadingRandom, setLoadingRandom] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useSEO({
     title: language === 'fr' 
