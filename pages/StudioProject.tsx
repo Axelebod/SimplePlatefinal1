@@ -71,9 +71,15 @@ export const StudioProject: React.FC = () => {
   useEffect(() => {
     if (slug || id) {
       loadProject();
-      loadReviews();
     }
   }, [slug, id]);
+
+  // Load reviews after project is loaded
+  useEffect(() => {
+    if (project) {
+      loadReviews();
+    }
+  }, [project]);
 
   const loadProject = async () => {
     if (!slug && !id) return;
