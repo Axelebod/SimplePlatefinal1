@@ -521,66 +521,65 @@ export const StudioProject: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Audit Section - Only visible to project owner */}
-      {project.user_owns && (
-          <div className="border-t-2 border-black dark:border-white pt-6 mt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
-                <Zap className="w-6 h-6 text-neo-violet" />
-                {language === 'fr' ? 'Audit IA' : 'AI Audit'}
-              </h2>
-              {!project.is_audit_unlocked && (
-                <div className="flex flex-col gap-2">
+      {/* AI Audit Section - Visible to everyone, but only owner can unlock */}
+      <div className="border-t-2 border-black dark:border-white pt-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
+            <Zap className="w-6 h-6 text-neo-violet" />
+            {language === 'fr' ? 'Audit IA' : 'AI Audit'}
+          </h2>
+          {!project.is_audit_unlocked && project.user_owns && (
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleUnlockAudit}
+                disabled={unlocking || !user}
+                className="flex items-center gap-2 px-4 py-2 bg-neo-yellow border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+              >
+                {unlocking ? (
+                  language === 'fr' ? 'Déblocage...' : 'Unlocking...'
+                ) : (
+                  <>
+                    <Unlock className="w-4 h-4" />
+                    {language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)'}
+                  </>
+                )}
+              </button>
+              {credits < 50 && user && (
+                <button
+                  onClick={() => setShowPromoCodeInput(!showPromoCodeInput)}
+                  className="text-xs text-neo-violet hover:underline font-bold"
+                >
+                  {language === 'fr' ? 'J\'ai un code promo' : 'I have a promo code'}
+                </button>
+              )}
+              {showPromoCodeInput && user && (
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    placeholder={language === 'fr' ? 'Code promo' : 'Promo code'}
+                    className="flex-1 px-3 py-2 border-2 border-black dark:border-white rounded-md bg-white dark:bg-gray-500 text-black dark:text-white font-bold text-sm"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleApplyPromoCode();
+                      }
+                    }}
+                  />
                   <button
-                    onClick={handleUnlockAudit}
-                    disabled={unlocking || !user}
-                    className="flex items-center gap-2 px-4 py-2 bg-neo-yellow border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+                    onClick={handleApplyPromoCode}
+                    disabled={applyingPromoCode || !promoCode.trim()}
+                    className="px-4 py-2 bg-neo-violet text-white font-bold border-2 border-black rounded-md shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
                   >
-                    {unlocking ? (
-                      language === 'fr' ? 'Déblocage...' : 'Unlocking...'
-                    ) : (
-                      <>
-                        <Unlock className="w-4 h-4" />
-                        {language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)'}
-                      </>
-                    )}
+                    {applyingPromoCode 
+                      ? (language === 'fr' ? '...' : '...')
+                      : (language === 'fr' ? 'Appliquer' : 'Apply')}
                   </button>
-                  {credits < 50 && user && (
-                    <button
-                      onClick={() => setShowPromoCodeInput(!showPromoCodeInput)}
-                      className="text-xs text-neo-violet hover:underline font-bold"
-                    >
-                      {language === 'fr' ? 'J\'ai un code promo' : 'I have a promo code'}
-                    </button>
-                  )}
-                  {showPromoCodeInput && user && (
-                    <div className="flex gap-2 mt-2">
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                        placeholder={language === 'fr' ? 'Code promo' : 'Promo code'}
-                        className="flex-1 px-3 py-2 border-2 border-black dark:border-white rounded-md bg-white dark:bg-gray-500 text-black dark:text-white font-bold text-sm"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleApplyPromoCode();
-                          }
-                        }}
-                      />
-                      <button
-                        onClick={handleApplyPromoCode}
-                        disabled={applyingPromoCode || !promoCode.trim()}
-                        className="px-4 py-2 bg-neo-violet text-white font-bold border-2 border-black rounded-md shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
-                      >
-                        {applyingPromoCode 
-                          ? (language === 'fr' ? '...' : '...')
-                          : (language === 'fr' ? 'Appliquer' : 'Apply')}
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+          )}
+        </div>
 
             {project.is_audit_unlocked && project.ai_score ? (
               <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
@@ -678,17 +677,20 @@ export const StudioProject: React.FC = () => {
               </div>
             </div>
           ) : (
-              <div className="bg-gray-50 dark:bg-gray-500 border-2 border-dashed border-gray-400 dark:border-white rounded-lg p-6 text-center">
-                <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" />
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {language === 'fr' 
+            <div className="bg-gray-50 dark:bg-gray-500 border-2 border-dashed border-gray-400 dark:border-white rounded-lg p-6 text-center">
+              <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-300" />
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {language === 'fr' 
+                  ? project.user_owns
                     ? 'Débloquez l\'audit IA pour voir l\'analyse détaillée de votre projet.'
-                    : 'Unlock the AI audit to see detailed analysis of your project.'}
-                </p>
-              </div>
-            )}
+                    : 'L\'audit IA n\'a pas encore été débloqué par le propriétaire du projet.'
+                  : project.user_owns
+                    ? 'Unlock the AI audit to see detailed analysis of your project.'
+                    : 'The AI audit has not been unlocked by the project owner yet.'}
+              </p>
+            </div>
+          )}
           </div>
-        )}
 
       {/* Reviews Section */}
       <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 md:p-8 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
