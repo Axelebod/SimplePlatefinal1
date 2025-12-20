@@ -18,6 +18,9 @@ type UseSEOParams = {
   keywords?: string[];
   noindex?: boolean;
   imagePath?: string; // absolute or path starting with /
+  ogType?: 'website' | 'article';
+  publishedTime?: string; // ISO 8601 (for articles)
+  modifiedTime?: string; // ISO 8601 (for articles)
   jsonLd?: unknown | null;
   jsonLdId?: string;
 };
@@ -58,6 +61,9 @@ export function useSEO(params: UseSEOParams) {
       url: canonical,
       image,
       language: params.language,
+      type: params.ogType,
+      publishedTime: params.publishedTime,
+      modifiedTime: params.modifiedTime,
     });
 
     // JSON-LD (optional)
@@ -76,6 +82,9 @@ export function useSEO(params: UseSEOParams) {
     params.language,
     params.noindex,
     params.imagePath,
+    params.ogType,
+    params.publishedTime,
+    params.modifiedTime,
     params.jsonLdId,
     // keywords array identity can change; stringify to keep stable
     params.keywords ? params.keywords.join('|') : '',

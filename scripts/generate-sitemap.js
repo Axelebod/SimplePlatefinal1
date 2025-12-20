@@ -66,11 +66,28 @@ function extractBlogSlugsFromSource() {
   const blogPath = path.join(__dirname, '../content/blogPosts.ts');
   const content = fs.readFileSync(blogPath, 'utf8');
 
-  const slugs = new Set();
-  for (const m of content.matchAll(/slug:\s*'([^']+)'/g)) {
-    slugs.add(m[1]);
+  // Try to capture slug + publishedAt per post for accurate <lastmod>.
+  // We keep a fallback for safety if a post doesn't match the pattern.
+  const entries = [];
+
+  for (const m of content.matchAll(/\{\s*[\s\S]*?slug:\s*'([^']+)'\s*,[\s\S]*?publishedAt:\s*'([^']+)'\s*,/g)) {
+    entries.push({ slug: m[1], publishedAt: m[2] });
   }
-  return Array.from(slugs).filter(Boolean).sort();
+
+  // Fallback: any slug not captured above gets CURRENT_DATE.
+  const captured = new Set(entries.map((e) => e.slug));
+  for (const m of content.matchAll(/slug:\s*'([^']+)'/g)) {
+    const slug = m[1];
+    if (!captured.has(slug)) entries.push({ slug, publishedAt: CURRENT_DATE });
+  }
+
+  // Unique by slug
+  const bySlug = new Map();
+  for (const e of entries) bySlug.set(e.slug, e.publishedAt || CURRENT_DATE);
+
+  return Array.from(bySlug.entries())
+    .map(([slug, publishedAt]) => ({ slug, publishedAt }))
+    .sort((a, b) => (a.slug < b.slug ? -1 : 1));
 }
 
 function renderUrlNode({ loc, lastmod, changefreq, priority, alternates }) {
@@ -88,17 +105,17 @@ ${altLinks ? `${altLinks}\n` : ''}    <lastmod>${lastmod}</lastmod>
 
 function generateSitemap() {
   const toolSlugs = extractToolSlugsFromSource();
-  const blogSlugs = extractBlogSlugsFromSource();
+  const blogEntries = extractBlogSlugsFromSource();
 
   const entries = [];
 
-  const addPath = (pathname, changefreq, priority) => {
+  const addPath = (pathname, changefreq, priority, lastmod = CURRENT_DATE) => {
     for (const lang of LANGS) {
       const loc = withLang(pathname, lang);
       entries.push(
         renderUrlNode({
           loc,
-          lastmod: CURRENT_DATE,
+          lastmod,
           changefreq,
           priority,
           alternates: [
@@ -122,8 +139,8 @@ function generateSitemap() {
   }
 
   // Blog posts
-  for (const slug of blogSlugs) {
-    addPath(`/blog/${slug}`, 'monthly', '0.6');
+  for (const { slug, publishedAt } of blogEntries) {
+    addPath(`/blog/${slug}`, 'monthly', '0.6', publishedAt || CURRENT_DATE);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -142,7 +159,7 @@ ${entries.join('\n')}
   // eslint-disable-next-line no-console
   console.log(`   - ${toolSlugs.length} tools x ${LANGS.length} langs`);
   // eslint-disable-next-line no-console
-  console.log(`   - ${blogSlugs.length} blog posts x ${LANGS.length} langs`);
+  console.log(`   - ${blogEntries.length} blog posts x ${LANGS.length} langs`);
 }
 
 generateSitemap();
