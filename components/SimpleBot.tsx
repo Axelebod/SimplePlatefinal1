@@ -34,14 +34,16 @@ export const SimpleBot: React.FC = () => {
   
   // Initialisation de l'état avec le localStorage
   const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = localStorage.getItem(`simplebot_history_${language}`);
+    if (typeof window === 'undefined') return [getInitialBotMessage(language)];
+    const saved = window.localStorage.getItem(`simplebot_history_${language}`);
     return saved ? JSON.parse(saved) : [getInitialBotMessage(language)];
   });
 
   // Gestion du quota (INDÉPENDANT de l'état utilisateur - utilise uniquement localStorage)
   // La limite de 5 messages/jour est appliquée à tous les utilisateurs, connectés ou non
   const [usage, setUsage] = useState<BotUsage>(() => {
-      const savedUsage = localStorage.getItem(`simplebot_usage_${language}`);
+      if (typeof window === 'undefined') return { date: new Date().toDateString(), count: 0 };
+      const savedUsage = window.localStorage.getItem(`simplebot_usage_${language}`);
       const today = new Date().toDateString();
       if (savedUsage) {
           const parsed = JSON.parse(savedUsage);
@@ -52,10 +54,10 @@ export const SimpleBot: React.FC = () => {
 
   // Reload per-language history/quota when language changes
   useEffect(() => {
-    const saved = localStorage.getItem(`simplebot_history_${language}`);
+    const saved = window.localStorage.getItem(`simplebot_history_${language}`);
     setMessages(saved ? JSON.parse(saved) : [getInitialBotMessage(language)]);
 
-    const savedUsage = localStorage.getItem(`simplebot_usage_${language}`);
+    const savedUsage = window.localStorage.getItem(`simplebot_usage_${language}`);
     const today = new Date().toDateString();
     if (savedUsage) {
       const parsed = JSON.parse(savedUsage);
@@ -83,12 +85,12 @@ export const SimpleBot: React.FC = () => {
 
   // Sauvegarde automatique
   useEffect(() => {
-    localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(messages));
+    window.localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(messages));
     scrollToBottom();
   }, [messages, isOpen, language]);
 
   useEffect(() => {
-      localStorage.setItem(`simplebot_usage_${language}`, JSON.stringify(usage));
+      window.localStorage.setItem(`simplebot_usage_${language}`, JSON.stringify(usage));
   }, [usage, language]);
 
   // Fonction pour vider la mémoire
@@ -103,7 +105,7 @@ export const SimpleBot: React.FC = () => {
       },
     ];
     setMessages(initialMsg);
-    localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(initialMsg));
+    window.localStorage.setItem(`simplebot_history_${language}`, JSON.stringify(initialMsg));
   };
 
   const handleSend = async (e?: React.FormEvent) => {

@@ -105,18 +105,28 @@ export function applySocialMeta(params: {
   url: string;
   image?: string;
   language: Language;
+  type?: 'website' | 'article';
+  publishedTime?: string; // ISO 8601
+  modifiedTime?: string; // ISO 8601
 }) {
   const image = params.image || `${window.location.origin}${DEFAULT_OG_IMAGE_PATH}`;
 
   // Open Graph
   updateMeta('og:title', params.title, 'property');
   updateMeta('og:description', params.description, 'property');
-  updateMeta('og:type', 'website', 'property');
+  updateMeta('og:type', params.type ?? 'website', 'property');
   updateMeta('og:url', params.url, 'property');
   updateMeta('og:image', image, 'property');
   updateMeta('og:site_name', 'SimplePlate AI', 'property');
   updateMeta('og:locale', params.language === 'en' ? 'en_US' : 'fr_FR', 'property');
   updateMeta('og:locale:alternate', params.language === 'en' ? 'fr_FR' : 'en_US', 'property');
+
+  // Article metadata (only if relevant)
+  if (params.type === 'article') {
+    if (params.publishedTime) updateMeta('article:published_time', params.publishedTime, 'property');
+    if (params.modifiedTime) updateMeta('article:modified_time', params.modifiedTime, 'property');
+    if (params.modifiedTime) updateMeta('og:updated_time', params.modifiedTime, 'property');
+  }
 
   // Twitter
   updateMeta('twitter:card', 'summary_large_image');

@@ -283,15 +283,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                                 <span>Reset crédits gratuits: {timeRemaining}</span>
                             </div>
                         )}
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                            {creditsFree} gratuits (hebdo) + {creditsPaid} payants
-                            {creditsFree < 5 && timeRemaining && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    <Clock className="w-3 h-3" aria-hidden="true" />
-                                    <span>Reset crédits gratuits: {timeRemaining}</span>
-                                </div>
-                            )}
-                        </div>
                     </div>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
                         Voir les Outils
@@ -362,11 +353,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </button>
       )}
 
-      {/* SIMPLE BOT INTEGRATION */}
-      <SimpleBot />
+      {/* SIMPLE BOT INTEGRATION (client-only for SSR/prerender safety) */}
+      {typeof window !== 'undefined' ? <SimpleBot /> : null}
       
-      {/* PWA INSTALL PROMPT (MOBILE ONLY) */}
-      <InstallPrompt />
+      {/* PWA INSTALL PROMPT (MOBILE ONLY) (client-only) */}
+      {typeof window !== 'undefined' ? <InstallPrompt /> : null}
     </div>
   );
 };

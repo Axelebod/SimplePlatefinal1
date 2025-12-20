@@ -3,10 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "generate:sitemap": "node scripts/generate-sitemap.js",
-    "build": "node scripts/generate-sitemap.js && vite build",
+    "build:client": "node scripts/generate-sitemap.js && vite build",
+    "build:ssr": "vite build --ssr entry-server.tsx --outDir dist-ssr",
+    "prerender:blog": "node scripts/prerender-blog.js",
+    "build": "npm run build:client && npm run build:ssr && npm run prerender:blog",
     "preview": "vite preview"
   },
   "dependencies": {
