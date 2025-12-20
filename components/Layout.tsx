@@ -353,11 +353,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </button>
       )}
 
-      {/* SIMPLE BOT INTEGRATION */}
-      <SimpleBot />
+      {/* SIMPLE BOT INTEGRATION (client-only for SSR/prerender safety) */}
+      {typeof window !== 'undefined' ? <SimpleBot /> : null}
       
-      {/* PWA INSTALL PROMPT (MOBILE ONLY) */}
-      <InstallPrompt />
+      {/* PWA INSTALL PROMPT (MOBILE ONLY) (client-only) */}
+      {typeof window !== 'undefined' ? <InstallPrompt /> : null}
     </div>
   );
 };

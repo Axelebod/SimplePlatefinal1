@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { UserState, User } from '../types';
 import { supabase } from '../lib/supabaseClient';
 import { SITE_CONFIG } from '../constants';
+import { safeStorage } from '../utils/safeStorage';
 
 export const useUserStore = create<UserState>()(
   persist(
@@ -400,7 +401,7 @@ export const useUserStore = create<UserState>()(
   },
   {
     name: 'simpleplate-storage',
-    storage: createJSONStorage(() => localStorage),
+    storage: createJSONStorage(() => safeStorage as any),
   }
 )
 );

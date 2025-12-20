@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { safeStorage } from '../utils/safeStorage';
 
 type Language = 'fr' | 'en';
 
@@ -18,6 +19,7 @@ export const useLanguageStore = create<LanguageState>()(
     }),
     {
       name: 'language-storage',
+      storage: createJSONStorage(() => safeStorage as any),
     }
   )
 );

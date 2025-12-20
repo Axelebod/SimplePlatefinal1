@@ -1,6 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CookieConsent } from './components/CookieConsent';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -67,43 +67,41 @@ function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <Router>
-          <ScrollToTop />
-          <Layout>
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/tool/:slug" element={<ToolPage />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/legal" element={<Legal />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Auth />} />
-                <Route path="/signup" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/sitemap" element={<Sitemap />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                {/* SimplePlate Studio (Phase 2) */}
-                <Route path="/studio" element={<Studio />} />
-                <Route path="/studio/submit" element={<StudioSubmit />} />
-                <Route path="/studio/project/:slug" element={<StudioProject />} />
-                <Route path="/studio/project/id/:id" element={<StudioProject />} />
-                {/* About/SimplePlate Page */}
-                <Route path="/about" element={<About />} />
-                <Route path="/simpleplate" element={<About />} />
-                
-                {/* 404 Catch-all */}
-                <Route path="/404" element={<NotFound />} />
-                <Route path="*" element={<Navigate to="/404" replace />} />
-              </Routes>
-            </Suspense>
-            
-            {/* Global Components */}
-            <CookieConsent />
-          </Layout>
-        </Router>
+        <ScrollToTop />
+        <Layout>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/tool/:slug" element={<ToolPage />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/legal" element={<Legal />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/sitemap" element={<Sitemap />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              {/* SimplePlate Studio (Phase 2) */}
+              <Route path="/studio" element={<Studio />} />
+              <Route path="/studio/submit" element={<StudioSubmit />} />
+              <Route path="/studio/project/:slug" element={<StudioProject />} />
+              <Route path="/studio/project/id/:id" element={<StudioProject />} />
+              {/* About/SimplePlate Page */}
+              <Route path="/about" element={<About />} />
+              <Route path="/simpleplate" element={<About />} />
+              
+              {/* 404 Catch-all */}
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Routes>
+          </Suspense>
+          
+          {/* Global Components */}
+          <CookieConsent />
+        </Layout>
       </ToastProvider>
     </ErrorBoundary>
   );

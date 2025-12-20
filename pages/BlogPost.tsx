@@ -81,68 +81,69 @@ export const BlogPost: React.FC = () => {
     publishedTime: publishedIso,
     modifiedTime: publishedIso,
     jsonLdId: 'json-ld-blog-post',
-    jsonLd: post
-      ? (() => {
-          const absoluteCover = post.cover.src.startsWith('http')
-            ? post.cover.src
-            : `${window.location.origin}${post.cover.src}`;
-          const canonical = window.location.href;
+    jsonLd:
+      post && typeof window !== 'undefined'
+        ? (() => {
+            const absoluteCover = post.cover.src.startsWith('http')
+              ? post.cover.src
+              : `${window.location.origin}${post.cover.src}`;
+            const canonical = window.location.href;
 
-          return [
-            {
-              '@context': 'https://schema.org',
-              '@type': 'BlogPosting',
-              headline: post.title,
-              description: post.metaDescription,
-              datePublished: publishedIso ?? post.publishedAt,
-              dateModified: publishedIso ?? post.publishedAt,
-              image: [absoluteCover],
-              keywords: post.keywords.join(', '),
-              inLanguage: language,
-              author: {
-                '@type': 'Organization',
-                name: 'SimplePlate',
-              },
-              publisher: {
-                '@type': 'Organization',
-                name: 'SimplePlate AI',
-                logo: {
-                  '@type': 'ImageObject',
-                  url: `${window.location.origin}/favicon/web-app-manifest-512x512.png`,
+            return [
+              {
+                '@context': 'https://schema.org',
+                '@type': 'BlogPosting',
+                headline: post.title,
+                description: post.metaDescription,
+                datePublished: publishedIso ?? post.publishedAt,
+                dateModified: publishedIso ?? post.publishedAt,
+                image: [absoluteCover],
+                keywords: post.keywords.join(', '),
+                inLanguage: language,
+                author: {
+                  '@type': 'Organization',
+                  name: 'SimplePlate',
+                },
+                publisher: {
+                  '@type': 'Organization',
+                  name: 'SimplePlate AI',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: `${window.location.origin}/favicon/web-app-manifest-512x512.png`,
+                  },
+                },
+                mainEntityOfPage: {
+                  '@type': 'WebPage',
+                  '@id': canonical,
                 },
               },
-              mainEntityOfPage: {
-                '@type': 'WebPage',
-                '@id': canonical,
+              {
+                '@context': 'https://schema.org',
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: language === 'fr' ? 'Accueil' : 'Home',
+                    item: `${window.location.origin}/?lang=${language}`,
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: 'Blog',
+                    item: `${window.location.origin}/blog?lang=${language}`,
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 3,
+                    name: post.title,
+                    item: canonical,
+                  },
+                ],
               },
-            },
-            {
-              '@context': 'https://schema.org',
-              '@type': 'BreadcrumbList',
-              itemListElement: [
-                {
-                  '@type': 'ListItem',
-                  position: 1,
-                  name: language === 'fr' ? 'Accueil' : 'Home',
-                  item: `${window.location.origin}/?lang=${language}`,
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 2,
-                  name: 'Blog',
-                  item: `${window.location.origin}/blog?lang=${language}`,
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 3,
-                  name: post.title,
-                  item: canonical,
-                },
-              ],
-            },
-          ];
-        })()
-      : null,
+            ];
+          })()
+        : null,
   });
 
   if (!post) {

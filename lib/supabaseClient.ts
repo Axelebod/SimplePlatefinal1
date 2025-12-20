@@ -6,7 +6,9 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
     // En production, ceci doit être rempli dans les variables d'environnement
-    console.warn("Supabase URLs manquantes. Veuillez configurer le fichier .env ou les variables Vercel.");
+    if (typeof window !== 'undefined') {
+        console.warn("Supabase URLs manquantes. Veuillez configurer le fichier .env ou les variables Vercel.");
+    }
 }
 
 export const supabase = createClient(
