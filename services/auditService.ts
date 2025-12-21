@@ -197,6 +197,8 @@ Respond ONLY with valid JSON, no text before/after.`;
     }
     
     // Extraire le JSON de la réponse (peut contenir du markdown ou du texte)
+    // IMPORTANT: On extrait d'abord le JSON avant de vérifier les erreurs
+    // pour éviter de rejeter des réponses valides qui contiennent "erreur" dans le contenu
     let jsonString = response.trim();
     
     // Enlever les blocs de code markdown si présents
@@ -206,12 +208,15 @@ Respond ONLY with valid JSON, no text before/after.`;
     const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       // Si pas de JSON trouvé, vérifier si c'est un message d'erreur explicite
-      const lowerResponse = response.toLowerCase();
-      if (lowerResponse.includes("désolé") || 
-          lowerResponse.includes("je n'ai pas") ||
-          lowerResponse.includes("i don't have") ||
-          lowerResponse.includes("clé api") ||
-          lowerResponse.includes("api key")) {
+      // On vérifie seulement au début de la réponse (avant toute tentative de JSON)
+      const responseStart = response.trim().substring(0, 200).toLowerCase();
+      if (responseStart.includes("désolé") || 
+          responseStart.includes("je n'ai pas") ||
+          responseStart.includes("i don't have") ||
+          responseStart.includes("clé api") ||
+          responseStart.includes("api key") ||
+          responseStart.includes("i cannot") ||
+          responseStart.includes("je ne peux pas")) {
         console.error('AI returned error message:', response);
         throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
       }
