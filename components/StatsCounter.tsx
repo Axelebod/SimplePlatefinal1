@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Users, Zap } from 'lucide-react';
+import { TrendingUp, Zap } from 'lucide-react';
 import { getSiteStats } from '../services/statsService';
 
 interface StatsCounterProps {
@@ -39,7 +39,6 @@ export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) =>
         };
 
         animate(realStats.generations, (val) => setStats(prev => ({ ...prev, generations: val })));
-        animate(realStats.users, (val) => setStats(prev => ({ ...prev, users: val })));
         setStats(prev => ({ ...prev, tools: realStats.tools }));
       } catch (error) {
         console.error('Error loading stats:', error);
@@ -63,7 +62,7 @@ export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) =>
   };
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}>
       <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-4 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-neo-green border-2 border-black dark:border-white rounded-md flex items-center justify-center">
@@ -72,18 +71,6 @@ export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) =>
           <div>
             <p className="text-2xl font-bold dark:text-white">{formatNumber(stats.generations)}</p>
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Générations</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-lg p-4 shadow-neo-sm dark:shadow-[2px_2px_0px_0px_#fff]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-neo-violet border-2 border-black dark:border-white rounded-md flex items-center justify-center">
-            <Users className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold dark:text-white">{formatNumber(stats.users)}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Utilisateurs</p>
           </div>
         </div>
       </div>
