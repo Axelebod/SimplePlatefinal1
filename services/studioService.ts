@@ -703,16 +703,32 @@ export async function unlockProjectAudit(
     }
 
     // Now generate the audit (credits already deducted)
-    console.log('Generating audit...');
-    const auditResult = await performCompleteAudit(
-      project.url,
-      project.name,
-      project.description || '',
-      language
-    );
+    console.log('Generating audit...', {
+      url: project.url,
+      name: project.name,
+      description: project.description,
+      language,
+    });
+    
+    let auditResult;
+    try {
+      auditResult = await performCompleteAudit(
+        project.url,
+        project.name,
+        project.description || '',
+        language
+      );
+      console.log('Audit generated successfully:', {
+        overall_score: auditResult.overall_score,
+        categories_count: auditResult.categories?.length || 0,
+      });
+    } catch (auditGenError: any) {
+      console.error('Error generating audit:', auditGenError);
+      throw auditGenError; // Re-throw to trigger fallback
+    }
 
     // Update project with audit result
-    // Simple approach: let Supabase handle JSONB serialization automatically
+    console.log('Saving audit to database...');
     const { error: updateError } = await supabase
       .from('projects')
       .update({
@@ -731,6 +747,8 @@ export async function unlockProjectAudit(
       });
       throw new Error(`Failed to save audit: ${updateError.message}`);
     }
+    
+    console.log('Audit saved successfully to database');
 
     // Get updated credits to return accurate remaining amount
     const { data: updatedProfile } = await supabase
