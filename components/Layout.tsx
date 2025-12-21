@@ -236,6 +236,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <button 
                 onClick={toggleDarkMode} 
                 className="p-2 text-black dark:text-white"
+                aria-label={isDarkMode ? (language === 'fr' ? 'Désactiver le mode sombre' : 'Disable dark mode') : (language === 'fr' ? 'Activer le mode sombre' : 'Enable dark mode')}
             >
                  {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -243,12 +244,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 onClick={handleToggleLanguage}
                 className="p-2 text-black dark:text-white font-bold"
                 title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
+                aria-label={language === 'fr' ? 'Passer en anglais' : 'Switch to French'}
             >
                 <Languages className="w-5 h-5" />
             </button>
             <button 
                 className="p-2 text-black dark:text-white"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? (language === 'fr' ? 'Fermer le menu' : 'Close menu') : (language === 'fr' ? 'Ouvrir le menu' : 'Open menu')}
             >
                 {isMenuOpen ? <X /> : <Menu />}
             </button>
@@ -283,15 +286,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                                 <span>Reset crédits gratuits: {timeRemaining}</span>
                             </div>
                         )}
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                            {creditsFree} gratuits (hebdo) + {creditsPaid} payants
-                            {creditsFree < 5 && timeRemaining && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    <Clock className="w-3 h-3" aria-hidden="true" />
-                                    <span>Reset crédits gratuits: {timeRemaining}</span>
-                                </div>
-                            )}
-                        </div>
                     </div>
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
                         Voir les Outils

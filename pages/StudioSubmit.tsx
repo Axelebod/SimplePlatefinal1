@@ -9,6 +9,7 @@ import type { SubmitProjectData, ProjectCategory, ProjectLink } from '../types/s
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { useToast } from '../contexts/ToastContext';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export const StudioSubmit: React.FC = () => {
   const navigate = useNavigate();
@@ -62,18 +63,54 @@ export const StudioSubmit: React.FC = () => {
     e.preventDefault();
     setError(null);
 
-    if (!formData.url || !formData.name) {
-      const errorMsg = language === 'fr' ? 'URL et nom sont requis' : 'URL and name are required';
+    // Validation du nom
+    if (!formData.name || formData.name.trim().length < 2) {
+      const errorMsg = language === 'fr' ? 'Le nom doit contenir au moins 2 caractères' : 'Name must be at least 2 characters';
+      setError(errorMsg);
+      showError(errorMsg);
+      return;
+    }
+
+    if (formData.name.length > 100) {
+      const errorMsg = language === 'fr' ? 'Le nom ne peut pas dépasser 100 caractères' : 'Name cannot exceed 100 characters';
+      setError(errorMsg);
+      showError(errorMsg);
+      return;
+    }
+
+    // Validation de l'URL
+    if (!formData.url || formData.url.trim().length === 0) {
+      const errorMsg = language === 'fr' ? 'L\'URL est requise' : 'URL is required';
       setError(errorMsg);
       showError(errorMsg);
       return;
     }
 
     // Basic URL validation
+    let urlToValidate = formData.url.trim();
+    if (!urlToValidate.startsWith('http://') && !urlToValidate.startsWith('https://')) {
+      urlToValidate = 'https://' + urlToValidate;
+    }
+
     try {
-      new URL(formData.url);
+      const validatedUrl = new URL(urlToValidate);
+      if (!['http:', 'https:'].includes(validatedUrl.protocol)) {
+        throw new Error('Invalid protocol');
+      }
+      // Mettre à jour l'URL avec le protocole si nécessaire
+      if (urlToValidate !== formData.url) {
+        setFormData({ ...formData, url: urlToValidate });
+      }
     } catch {
-      const errorMsg = language === 'fr' ? 'URL invalide' : 'Invalid URL';
+      const errorMsg = language === 'fr' ? 'URL invalide. Veuillez entrer une URL valide (ex: example.com ou https://example.com)' : 'Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com)';
+      setError(errorMsg);
+      showError(errorMsg);
+      return;
+    }
+
+    // Validation de la description (optionnelle mais si fournie, doit être valide)
+    if (formData.description && formData.description.length > 1000) {
+      const errorMsg = language === 'fr' ? 'La description ne peut pas dépasser 1000 caractères' : 'Description cannot exceed 1000 characters';
       setError(errorMsg);
       showError(errorMsg);
       return;
@@ -352,7 +389,12 @@ export const StudioSubmit: React.FC = () => {
           <div className="flex items-center gap-4">
             {formData.screenshot_url ? (
               <div className="flex items-center gap-4">
-                <img src={formData.screenshot_url} alt="Screenshot" className="w-32 h-20 object-cover border-2 border-black dark:border-white rounded-md" />
+                <img 
+                  src={formData.screenshot_url} 
+                  alt={`Capture d'écran de ${formData.name || 'votre projet'}`}
+                  className="w-32 h-20 object-cover border-2 border-black dark:border-white rounded-md" 
+                  loading="lazy"
+                />
                 <button
                   type="button"
                   onClick={() => {

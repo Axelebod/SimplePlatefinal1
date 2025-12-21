@@ -11,6 +11,7 @@ import { getTools } from '../tools-config';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from '../contexts/ToastContext';
 import { getProjectImageUrl, getFaviconUrl } from '../utils/faviconUtils';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 export const StudioProject: React.FC = () => {
   const { slug, id } = useParams<{ slug?: string; id?: string }>();
@@ -32,6 +33,8 @@ export const StudioProject: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [freeAuditsRemaining, setFreeAuditsRemaining] = useState<number | null>(null);
   const [isAuditOpen, setIsAuditOpen] = useState(true);
+  const [showBoostConfirm, setShowBoostConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const tools = React.useMemo(() => getTools(language), [language]);
 
   useSEO({
@@ -248,12 +251,12 @@ export const StudioProject: React.FC = () => {
       return;
     }
 
-    if (!confirm(language === 'fr' 
-      ? 'Boostez ce projet pour 1 semaine avec 100 crédits ? Il apparaîtra en haut du classement.'
-      : 'Boost this project for 1 week with 100 credits? It will appear at the top of the leaderboard.')) {
-      return;
-    }
+    setShowBoostConfirm(true);
+  };
 
+  const handleBoostConfirm = async () => {
+    if (!user || !project) return;
+    setShowBoostConfirm(false);
     setBoosting(true);
     try {
       const result = await boostProject(project.id);
@@ -278,13 +281,29 @@ export const StudioProject: React.FC = () => {
       return;
     }
 
-    // Validate review content
+    // Validation de base
+    const trimmedContent = reviewContent.trim();
+    if (!trimmedContent || trimmedContent.length < 100) {
+      warning(language === 'fr' 
+        ? 'Le commentaire doit contenir au moins 100 caractères'
+        : 'Review must be at least 100 characters');
+      return;
+    }
+
+    if (trimmedContent.length > 2000) {
+      warning(language === 'fr' 
+        ? 'Le commentaire ne peut pas dépasser 2000 caractères'
+        : 'Review cannot exceed 2000 characters');
+      return;
+    }
+
+    // Validation anti-spam
     const { validateReviewContent } = await import('../utils/reviewValidation');
-    const validation = validateReviewContent(reviewContent);
+    const validation = validateReviewContent(trimmedContent);
     if (!validation.valid) {
       warning(validation.error || (language === 'fr' 
-        ? 'Le commentaire doit contenir plus de 100 caractères'
-        : 'Review must be more than 100 characters'));
+        ? 'Le commentaire semble contenir du spam. Veuillez écrire un commentaire plus détaillé.'
+        : 'Review appears to contain spam. Please write a more detailed review.'));
       return;
     }
 
@@ -388,6 +407,13 @@ export const StudioProject: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: language === 'fr' ? 'Studio' : 'Studio', path: '/studio' },
+          { label: project?.name || (language === 'fr' ? 'Projet' : 'Project') },
+        ]}
+      />
       {/* Back Button */}
       <Link
         to="/studio"
@@ -403,29 +429,7 @@ export const StudioProject: React.FC = () => {
         <div className="flex justify-end gap-2 mb-4">
           {project.user_owns && (
             <button
-              onClick={async () => {
-                if (!confirm(language === 'fr' 
-                  ? 'Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.'
-                  : 'Are you sure you want to delete this project? This action cannot be undone.')) {
-                  return;
-                }
-                
-                setDeleting(true);
-                try {
-                  const result = await deleteProject(project.id);
-                  if (result.success) {
-                    success(language === 'fr' ? 'Projet supprimé avec succès' : 'Project deleted successfully');
-                    setTimeout(() => navigate('/studio'), 1000);
-                  } else {
-                    showError(result.message || (language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project'));
-                  }
-                } catch (error) {
-                  console.error('Error deleting project:', error);
-                  showError(language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project');
-                } finally {
-                  setDeleting(false);
-                }
-              }}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={deleting}
               className="px-4 py-2 bg-neo-red text-white border-2 border-black rounded-md font-bold hover:bg-neo-red/90 transition-colors flex items-center gap-2 disabled:opacity-50"
             >
@@ -486,8 +490,9 @@ export const StudioProject: React.FC = () => {
             {project.screenshot_url && (
               <img 
                 src={project.screenshot_url} 
-                alt={`${project.name} screenshot`} 
+                alt={`Capture d'écran de ${project.name} - ${project.description || 'Projet Micro-SaaS'}`}
                 className="w-full md:w-96 h-48 object-cover border-2 border-black dark:border-white rounded-md"
+                loading="lazy"
                 onError={(e) => {
                   // Hide image if it fails to load
                   const target = e.target as HTMLImageElement;
@@ -844,6 +849,36 @@ export const StudioProject: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Boost Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showBoostConfirm}
+        onClose={() => setShowBoostConfirm(false)}
+        onConfirm={handleBoostConfirm}
+        title={language === 'fr' ? 'Booster le projet' : 'Boost Project'}
+        message={language === 'fr' 
+          ? 'Boostez ce projet pour 1 semaine avec 100 crédits ? Il apparaîtra en haut du classement.'
+          : 'Boost this project for 1 week with 100 credits? It will appear at the top of the leaderboard.'}
+        confirmText={language === 'fr' ? 'Booster' : 'Boost'}
+        cancelText={language === 'fr' ? 'Annuler' : 'Cancel'}
+        variant="warning"
+        isLoading={boosting}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteConfirm}
+        title={language === 'fr' ? 'Supprimer le projet' : 'Delete Project'}
+        message={language === 'fr' 
+          ? 'Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.'
+          : 'Are you sure you want to delete this project? This action cannot be undone.'}
+        confirmText={language === 'fr' ? 'Supprimer' : 'Delete'}
+        cancelText={language === 'fr' ? 'Annuler' : 'Cancel'}
+        variant="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

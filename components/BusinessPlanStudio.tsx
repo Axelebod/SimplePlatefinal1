@@ -6,6 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { ToolConfig } from '../types';
 import { useUserStore } from '../store/userStore';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 import { RichTextEditor } from './RichTextEditor';
 import { HtmlResultDisplay } from './HtmlResultDisplay';
 
@@ -55,7 +56,7 @@ export const BusinessPlanStudio: React.FC<BusinessPlanStudioProps> = ({
 
   const { exportToPDF } = useExportToPDF({ 
     filename: 'business-plan',
-    onError: (err) => alert(`Erreur export PDF: ${err.message}`)
+    onError: (err) => showError(`Erreur export PDF: ${err.message}`)
   });
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export const BusinessPlanStudio: React.FC<BusinessPlanStudioProps> = ({
     }
 
     if (!hasCredits) {
-      alert(`${t('tools.noCredits')} ${t('tools.creditsRequired')} ${tool?.cost || 3}.`);
+      warning(`${t('tools.noCredits')} ${t('tools.creditsRequired')} ${tool?.cost || 3}.`);
       return;
     }
 
@@ -118,7 +119,7 @@ export const BusinessPlanStudio: React.FC<BusinessPlanStudioProps> = ({
     if (tool?.inputs?.length) {
       const missing = tool.inputs.filter((i) => i.required && !formInputs[i.name]);
       if (missing.length) {
-        alert(`${t('tools.fillRequired')}: ${missing.map((m) => m.label).join(', ')}`);
+        warning(`${t('tools.fillRequired')}: ${missing.map((m) => m.label).join(', ')}`);
         return;
       }
     }

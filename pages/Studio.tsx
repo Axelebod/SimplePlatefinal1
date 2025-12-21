@@ -10,6 +10,7 @@ import { useSEO } from '../hooks/useSEO';
 import { useToast } from '../contexts/ToastContext';
 import { ProjectCardSkeleton } from '../components/LoadingSkeleton';
 import { getProjectImageUrl } from '../utils/faviconUtils';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 export const Studio: React.FC = () => {
   const { user, credits } = useUserStore();
@@ -113,12 +114,13 @@ export const Studio: React.FC = () => {
       return;
     }
 
-    if (!confirm(language === 'fr' 
-      ? 'Boostez ce projet pour 1 semaine avec 100 crédits ?'
-      : 'Boost this project for 1 week with 100 credits?')) {
-      return;
-    }
+    setShowBoostConfirm(projectId);
+  };
 
+  const handleBoostConfirm = async () => {
+    const projectId = showBoostConfirm;
+    if (!projectId) return;
+    setShowBoostConfirm(null);
     setBoosting(projectId);
     try {
       const result = await boostProject(projectId);
@@ -187,6 +189,7 @@ export const Studio: React.FC = () => {
             }}
             disabled={loadingRandom}
             className="px-6 py-3 bg-neo-violet text-white font-bold border-2 border-black dark:border-white rounded-md shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center gap-2 disabled:opacity-50"
+            aria-label={language === 'fr' ? 'Voir un projet aléatoire' : 'View random project'}
           >
             <Shuffle className="w-5 h-5" />
             {loadingRandom 
@@ -253,8 +256,9 @@ export const Studio: React.FC = () => {
                   return imageUrl ? (
                     <img 
                       src={imageUrl} 
-                      alt={`${project.name} ${project.logo_url ? 'logo' : project.screenshot_url ? 'screenshot' : 'favicon'}`} 
+                      alt={`${project.logo_url ? 'Logo' : project.screenshot_url ? 'Capture d\'écran' : 'Favicon'} de ${project.name} - ${project.description || 'Projet Micro-SaaS'}`}
                       className="w-16 h-16 object-contain border-2 border-black dark:border-white rounded-md flex-shrink-0"
+                      loading="lazy"
                       onError={(e) => {
                         // Fallback to favicon if image fails to load
                         if (project.logo_url || project.screenshot_url) {
@@ -285,6 +289,7 @@ export const Studio: React.FC = () => {
                         onClick={() => handleBoost(project.id)}
                         disabled={boosting === project.id || credits < 100}
                         className="flex items-center gap-1 px-2 py-1 bg-neo-yellow border-2 border-black rounded-md text-xs font-bold hover:bg-neo-yellow/90 transition-colors disabled:opacity-50"
+                        aria-label={language === 'fr' ? `Booster ${project.name}` : `Boost ${project.name}`}
                       >
                         <Zap className="w-3 h-3" />
                         {language === 'fr' ? 'Boost (100)' : 'Boost (100)'}
@@ -300,6 +305,10 @@ export const Studio: React.FC = () => {
                       ? 'bg-neo-violet text-white border-neo-violet'
                       : 'bg-white dark:bg-gray-600 border-black dark:border-white hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
+                  aria-label={project.user_voted 
+                    ? (language === 'fr' ? `Retirer le vote pour ${project.name}` : `Remove vote for ${project.name}`)
+                    : (language === 'fr' ? `Voter pour ${project.name}` : `Vote for ${project.name}`)
+                  }
                 >
                   <Heart className={`w-4 h-4 ${project.user_voted ? 'fill-current' : ''}`} />
                   {project.votes_count}
@@ -336,6 +345,21 @@ export const Studio: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Boost Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showBoostConfirm !== null}
+        onClose={() => setShowBoostConfirm(null)}
+        onConfirm={handleBoostConfirm}
+        title={language === 'fr' ? 'Booster le projet' : 'Boost Project'}
+        message={language === 'fr' 
+          ? 'Boostez ce projet pour 1 semaine avec 100 crédits ? Il apparaîtra en haut du classement.'
+          : 'Boost this project for 1 week with 100 credits? It will appear at the top of the leaderboard.'}
+        confirmText={language === 'fr' ? 'Booster' : 'Boost'}
+        cancelText={language === 'fr' ? 'Annuler' : 'Cancel'}
+        variant="warning"
+        isLoading={boosting === showBoostConfirm}
+      />
     </div>
   );
 };

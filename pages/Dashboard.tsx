@@ -10,6 +10,7 @@ import { getUserProjects, deleteProject } from '../services/studioService';
 import type { Project } from '../types/studio';
 import { useToast } from '../contexts/ToastContext';
 import { getProjectImageUrl } from '../utils/faviconUtils';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 export const Dashboard: React.FC = () => {
   const { user, credits, logout, refreshCredits, updateUsername } = useUserStore();
@@ -18,7 +19,7 @@ export const Dashboard: React.FC = () => {
   const [usernameError, setUsernameError] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { t, language } = useTranslation();
-  const { success, error: showError } = useToast();
+  const { success, error: showError, warning, info } = useToast();
   const [nextResetDate, setNextResetDate] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [myProjects, setMyProjects] = useState<Project[]>([]);
@@ -138,7 +139,9 @@ export const Dashboard: React.FC = () => {
       if (portalUrl && !portalUrl.includes('votre_portail')) {
           window.location.href = portalUrl;
       } else {
-          alert("Le portail client Stripe n'est pas encore configuré. Veuillez configurer REACT_APP_STRIPE_PORTAL dans vos variables d'environnement.");
+          warning(language === 'fr' 
+            ? "Le portail client Stripe n'est pas encore configuré. Veuillez configurer REACT_APP_STRIPE_PORTAL dans vos variables d'environnement."
+            : "Stripe customer portal is not yet configured. Please configure REACT_APP_STRIPE_PORTAL in your environment variables.");
       }
   };
 
@@ -237,8 +240,9 @@ export const Dashboard: React.FC = () => {
                     return imageUrl ? (
                       <img 
                         src={imageUrl} 
-                        alt={`${project.name}`} 
+                        alt={`${project.logo_url ? 'Logo' : project.screenshot_url ? 'Capture d\'écran' : 'Favicon'} de ${project.name}`}
                         className="w-12 h-12 object-contain border-2 border-black dark:border-white rounded-md flex-shrink-0"
+                        loading="lazy"
                         onError={(e) => {
                           if (project.logo_url || project.screenshot_url) {
                             const target = e.target as HTMLImageElement;
@@ -259,29 +263,7 @@ export const Dashboard: React.FC = () => {
                       {project.votes_count} {language === 'fr' ? 'votes' : 'votes'}
                     </span>
                     <button
-                      onClick={async () => {
-                        if (!confirm(language === 'fr' 
-                          ? 'Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.'
-                          : 'Are you sure you want to delete this project? This action cannot be undone.')) {
-                          return;
-                        }
-                        
-                        setDeletingProjectId(project.id);
-                        try {
-                          const result = await deleteProject(project.id);
-                          if (result.success) {
-                            setMyProjects(myProjects.filter(p => p.id !== project.id));
-                            success(language === 'fr' ? 'Projet supprimé avec succès' : 'Project deleted successfully');
-                          } else {
-                            showError(result.message || (language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project'));
-                          }
-                        } catch (error) {
-                          console.error('Error deleting project:', error);
-                          showError(language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project');
-                        } finally {
-                          setDeletingProjectId(null);
-                        }
-                      }}
+                      onClick={() => setShowDeleteConfirm(project.id)}
                       disabled={deletingProjectId === project.id}
                       className="p-1.5 text-neo-red hover:bg-neo-red/10 rounded transition-colors disabled:opacity-50"
                       title={language === 'fr' ? 'Supprimer le projet' : 'Delete project'}
@@ -413,6 +395,39 @@ export const Dashboard: React.FC = () => {
           </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm !== null}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={async () => {
+          const projectId = showDeleteConfirm;
+          if (!projectId) return;
+          setShowDeleteConfirm(null);
+          setDeletingProjectId(projectId);
+          try {
+            const result = await deleteProject(projectId);
+            if (result.success) {
+              setMyProjects(myProjects.filter(p => p.id !== projectId));
+              success(language === 'fr' ? 'Projet supprimé avec succès' : 'Project deleted successfully');
+            } else {
+              showError(result.message || (language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project'));
+            }
+          } catch (error) {
+            console.error('Error deleting project:', error);
+            showError(language === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting project');
+          } finally {
+            setDeletingProjectId(null);
+          }
+        }}
+        title={language === 'fr' ? 'Supprimer le projet' : 'Delete Project'}
+        message={language === 'fr' 
+          ? 'Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.'
+          : 'Are you sure you want to delete this project? This action cannot be undone.'}
+        confirmText={language === 'fr' ? 'Supprimer' : 'Delete'}
+        cancelText={language === 'fr' ? 'Annuler' : 'Cancel'}
+        variant="danger"
+        isLoading={deletingProjectId === showDeleteConfirm}
+      />
     </div>
   );
 };

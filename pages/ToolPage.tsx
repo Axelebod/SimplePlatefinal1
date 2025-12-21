@@ -31,11 +31,13 @@ import { useToolSEO } from '../hooks/useToolSEO';
 import { useToolGeneration } from '../hooks/useToolGeneration';
 import { useDebounce } from '../hooks/useDebounce';
 import { useTranslation } from '../hooks/useTranslation';
+import { useToast } from '../contexts/ToastContext';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t, language } = useTranslation();
+  const { error: showError, warning, success, info } = useToast();
   const tools = React.useMemo(() => getTools(language), [language]);
   
   // Trouver l'outil correspondant au slug
@@ -196,7 +198,7 @@ export const ToolPage: React.FC = () => {
       const file = e.target.files?.[0];
       if (file) {
           if (file.size > 4 * 1024 * 1024) { // Limit 4MB
-              alert(t('toolPage.fileTooLarge'));
+              showError(t('toolPage.fileTooLarge'));
               return;
           }
           setFileName(file.name);
@@ -230,7 +232,7 @@ export const ToolPage: React.FC = () => {
     }
 
     if (!hasCredits) {
-      alert(`${t('tools.noCredits')} ${t('tools.creditsRequired')} ${tool.cost}.`);
+      warning(`${t('tools.noCredits')} ${t('tools.creditsRequired')} ${tool.cost}.`);
       return;
     }
 
@@ -372,13 +374,13 @@ export const ToolPage: React.FC = () => {
 
       if (response.success) {
         setIsResultSaved(true);
-        alert(t('toolPage.savedSuccess'));
+        success(t('toolPage.savedSuccess'));
       } else {
-        alert(`❌ ${response.message || t('toolPage.saveError')}`);
+        showError(response.message || t('toolPage.saveError'));
       }
     } catch (error: any) {
       console.error('Error saving result:', error);
-      alert(t('toolPage.saveErrorRetry'));
+      showError(t('toolPage.saveErrorRetry'));
     } finally {
       setSavingResult(false);
     }
@@ -387,7 +389,7 @@ export const ToolPage: React.FC = () => {
   const copyToClipboard = () => {
     if (result) {
       navigator.clipboard.writeText(result);
-      alert(t('tools.copied'));
+      success(t('tools.copied'));
     }
   };
 
@@ -421,7 +423,7 @@ export const ToolPage: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('ZIP generation error:', error);
-      alert('Impossible de préparer le ZIP. Réessayez dans un instant.');
+      showError(language === 'fr' ? 'Impossible de préparer le ZIP. Réessayez dans un instant.' : 'Unable to prepare ZIP. Please try again in a moment.');
     }
   };
 
@@ -754,7 +756,13 @@ export const ToolPage: React.FC = () => {
              {!loading && result && (
                tool.outputType === 'image' ? (
                  <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500">
-                    <img src={String(result)} alt="Résultat généré" className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" onError={(e) => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }} />
+                    <img 
+                      src={String(result)} 
+                      alt={`Résultat généré par ${tool.title} - Image créée par intelligence artificielle`}
+                      className="max-w-full rounded-md border-2 border-black dark:border-gray-500 shadow-sm" 
+                      loading="lazy"
+                      onError={(e) => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }} 
+                    />
                     <div className="mt-4 text-center">
                       <a href={String(result)} download={`simpleplate-${tool.id}.png`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black rounded-md text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200">
                         {t('toolPage.downloadImage')}
@@ -925,7 +933,7 @@ export const ToolPage: React.FC = () => {
                                           onClick={() => {
                                             const code = String(children).replace(/\n$/, '');
                                             navigator.clipboard.writeText(code);
-                                            alert(t('tools.copied'));
+                                            success(t('tools.copied'));
                                           }}
                                           className="absolute top-2 right-2 px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600"
                                         >
