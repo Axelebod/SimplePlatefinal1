@@ -674,21 +674,16 @@ export const StudioProject: React.FC = () => {
                     <div key={idx} className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-5 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-display text-xl font-bold dark:text-white">{category.name}</h3>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-3xl font-bold ${scoreColor}`}>
-                            {category.score}/100
+                        <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center ${
+                          category.score >= 80 
+                            ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+                            : category.score >= 60 
+                            ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' 
+                            : 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                        }`}>
+                          <span className={`text-lg font-bold ${scoreColor}`}>
+                            {category.score}%
                           </span>
-                          <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center ${
-                            category.score >= 80 
-                              ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
-                              : category.score >= 60 
-                              ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' 
-                              : 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                          }`}>
-                            <span className={`text-lg font-bold ${scoreColor}`}>
-                              {category.score}%
-                            </span>
-                          </div>
                         </div>
                       </div>
                       
