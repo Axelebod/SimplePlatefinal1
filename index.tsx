@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './index.css';
 
 // Gestionnaire d'erreur global pour filtrer les erreurs des scripts tiers
 window.addEventListener('error', (event) => {
