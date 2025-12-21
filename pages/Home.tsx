@@ -14,6 +14,8 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { generateSitelinksJsonLd, STUDIO_SITELINKS, STUDIO_SITELINKS_EN } from '../utils/sitelinks';
 import { setJsonLd } from '../utils/seo';
+import { generateSitelinksJsonLd, STUDIO_SITELINKS, STUDIO_SITELINKS_EN } from '../utils/sitelinks';
+import { setJsonLd } from '../utils/seo';
 
 export const Home: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
