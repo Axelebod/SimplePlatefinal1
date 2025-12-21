@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getTools } from '../tools-config';
 import { ToolCard } from '../components/ToolCard';
 import { CATEGORIES, getCategoryLabel } from '../constants';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { StatsCounter } from '../components/StatsCounter';
 import { HomeCTA } from '../components/HomeCTA';
@@ -12,8 +12,6 @@ import { WelcomeModal } from '../components/WelcomeModal';
 import { StudioBanner } from '../components/StudioBanner';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
-import { generateSitelinksJsonLd, STUDIO_SITELINKS, STUDIO_SITELINKS_EN } from '../utils/sitelinks';
-import { setJsonLd } from '../utils/seo';
 import { generateSitelinksJsonLd, STUDIO_SITELINKS, STUDIO_SITELINKS_EN } from '../utils/sitelinks';
 import { setJsonLd } from '../utils/seo';
 
@@ -111,44 +109,57 @@ export const Home: React.FC = () => {
       <TrustBadges />
 
       {/* Controls */}
-      <div className="sticky top-0 md:top-20 z-40 bg-neo-white dark:bg-gray-800 border-b-2 border-black dark:border-white py-4 space-y-4 transition-all shadow-neo-sm backdrop-blur-md">
-        {/* Search */}
-        <div className="relative max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder={t('homePage.searchPlaceholder')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-black dark:border-white rounded-md shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] focus:outline-none focus:ring-2 focus:ring-neo-violet bg-white dark:bg-gray-600 dark:text-white placeholder-gray-500 dark:placeholder-gray-300"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white w-5 h-5" />
-        </div>
+      <div className="sticky top-16 md:top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm py-6 transition-all">
+        <div className="max-w-4xl mx-auto px-4 space-y-5">
+          {/* Search */}
+          <div className="relative max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5 pointer-events-none" />
+              <input
+                type="text"
+                placeholder={t('homePage.searchPlaceholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-neo-violet focus:border-transparent dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all hover:border-gray-400 dark:hover:border-gray-600"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Effacer la recherche"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
 
-        {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => setSelectedCategory('All')}
-            className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
-              selectedCategory === 'All' 
-                ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
-            }`}
-          >
-            {t('common.all')}
-          </button>
-          {CATEGORIES.map(cat => (
+          {/* Categories */}
+          <div className="flex flex-wrap justify-center gap-2">
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 text-sm font-bold border border-black dark:border-white rounded-full transition-all ${
-                selectedCategory === cat 
-                  ? 'bg-neo-black text-white shadow-neo-sm dark:bg-white dark:text-black dark:shadow-[2px_2px_0px_0px_#000]'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500'
+              onClick={() => setSelectedCategory('All')}
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                selectedCategory === 'All' 
+                  ? 'bg-neo-violet text-white shadow-md' 
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
-              {getCategoryLabel(cat, language)}
+              {t('common.all')}
             </button>
-          ))}
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  selectedCategory === cat 
+                    ? 'bg-neo-violet text-white shadow-md'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {getCategoryLabel(cat, language)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
