@@ -192,8 +192,8 @@ Respond ONLY with valid JSON, no text before/after.`;
     
     // Vérifier si la réponse est une erreur
     if (!response || response.includes("Désolé") || response.includes("erreur") || response.includes("error")) {
-      console.warn('AI returned error message, using fallback audit');
-      return generateFallbackAudit(projectUrl, projectName, language, tools);
+      console.error('AI returned error message:', response);
+      throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
     }
     
     // Extraire le JSON de la réponse (peut contenir du markdown ou du texte)
@@ -205,8 +205,8 @@ Respond ONLY with valid JSON, no text before/after.`;
     // Trouver le JSON dans la réponse
     const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.warn('No JSON found in AI response, using fallback audit');
-      return generateFallbackAudit(projectUrl, projectName, language, tools);
+      console.error('No JSON found in AI response. Response:', response.substring(0, 500));
+      throw new Error('L\'IA n\'a pas retourné un format JSON valide. Veuillez réessayer.');
     }
     
     jsonString = jsonMatch[0];
@@ -215,14 +215,14 @@ Respond ONLY with valid JSON, no text before/after.`;
     try {
       auditData = JSON.parse(jsonString);
     } catch (parseError) {
-      console.error('JSON parse error:', parseError, 'Response:', jsonString.substring(0, 200));
-      return generateFallbackAudit(projectUrl, projectName, language, tools);
+      console.error('JSON parse error:', parseError, 'Response:', jsonString.substring(0, 500));
+      throw new Error('Erreur lors de l\'analyse de la réponse de l\'IA. Veuillez réessayer.');
     }
     
     // Valider la structure de base
     if (!auditData || typeof auditData !== 'object') {
-      console.warn('Invalid audit data structure, using fallback');
-      return generateFallbackAudit(projectUrl, projectName, language, tools);
+      console.error('Invalid audit data structure. Data:', auditData);
+      throw new Error('La structure de l\'audit généré par l\'IA est invalide. Veuillez réessayer.');
     }
     
     // Valider et enrichir les données
@@ -230,8 +230,8 @@ Respond ONLY with valid JSON, no text before/after.`;
     
     // S'assurer qu'on a au moins une catégorie
     if (!enrichedAudit.categories || enrichedAudit.categories.length === 0) {
-      console.warn('No categories in audit, using fallback');
-      return generateFallbackAudit(projectUrl, projectName, language, tools);
+      console.error('No categories in audit. Enriched audit:', enrichedAudit);
+      throw new Error('L\'audit généré par l\'IA ne contient aucune catégorie. Veuillez réessayer.');
     }
     
     return {
@@ -243,8 +243,8 @@ Respond ONLY with valid JSON, no text before/after.`;
     console.error('Error performing audit:', error);
     console.error('Error details:', error?.message, error?.stack);
     
-    // Fallback: Audit de base avec suggestions génériques
-    return generateFallbackAudit(projectUrl, projectName, language, tools);
+    // Ne pas utiliser de fallback - propager l'erreur
+    throw error;
   }
 }
 
