@@ -98,7 +98,19 @@ RÈGLES STRICTES:
 
 7. Score: 0-100 pour chaque catégorie et overall_score (sois sévère mais juste)
 
-6. IMPORTANT: 
+6. OUTILS SIMPLEPLATE DISPONIBLES (suggère-les si pertinent):
+   ${availableToolsList}
+   
+   Exemples de suggestions intelligentes:
+   - Problème JSON/format → "json-formatter"
+   - Problème SEO/meta tags → "seo-meta-generator"
+   - Problème copywriting/contenu → "business-plan-pro"
+   - Problème slug/URL → "slug-gen"
+   - Problème couleurs → "hex-color-display"
+   - Problème spacing/px → "px-rem-converter"
+   - Problème site web → "website-generator"
+
+7. IMPORTANT: 
    - Analyse le site réellement (pas de réponse générique)
    - Sois exhaustif: plus de problèmes = meilleur audit
    - Réponds UNIQUEMENT avec le JSON, sans texte avant/après
@@ -137,6 +149,18 @@ STRICT RULES:
    - Examples: JSON issue → "json-formatter", SEO issue → "seo-meta-generator", copywriting issue → "business-plan-pro"
 
 6. Score: 0-100 for each category and overall_score
+
+6. SIMPLEPLATE TOOLS AVAILABLE (suggest if relevant):
+   ${availableToolsList}
+   
+   Smart suggestion examples:
+   - JSON/format issue → "json-formatter"
+   - SEO/meta tags issue → "seo-meta-generator"
+   - Copywriting/content issue → "business-plan-pro"
+   - Slug/URL issue → "slug-gen"
+   - Color issue → "hex-color-display"
+   - Spacing/px issue → "px-rem-converter"
+   - Website issue → "website-generator"
 
 IMPORTANT: Respond ONLY with JSON, no text before/after.`;
 
