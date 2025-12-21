@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import { useSEO } from '../hooks/useSEO';
 import { useTranslation } from '../hooks/useTranslation';
 import { BLOG_POSTS, getBlogPostBySlug } from '../content/blogPosts';
+import { Calendar, Clock, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -60,56 +62,138 @@ export const BlogPost: React.FC = () => {
     .filter(Boolean) as typeof BLOG_POSTS;
 
   return (
-    <article className="max-w-3xl mx-auto">
-      <nav className="mb-6">
-        <Link to="/blog" className="font-bold underline text-sm text-gray-600 dark:text-gray-300">
-          ← Blog
-        </Link>
-      </nav>
+    <article className="max-w-4xl mx-auto px-4 py-8">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: language === 'fr' ? 'Accueil' : 'Home', path: '/' },
+          { label: language === 'fr' ? 'Blog' : 'Blog', path: '/blog' },
+          { label: post.title },
+        ]}
+      />
 
-      {/* H1 = mot-clé principal */}
-      <h1 className="font-display text-4xl md:text-5xl font-bold dark:text-white">{post.h1}</h1>
-      <p className="mt-3 text-gray-600 dark:text-gray-300">{post.excerpt}</p>
+      {/* Back button */}
+      <Link
+        to="/blog"
+        className="inline-flex items-center gap-2 mb-6 text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-neo-violet transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>{language === 'fr' ? 'Retour au blog' : 'Back to blog'}</span>
+      </Link>
 
-      <div className="mt-8 prose prose-sm max-w-none markdown-body dark:prose-invert">
-        <ReactMarkdown>{post.bodyMarkdown}</ReactMarkdown>
+      {/* Header */}
+      <header className="mb-8 pb-6 border-b-2 border-black dark:border-white">
+        <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold dark:text-white mb-4 leading-tight">
+          {post.h1}
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
+          {post.excerpt}
+        </p>
+        
+        {/* Metadata */}
+        <div className="flex items-center gap-6 text-sm font-semibold text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            <span>{post.publishedAt}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            <span>{post.readingTime}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <div className="prose prose-lg max-w-none markdown-body dark:prose-invert">
+        <ReactMarkdown
+          components={{
+            h1: ({ node, ...props }) => (
+              <h1 className="font-display text-3xl font-bold mt-8 mb-4 dark:text-white" {...props} />
+            ),
+            h2: ({ node, ...props }) => (
+              <h2 className="font-display text-2xl font-bold mt-8 mb-3 dark:text-white" {...props} />
+            ),
+            h3: ({ node, ...props }) => (
+              <h3 className="font-display text-xl font-bold mt-6 mb-2 dark:text-white" {...props} />
+            ),
+            p: ({ node, ...props }) => (
+              <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />
+            ),
+            a: ({ node, ...props }) => (
+              <a className="text-neo-violet font-bold underline hover:text-neo-blue transition-colors" {...props} />
+            ),
+            strong: ({ node, ...props }) => (
+              <strong className="font-bold text-black dark:text-white" {...props} />
+            ),
+            ul: ({ node, ...props }) => (
+              <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+            ),
+            ol: ({ node, ...props }) => (
+              <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+            ),
+            code: ({ node, ...props }) => (
+              <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono" {...props} />
+            ),
+            pre: ({ node, ...props }) => (
+              <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4 border-2 border-black dark:border-white" {...props} />
+            ),
+          }}
+        >
+          {post.bodyMarkdown}
+        </ReactMarkdown>
       </div>
 
       {/* CTA */}
-      <div className="mt-10 bg-neo-yellow border-2 border-black rounded-lg p-6 shadow-neo">
-        <h2 className="font-display text-2xl font-bold">Prêt à essayer ?</h2>
-        <p className="mt-2 text-sm text-gray-800">
+      <div className="mt-12 bg-gradient-to-br from-neo-yellow to-neo-green border-2 border-black dark:border-white rounded-xl p-8 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
+        <h2 className="font-display text-3xl font-bold mb-3 dark:text-white">
+          {language === 'fr' ? 'Prêt à essayer ?' : 'Ready to try?'}
+        </h2>
+        <p className="text-base text-gray-800 dark:text-gray-200 mb-6">
           {language === 'fr'
-            ? "Ouvrez SimplePlate et utilisez l'outil adapté à votre besoin."
-            : 'Open SimplePlate and use the right tool for your needs.'}
+            ? "Ouvrez SimplePlate et utilisez l'outil adapté à votre besoin. Plus de 50 outils gratuits à votre disposition."
+            : 'Open SimplePlate and use the right tool for your needs. Over 50 free tools at your disposal.'}
         </p>
         <Link
           to="/"
-          className="mt-4 inline-flex items-center justify-center px-5 py-3 bg-neo-black text-white font-bold border-2 border-black rounded-md hover:bg-gray-800 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-neo-black dark:bg-white text-white dark:text-black font-bold border-2 border-black dark:border-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-neo-sm hover:shadow-neo"
         >
-          Utiliser SimplePlate
+          <span>{language === 'fr' ? 'Utiliser SimplePlate' : 'Use SimplePlate'}</span>
+          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
       {related.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-display text-2xl font-bold dark:text-white">Articles liés</h2>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <section className="mt-12 pt-8 border-t-2 border-black dark:border-white">
+          <h2 className="font-display text-3xl font-bold dark:text-white mb-6">
+            {language === 'fr' ? 'Articles liés' : 'Related Articles'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {related.map((p) => (
               <Link
                 key={p.slug}
                 to={`/blog/${p.slug}`}
-                className="group bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg overflow-hidden shadow-neo dark:shadow-none hover:-translate-y-0.5 transition-transform"
+                className="group bg-white dark:bg-gray-800 border-2 border-black dark:border-white rounded-xl overflow-hidden shadow-neo dark:shadow-[2px_2px_0px_0px_#fff] hover:shadow-neo-lg dark:hover:shadow-[4px_4px_0px_0px_#fff] hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="p-4">
-                  <div className="flex items-center justify-between gap-4 text-xs font-bold text-gray-500 dark:text-gray-400">
-                    <span>{p.publishedAt}</span>
-                    <span>{p.readingTime}</span>
+                <div className="h-1 bg-gradient-to-r from-neo-violet to-neo-blue"></div>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>{p.publishedAt}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{p.readingTime}</span>
+                    </div>
                   </div>
-                  <div className="mt-1 font-bold dark:text-white group-hover:text-neo-violet transition-colors">
+                  <h3 className="font-display text-lg font-bold dark:text-white group-hover:text-neo-violet transition-colors mb-2 line-clamp-2">
                     {p.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{p.excerpt}</p>
+                  <div className="mt-4 flex items-center gap-2 text-sm font-bold text-neo-violet group-hover:gap-3 transition-all">
+                    <span>{language === 'fr' ? 'Lire' : 'Read'}</span>
+                    <ArrowRight className="w-4 h-4" />
                   </div>
-                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">{p.excerpt}</div>
                 </div>
               </Link>
             ))}
