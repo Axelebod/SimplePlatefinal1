@@ -17,6 +17,151 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'simpleplate-studio-nouvelle-version',
+    h1: 'SimplePlate Studio : La Nouvelle Version avec Audit IA & Communauté',
+    title: 'SimplePlate Studio : Découvrez la Nouvelle Version avec Audit IA & Communauté Micro-SaaS',
+    metaDescription:
+      'SimplePlate Studio est maintenant disponible ! Plateforme communautaire pour découvrir, auditer et promouvoir des Micro-SaaS. Audit IA complet, classements, avis communautaires. Gratuit.',
+    keywords: ['SimplePlate Studio', 'audit IA', 'Micro-SaaS', 'communauté', 'nouvelle version', 'audit gratuit', 'startup', 'SaaS'],
+    publishedAt: '2025-01-17',
+    readingTime: '8 min',
+    cover: {
+      src: '/blog/simpleplate-studio-nouvelle-version.svg',
+      alt: 'SimplePlate Studio : Nouvelle version avec audit IA et communauté',
+    },
+    excerpt:
+      'SimplePlate Studio est maintenant disponible ! Découvrez la nouvelle plateforme communautaire pour auditer, promouvoir et découvrir des Micro-SaaS avec un audit IA complet.',
+    bodyMarkdown: `## 🎉 SimplePlate Studio : La Grande Nouvelle
+
+**SimplePlate Studio** est officiellement lancé ! C'est la **Phase 2** de SimplePlate, une plateforme communautaire dédiée aux **Micro-SaaS** et aux entrepreneurs.
+
+## Qu'est-ce que SimplePlate Studio ?
+
+SimplePlate Studio est une **plateforme communautaire gratuite** qui permet de :
+
+- **Découvrir** les meilleurs Micro-SaaS de la communauté
+- **Soumettre** votre propre projet Micro-SaaS
+- **Obtenir un audit IA complet** de votre site (50 crédits ou gratuit pour les 20 premiers)
+- **Recevoir des avis** constructifs de la communauté
+- **Voter** pour vos projets préférés
+- **Gagner des crédits** en commentant (0.5 crédit par avis, max 3 crédits/jour)
+
+## 🚀 Les Fonctionnalités Principales
+
+### 1. Audit IA Complet
+
+L'audit IA de SimplePlate Studio analyse votre site sur **8 catégories** :
+
+- **SEO** : Optimisation pour les moteurs de recherche
+- **Performance** : Vitesse de chargement et optimisation
+- **Accessibilité** : Conformité aux standards web
+- **Design UX** : Expérience utilisateur et interface
+- **Contenu** : Qualité et pertinence du contenu
+- **Sécurité** : Protection des données et HTTPS
+- **Mobile** : Responsive design et compatibilité
+- **Conversion** : Optimisation des taux de conversion
+
+Chaque catégorie reçoit un **score sur 100** et des **recommandations concrètes** pour améliorer votre site.
+
+### 2. Système de Votes et Classements
+
+Les projets sont classés selon leur nombre de votes :
+
+- **Classement hebdomadaire** : Top projets de la semaine
+- **Classement journalier** : Projets du jour
+- **Classement global** : Tous les temps
+
+Le projet le plus voté apparaît en haut de la liste, ce qui encourage la qualité et l'engagement communautaire.
+
+### 3. Avis Communautaires
+
+Chaque projet peut recevoir des **avis de la communauté** :
+
+- Avis détaillés avec notation (1-5 étoiles)
+- Commentaires constructifs pour améliorer le projet
+- **Gagnez 0.5 crédit par avis valide** (minimum 100 caractères)
+- Maximum de **3 crédits par jour** via les avis
+
+### 4. Boost de Visibilité
+
+Pour **100 crédits**, vous pouvez booster votre projet pendant **1 semaine** :
+
+- Badge "Boost" visible sur votre projet
+- Mise en avant dans les classements
+- Plus de visibilité = plus de votes et d'avis
+
+## 💰 Le Système de Crédits
+
+SimplePlate Studio utilise le même système de crédits que SimplePlate :
+
+- **5 crédits gratuits par semaine** (recharge automatique)
+- **Gagnez des crédits** en commentant (0.5 crédit/avis, max 3/jour)
+- **Achetez des crédits** si besoin (packs de 1 à 500 crédits)
+- **20 premiers audits gratuits** pour toute la plateforme
+
+## 📊 Comment Utiliser SimplePlate Studio
+
+### Étape 1 : Soumettre Votre Projet
+
+1. Allez sur [SimplePlate Studio - Soumettre](/studio/submit)
+2. Remplissez le formulaire :
+   - URL de votre site
+   - Nom du projet
+   - Description
+   - Catégorie (SaaS, E-commerce, Outil, etc.)
+   - Logo et screenshot (optionnels)
+   - Liens supplémentaires (optionnels)
+
+### Étape 2 : Obtenir un Audit IA
+
+1. Une fois votre projet soumis, vous pouvez **débloquer l'audit IA** pour 50 crédits
+2. Les **20 premiers audits sont gratuits** pour toute la plateforme
+3. L'audit est généré en quelques minutes
+4. Vous recevez un **score global** et des **recommandations détaillées**
+
+### Étape 3 : Recevoir des Avis
+
+1. Partagez votre projet pour recevoir des votes et avis
+2. Les membres de la communauté peuvent commenter et noter
+3. Utilisez les retours pour améliorer votre projet
+
+### Étape 4 : Gagner des Crédits
+
+1. **Commentez d'autres projets** pour gagner 0.5 crédit par avis
+2. Maximum de **3 crédits par jour** via les avis
+3. Utilisez ces crédits pour auditer votre propre projet ou utiliser les outils SimplePlate
+
+## 🎯 Pour Qui est SimplePlate Studio ?
+
+SimplePlate Studio est parfait pour :
+
+- **Entrepreneurs** qui lancent un Micro-SaaS
+- **Startups** qui veulent des retours sur leur site
+- **Développeurs** qui créent des outils en ligne
+- **Créateurs** qui veulent promouvoir leur projet
+- **Communauté** qui veut découvrir de nouveaux projets
+
+## 🔗 Liens Utiles
+
+- [Voir tous les projets](/studio) : Découvrez les Micro-SaaS de la communauté
+- [Soumettre un projet](/studio/submit) : Ajoutez votre Micro-SaaS
+- [Tableau de bord](/dashboard) : Gérez vos projets et crédits
+- [Tarifs](/pricing) : Achetez des crédits si besoin
+
+## 🚀 Commencez Maintenant
+
+SimplePlate Studio est **100% gratuit** pour commencer. Vous recevez **5 crédits gratuits par semaine** et pouvez gagner des crédits en commentant.
+
+**Prêt à découvrir ou soumettre votre Micro-SaaS ?**
+
+👉 [Accéder à SimplePlate Studio](/studio)
+
+---
+
+*SimplePlate Studio fait partie de SimplePlate, la boîte à outils IA avec 50+ outils gratuits pour créer, coder et produire plus vite.*`,
+    relatedSlugs: ['simpleplate-cest-quoi', 'pourquoi-mon-site-nattire-pas-de-visiteurs', 'audit-ia-site-web'],
+  },
+  {
     slug: 'simpleplate-cest-quoi',
     h1: 'SimplePlate',
     title: "SimplePlate : la boîte à outils IA pour créer, écrire et produire plus vite",
