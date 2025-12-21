@@ -86,6 +86,26 @@ export const ToolPage: React.FC = () => {
   // Hook SEO (remplace toute la logique SEO)
   useToolSEO(tool);
 
+  // Ajouter les sitelinks pour les outils principaux
+  useEffect(() => {
+    if (!tool) return;
+
+    const toolSitelinks = MAIN_TOOLS_SITELINKS[tool.id];
+    if (toolSitelinks) {
+      const baseUrl = `${window.location.origin}/tool/${tool.slug || tool.id}`;
+      const sitelinks = language === 'fr' ? toolSitelinks.fr : toolSitelinks.en;
+      const sitelinksJsonLd = generateSitelinksJsonLd(baseUrl, sitelinks, language);
+      setJsonLd('json-ld-tool-sitelinks', sitelinksJsonLd);
+    } else {
+      // Nettoyer si l'outil n'a pas de sitelinks
+      setJsonLd('json-ld-tool-sitelinks', null);
+    }
+
+    return () => {
+      setJsonLd('json-ld-tool-sitelinks', null);
+    };
+  }, [tool, language]);
+
   // Hook de génération avec retry logic
   const { generate, loading: generationLoading, error: generationError, result: generationResult, setResult: setGenerationResult } = useToolGeneration({
     tool: tool!,
