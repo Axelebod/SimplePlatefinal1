@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Heart, ExternalLink, MessageSquare, Lock, Unlock, Zap, ArrowLeft, Share2, ArrowRight, Crown, Trash2 } from 'lucide-react';
+import { Heart, ExternalLink, MessageSquare, Lock, Unlock, Zap, ArrowLeft, Share2, ArrowRight, Crown, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import { getProjectById, getProjectBySlug, voteProject, getProjectReviews, submitReview, unlockProjectAudit, boostProject, deleteProject } from '../services/studioService';
 import { useUserStore as useUserStoreCredits } from '../store/userStore';
@@ -31,6 +31,7 @@ export const StudioProject: React.FC = () => {
   const [boosting, setBoosting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [freeAuditsRemaining, setFreeAuditsRemaining] = useState<number | null>(null);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
   const tools = React.useMemo(() => getTools(language), [language]);
 
   useSEO({
@@ -587,10 +588,18 @@ export const StudioProject: React.FC = () => {
       {/* AI Audit Section - Visible to everyone, but only owner can unlock */}
       <div className="border-t-2 border-black dark:border-white pt-6 mt-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-2xl font-bold dark:text-white flex items-center gap-2">
+          <button
+            onClick={() => setIsAuditOpen(!isAuditOpen)}
+            className="flex items-center gap-2 font-display text-2xl font-bold dark:text-white hover:opacity-80 transition-opacity"
+          >
             <Zap className="w-6 h-6 text-neo-violet" />
             {language === 'fr' ? 'Audit IA' : 'AI Audit'}
-          </h2>
+            {isAuditOpen ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
+            )}
+          </button>
           {!project.is_audit_unlocked && project.user_owns && (
             <div className="flex flex-col gap-2">
               {/* Free audits counter */}
@@ -631,6 +640,8 @@ export const StudioProject: React.FC = () => {
           )}
         </div>
 
+        {isAuditOpen && (
+          <>
             {project.is_audit_unlocked && project.ai_score ? (
               <div className="bg-gray-50 dark:bg-gray-500 border-2 border-black dark:border-white rounded-lg p-6">
                 {/* Overall Score */}
