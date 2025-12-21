@@ -26,6 +26,7 @@ export const Studio: React.FC = () => {
   const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('all-time');
   const [loadingRandom, setLoadingRandom] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [showBoostConfirm, setShowBoostConfirm] = useState<string | null>(null);
 
   useSEO({
     title: language === 'fr' 
