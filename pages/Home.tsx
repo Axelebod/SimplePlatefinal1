@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { getTools } from '../tools-config';
 import { ToolCard } from '../components/ToolCard';
 import { CATEGORIES, getCategoryLabel } from '../constants';
