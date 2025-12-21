@@ -190,18 +190,9 @@ Respond ONLY with valid JSON, no text before/after.`;
   try {
     const response = await askBot(`${systemPrompt}\n\n${userPrompt}`);
     
-    // Vérifier si la réponse est une erreur (mais pas si c'est juste "json" dans "```json")
-    if (!response) {
+    // Vérifier si la réponse est vide
+    if (!response || response.trim().length === 0) {
       console.error('AI returned empty response');
-      throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
-    }
-    
-    // Vérifier les messages d'erreur spécifiques (mais ignorer "json" qui peut être dans le markdown)
-    const lowerResponse = response.toLowerCase();
-    if (lowerResponse.includes("désolé") || 
-        (lowerResponse.includes("erreur") && !lowerResponse.includes("```json")) ||
-        (lowerResponse.includes("error") && !lowerResponse.includes("```json") && !lowerResponse.includes("json"))) {
-      console.error('AI returned error message:', response);
       throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
     }
     
@@ -214,6 +205,16 @@ Respond ONLY with valid JSON, no text before/after.`;
     // Trouver le JSON dans la réponse
     const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      // Si pas de JSON trouvé, vérifier si c'est un message d'erreur explicite
+      const lowerResponse = response.toLowerCase();
+      if (lowerResponse.includes("désolé") || 
+          lowerResponse.includes("je n'ai pas") ||
+          lowerResponse.includes("i don't have") ||
+          lowerResponse.includes("clé api") ||
+          lowerResponse.includes("api key")) {
+        console.error('AI returned error message:', response);
+        throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
+      }
       console.error('No JSON found in AI response. Response:', response.substring(0, 500));
       throw new Error('L\'IA n\'a pas retourné un format JSON valide. Veuillez réessayer.');
     }
