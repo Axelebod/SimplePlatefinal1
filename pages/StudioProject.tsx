@@ -8,6 +8,7 @@ import type { Project, Review, SubmitReviewData } from '../types/studio';
 import { useTranslation } from '../hooks/useTranslation';
 import { useSEO } from '../hooks/useSEO';
 import { getTools } from '../tools-config';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from '../contexts/ToastContext';
 import { getProjectImageUrl, getFaviconUrl } from '../utils/faviconUtils';

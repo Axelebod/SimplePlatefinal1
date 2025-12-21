@@ -73,7 +73,8 @@ RÈGLES STRICTES:
     {
       "name": "Design & UI",
       "score": 80,
-      "issues": ["Problème détaillé 1", "Problème détaillé 2", "Problème détaillé 3"]
+      "issues": ["Problème détaillé 1", "Problème détaillé 2", "Problème détaillé 3"],
+      "suggested_tools": ["tool-id"] // Optionnel: 1-2 outils SimplePlate si vraiment pertinent
     }
   ]
 }
@@ -91,8 +92,9 @@ RÈGLES STRICTES:
 5. Sois ULTRA-PRÉCIS et ACTIONNABLE:
    - Détecte au moins 3-5 problèmes par catégorie
    - Chaque problème doit être spécifique et mesurable
-   - Suggère des outils SimplePlate UNIQUEMENT si vraiment pertinent (pas systématique)
-   - Si le score est bon (>80), ne suggère pas d'outils
+   - Suggère 1-2 outils SimplePlate PARFOIS (pas systématique) si vraiment pertinent pour corriger les problèmes
+   - Suggère des outils seulement si le score est < 80 ET qu'un outil SimplePlate peut vraiment aider
+   - Exemples: problème JSON → "json-formatter", problème SEO → "seo-meta-generator", problème copywriting → "business-plan-pro"
 
 7. Score: 0-100 pour chaque catégorie et overall_score (sois sévère mais juste)
 
@@ -130,8 +132,9 @@ STRICT RULES:
 5. Be PRECISE and ACTIONABLE:
    - Detect at least 3-5 issues per category
    - Each issue must be specific and measurable
-   - Suggest SimplePlate tools ONLY if really relevant (not systematic)
-   - If score is good (>80), don't suggest tools
+   - Sometimes suggest 1-2 SimplePlate tools (not systematic) if really relevant to fix issues
+   - Suggest tools only if score < 80 AND a SimplePlate tool can really help
+   - Examples: JSON issue → "json-formatter", SEO issue → "seo-meta-generator", copywriting issue → "business-plan-pro"
 
 6. Score: 0-100 for each category and overall_score
 
