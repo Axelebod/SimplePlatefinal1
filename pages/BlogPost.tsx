@@ -108,34 +108,53 @@ export const BlogPost: React.FC = () => {
         <ReactMarkdown
           components={{
             h1: ({ node, ...props }) => (
-              <h1 className="font-display text-3xl font-bold mt-8 mb-4 dark:text-white" {...props} />
+              <h1 className="font-display text-3xl font-bold mt-12 mb-6 dark:text-white border-b-2 border-black dark:border-white pb-3" {...props} />
             ),
             h2: ({ node, ...props }) => (
-              <h2 className="font-display text-2xl font-bold mt-8 mb-3 dark:text-white" {...props} />
+              <h2 className="font-display text-2xl font-bold mt-10 mb-4 dark:text-white bg-neo-yellow dark:bg-neo-violet px-4 py-2 rounded-md border-2 border-black dark:border-white inline-block" {...props} />
             ),
             h3: ({ node, ...props }) => (
-              <h3 className="font-display text-xl font-bold mt-6 mb-2 dark:text-white" {...props} />
+              <h3 className="font-display text-xl font-bold mt-8 mb-3 dark:text-white" {...props} />
             ),
             p: ({ node, ...props }) => (
-              <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />
+              <p className="mb-6 leading-relaxed text-lg text-gray-800 dark:text-gray-200" {...props} />
             ),
             a: ({ node, ...props }) => (
-              <a className="text-neo-violet font-bold underline hover:text-neo-blue transition-colors" {...props} />
+              <a className="text-neo-violet font-bold underline hover:text-neo-blue transition-colors decoration-2 underline-offset-2" {...props} />
             ),
             strong: ({ node, ...props }) => (
-              <strong className="font-bold text-black dark:text-white" {...props} />
+              <strong className="font-bold text-black dark:text-white bg-neo-yellow dark:bg-neo-violet px-1 rounded" {...props} />
             ),
             ul: ({ node, ...props }) => (
-              <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+              <ul className="list-none mb-6 space-y-3" {...props} />
             ),
+            li: ({ node, children, ...props }) => {
+              const content = React.Children.toArray(children);
+              const text = content.join('');
+              
+              // Check if it's a link (internal tool link)
+              const hasLink = text.includes('Générateur') || text.includes('outil') || text.includes('tool');
+              
+              return (
+                <li className="flex items-start gap-3 mb-3 text-gray-800 dark:text-gray-200">
+                  <span className="flex-shrink-0 w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5">
+                    •
+                  </span>
+                  <span className="flex-1 text-lg leading-relaxed">{children}</span>
+                </li>
+              );
+            },
             ol: ({ node, ...props }) => (
-              <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+              <ol className="list-decimal list-inside mb-6 space-y-3 text-lg text-gray-800 dark:text-gray-200 ml-4" {...props} />
             ),
             code: ({ node, ...props }) => (
-              <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono" {...props} />
+              <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono border border-gray-300 dark:border-gray-600" {...props} />
             ),
             pre: ({ node, ...props }) => (
-              <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4 border-2 border-black dark:border-white" {...props} />
+              <pre className="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl overflow-x-auto mb-6 border-2 border-black dark:border-white shadow-neo-sm" {...props} />
+            ),
+            blockquote: ({ node, ...props }) => (
+              <blockquote className="border-l-4 border-neo-violet pl-6 py-4 my-6 bg-gray-50 dark:bg-gray-800 rounded-r-lg italic text-gray-700 dark:text-gray-300" {...props} />
             ),
           }}
         >
