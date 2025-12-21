@@ -79,6 +79,8 @@ export default defineConfig(({ mode }) => {
         cssMinify: true,
         // Réduire la taille des chunks
         target: 'esnext',
+        // Désactiver les source maps en production pour réduire la taille
+        sourcemap: false,
         // Améliorer la gestion des erreurs de chargement
         commonjsOptions: {
           include: [/node_modules/],

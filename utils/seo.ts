@@ -72,7 +72,14 @@ function normalizeUrl(u: URL) {
 export function buildUrlForCurrentPath(lang: Language) {
   const url = new URL(window.location.href);
   url.hash = '';
-  url.searchParams.set('lang', lang);
+  // Le canonical doit pointer vers l'URL actuelle avec le lang actuel
+  // Si lang n'est pas dans les params, on l'ajoute
+  if (!url.searchParams.has('lang')) {
+    url.searchParams.set('lang', lang);
+  } else {
+    // Si lang existe déjà, on le met à jour
+    url.searchParams.set('lang', lang);
+  }
   return normalizeUrl(url);
 }
 
