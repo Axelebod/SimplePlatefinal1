@@ -31,7 +31,7 @@ export const StudioProject: React.FC = () => {
   const [boosting, setBoosting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [freeAuditsRemaining, setFreeAuditsRemaining] = useState<number | null>(null);
-  const [isAuditOpen, setIsAuditOpen] = useState(false);
+  const [isAuditOpen, setIsAuditOpen] = useState(true);
   const tools = React.useMemo(() => getTools(language), [language]);
 
   useSEO({
