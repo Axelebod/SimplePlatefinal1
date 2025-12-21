@@ -108,62 +108,63 @@ export const Home: React.FC = () => {
       {/* Trust Badges */}
       <TrustBadges />
 
-      {/* Controls */}
-      <div className="sticky top-16 z-40 py-6 transition-all" style={{ marginTop: '-1px' }}>
-        {/* Liquid Glass Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/80 dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/80 backdrop-blur-xl border-t border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/5 dark:shadow-black/20">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent dark:via-white/5"></div>
-        </div>
-        
-        <div className="relative max-w-4xl mx-auto px-4 space-y-5">
-          {/* Search */}
-          <div className="relative max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 w-5 h-5 pointer-events-none z-10" />
-              <input
-                type="text"
-                placeholder={t('homePage.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/30 dark:border-gray-700/50 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 focus:outline-none focus:ring-2 focus:ring-neo-violet/50 focus:border-neo-violet/50 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all hover:bg-white/50 dark:hover:bg-gray-800/50 hover:border-white/40 dark:hover:border-gray-600/50"
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Effacer la recherche"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+      {/* Controls - Liquid Glass Effect */}
+      <div className="sticky top-16 z-40 -mt-px">
+        {/* Glass Background Layer */}
+        <div className="relative bg-gradient-to-b from-white/70 via-white/60 to-white/70 dark:from-gray-900/70 dark:via-gray-900/60 dark:to-gray-900/70 backdrop-blur-2xl border-t border-white/30 dark:border-gray-700/40 shadow-xl shadow-black/10 dark:shadow-black/30">
+          {/* Shine Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10 pointer-events-none"></div>
+          
+          <div className="relative max-w-4xl mx-auto px-4 py-6 space-y-5">
+            {/* Search */}
+            <div className="relative max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 w-5 h-5 pointer-events-none z-10" />
+                <input
+                  type="text"
+                  placeholder={t('homePage.searchPlaceholder')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/50 dark:bg-gray-800/50 backdrop-blur-lg border border-white/40 dark:border-gray-700/60 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 focus:outline-none focus:ring-2 focus:ring-neo-violet/50 focus:border-neo-violet/50 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all hover:bg-white/60 dark:hover:bg-gray-800/60 hover:border-white/50 dark:hover:border-gray-600/70"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/30 backdrop-blur-sm transition-colors z-10"
+                    aria-label="Effacer la recherche"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Categories */}
-          <div className="flex flex-wrap justify-center gap-2">
-            <button
-              onClick={() => setSelectedCategory('All')}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all backdrop-blur-md ${
-                selectedCategory === 'All' 
-                  ? 'bg-neo-violet/90 text-white shadow-lg shadow-neo-violet/30 border border-neo-violet/30' 
-                  : 'bg-white/30 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 border border-white/30 dark:border-gray-700/50 hover:bg-white/40 dark:hover:bg-gray-800/40 shadow-md shadow-black/5'
-              }`}
-            >
-              {t('common.all')}
-            </button>
-            {CATEGORIES.map(cat => (
+            {/* Categories */}
+            <div className="flex flex-wrap justify-center gap-2">
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => setSelectedCategory('All')}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all backdrop-blur-md ${
-                  selectedCategory === cat 
-                    ? 'bg-neo-violet/90 text-white shadow-lg shadow-neo-violet/30 border border-neo-violet/30'
-                    : 'bg-white/30 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 border border-white/30 dark:border-gray-700/50 hover:bg-white/40 dark:hover:bg-gray-800/40 shadow-md shadow-black/5'
+                  selectedCategory === 'All' 
+                    ? 'bg-neo-violet/90 text-white shadow-lg shadow-neo-violet/30 border border-neo-violet/40' 
+                    : 'bg-white/40 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border border-white/40 dark:border-gray-700/60 hover:bg-white/50 dark:hover:bg-gray-800/50 shadow-md shadow-black/5'
                 }`}
               >
-                {getCategoryLabel(cat, language)}
+                {t('common.all')}
               </button>
-            ))}
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all backdrop-blur-md ${
+                    selectedCategory === cat 
+                      ? 'bg-neo-violet/90 text-white shadow-lg shadow-neo-violet/30 border border-neo-violet/40'
+                      : 'bg-white/40 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border border-white/40 dark:border-gray-700/60 hover:bg-white/50 dark:hover:bg-gray-800/50 shadow-md shadow-black/5'
+                  }`}
+                >
+                  {getCategoryLabel(cat, language)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
