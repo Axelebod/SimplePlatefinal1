@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { removeConsole } from './vite-plugin-remove-console';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
@@ -37,7 +38,10 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
       },
-      plugins: [react()],
+      plugins: [
+        react(),
+        removeConsole(), // Supprimer console.log en production
+      ],
       define,
       resolve: {
         alias: {
@@ -47,11 +51,21 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           output: {
-            manualChunks: {
-              // Séparer les vendors pour un meilleur cache
-              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-              'ui-vendor': ['lucide-react', 'react-markdown'],
-              'store-vendor': ['zustand', '@supabase/supabase-js'],
+            manualChunks: (id) => {
+              // Séparer les vendors pour un meilleur cache et réduire la taille
+              if (id.includes('node_modules')) {
+                if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                  return 'react-vendor';
+                }
+                if (id.includes('lucide-react') || id.includes('react-markdown')) {
+                  return 'ui-vendor';
+                }
+                if (id.includes('zustand') || id.includes('@supabase')) {
+                  return 'store-vendor';
+                }
+                // Autres vendors dans un chunk séparé
+                return 'vendor';
+              }
             },
             // Améliorer la stabilité des noms de chunks
             chunkFileNames: 'assets/[name]-[hash].js',
@@ -59,7 +73,12 @@ export default defineConfig(({ mode }) => {
             assetFileNames: 'assets/[name]-[hash].[ext]',
           },
         },
-        chunkSizeWarningLimit: 1000, // Augmenter la limite pour éviter les warnings
+        chunkSizeWarningLimit: 1000,
+        // Optimisations de build
+        minify: 'esbuild',
+        cssMinify: true,
+        // Réduire la taille des chunks
+        target: 'esnext',
         // Améliorer la gestion des erreurs de chargement
         commonjsOptions: {
           include: [/node_modules/],
