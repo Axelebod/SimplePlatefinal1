@@ -136,178 +136,219 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   return (
     <div className="min-h-screen flex flex-col bg-neo-white dark:bg-gray-900 transition-colors duration-300">
-      <nav className="sticky top-0 z-50 bg-neo-white/90 dark:bg-gray-900/90 backdrop-blur border-b-2 border-black dark:border-gray-700 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            {/* LOGO */}
-            <div className="relative w-10 h-10">
-                <div className="absolute inset-0 bg-neo-yellow border-2 border-black dark:border-gray-500 rounded-sm translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform"></div>
-                <div className="absolute inset-0 bg-neo-black dark:bg-gray-700 border-2 border-black dark:border-gray-500 rounded-sm flex items-center justify-center z-10">
-                    <span className="font-display font-bold text-white dark:text-white text-xl tracking-tighter">SP</span>
-                </div>
-            </div>
-            <span className="font-display font-bold text-2xl tracking-tight group-hover:text-neo-violet transition-colors hidden sm:block dark:text-white">
-              SimplePlate
-            </span>
-          </Link>
+      <nav className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-neo-violet to-neo-blue rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <span className="font-display font-bold text-white text-sm">SP</span>
+              </div>
+              <span className="font-display font-bold text-xl tracking-tight group-hover:text-neo-violet transition-colors dark:text-white">
+                SimplePlate
+              </span>
+            </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
-             {/* Language Toggle */}
-             <button 
-                onClick={handleToggleLanguage} 
-                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white font-bold flex items-center gap-1"
-                title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
-             >
-                 <Languages className="w-5 h-5" />
-                 <span className="text-xs">{language.toUpperCase()}</span>
-             </button>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-6">
+              {/* Navigation Links */}
+              <div className="flex items-center gap-1">
+                <Link 
+                  to="/studio" 
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-neo-violet dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-1.5"
+                >
+                  <Rocket className="w-4 h-4" />
+                  {language === 'fr' ? 'Studio' : 'Studio'}
+                </Link>
+                <Link 
+                  to="/pricing" 
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-neo-violet dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  {t('nav.pricing')}
+                </Link>
+                <Link 
+                  to="/blog" 
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-neo-violet dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Blog
+                </Link>
+              </div>
 
-             {/* Dark Mode Toggle */}
-             <button 
-                onClick={toggleDarkMode} 
-                className="p-2 border-2 border-black dark:border-gray-500 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-2 text-black dark:text-white"
-                title={isDarkMode ? "Passer en mode clair" : "Passer en mode nuit"}
-             >
-                 {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
-             </button>
+              {/* Separator */}
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
 
-             <Link 
-               to="/studio" 
-               className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white flex items-center gap-1"
-             >
-               <Rocket className="w-4 h-4" />
-               {language === 'fr' ? 'Studio' : 'Studio'}
-             </Link>
-             <Link 
-               to="/pricing" 
-               className="font-bold hover:underline hover:text-neo-violet mr-2 dark:text-white"
-             >
-               {t('nav.pricing')}
-             </Link>
-
-             {user ? (
-                 <>
-                    <Link 
-                        to="/pricing"
-                        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-700 border border-black dark:border-gray-500 rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        title={t('nav.buyCredits')}
-                    >
-                        <Zap className="w-4 h-4 text-neo-orange fill-current" />
-                        <div className="flex flex-col items-start leading-tight">
-                            <span className="font-bold dark:text-white text-sm">{credits} Total</span>
-                            <span className="text-xs text-gray-600 dark:text-gray-400">
-                                {creditsFree} gratuits + {creditsPaid} payants
-                            </span>
-                            {creditsFree < 5 && timeRemaining && (
-                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    <Clock className="w-3 h-3" aria-hidden="true" />
-                                    <span>Reset: {timeRemaining}</span>
-                                </div>
-                            )}
-                        </div>
-                    </Link>
-
-                    
-                    <div className="ml-2 pl-4 border-l-2 border-gray-200 dark:border-gray-700 flex items-center gap-3">
-                        <Link to="/dashboard" className="flex items-center gap-2 group hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors">
-                            <div className="flex flex-col items-end leading-none">
-                                <span className="text-xs font-bold dark:text-gray-300 group-hover:text-neo-violet transition-colors">{user.username || user.email.split('@')[0]}</span>
-                            </div>
-                            <div className="bg-black dark:bg-white rounded-full p-1">
-                                <UserIcon className="w-3 h-3 text-white dark:text-black" />
-                            </div>
-                        </Link>
+              {/* User Section */}
+              {user ? (
+                <>
+                  {/* Credits Display */}
+                  <Link 
+                    to="/pricing"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+                    title={t('nav.buyCredits')}
+                  >
+                    <Zap className="w-4 h-4 text-neo-orange" />
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm dark:text-white">{credits}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">crédits</span>
                     </div>
-                 </>
-             ) : (
-                 <Link 
-                    to="/login"
-                    className="flex items-center gap-2 px-4 py-2 bg-neo-black dark:bg-white text-white dark:text-black font-bold border-2 border-black dark:border-white rounded-md hover:shadow-[4px_4px_0px_0px_#fde047] dark:hover:shadow-[4px_4px_0px_0px_#fde047] hover:text-neo-yellow dark:hover:text-neo-violet transition-all"
-                 >
-                    <LogIn className="w-4 h-4" />
-                    {t('nav.login')}
-                 </Link>
-             )}
-          </div>
+                  </Link>
 
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-4 md:hidden">
-            <button 
-                onClick={toggleDarkMode} 
-                className="p-2 text-black dark:text-white"
-                aria-label={isDarkMode ? (language === 'fr' ? 'Désactiver le mode sombre' : 'Disable dark mode') : (language === 'fr' ? 'Activer le mode sombre' : 'Enable dark mode')}
-            >
-                 {isDarkMode ? <Sun className="w-5 h-5 text-neo-yellow" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <button
-                onClick={handleToggleLanguage}
-                className="p-2 text-black dark:text-white font-bold"
+                  {/* User Profile */}
+                  <Link 
+                    to="/dashboard" 
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-neo-violet to-neo-blue rounded-full flex items-center justify-center">
+                      <UserIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium dark:text-white hidden lg:block max-w-[120px] truncate">
+                      {user.username || user.email.split('@')[0]}
+                    </span>
+                  </Link>
+                </>
+              ) : (
+                <Link 
+                  to="/login"
+                  className="px-4 py-2 bg-neo-violet text-white font-semibold rounded-lg hover:bg-neo-violet/90 transition-colors flex items-center gap-2 shadow-sm hover:shadow-md"
+                >
+                  <LogIn className="w-4 h-4" />
+                  {t('nav.login')}
+                </Link>
+              )}
+
+              {/* Language Toggle */}
+              <button 
+                onClick={handleToggleLanguage} 
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
                 aria-label={language === 'fr' ? 'Passer en anglais' : 'Switch to French'}
-            >
+              >
                 <Languages className="w-5 h-5" />
-            </button>
-            <button 
-                className="p-2 text-black dark:text-white"
+              </button>
+
+              {/* Dark Mode Toggle */}
+              <button 
+                onClick={toggleDarkMode} 
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                title={isDarkMode ? "Passer en mode clair" : "Passer en mode nuit"}
+                aria-label={isDarkMode ? (language === 'fr' ? 'Désactiver le mode sombre' : 'Disable dark mode') : (language === 'fr' ? 'Activer le mode sombre' : 'Enable dark mode')}
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <div className="flex items-center gap-2 md:hidden">
+              <button 
+                onClick={toggleDarkMode} 
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label={isDarkMode ? (language === 'fr' ? 'Désactiver le mode sombre' : 'Disable dark mode') : (language === 'fr' ? 'Activer le mode sombre' : 'Enable dark mode')}
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={handleToggleLanguage}
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={language === 'fr' ? 'Switch to English' : 'Passer en français'}
+                aria-label={language === 'fr' ? 'Passer en anglais' : 'Switch to French'}
+              >
+                <Languages className="w-5 h-5" />
+              </button>
+              <button 
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label={isMenuOpen ? (language === 'fr' ? 'Fermer le menu' : 'Close menu') : (language === 'fr' ? 'Ouvrir le menu' : 'Open menu')}
-            >
-                {isMenuOpen ? <X /> : <Menu />}
-            </button>
+              >
+                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-neo-white dark:bg-gray-900 border-b-2 border-black dark:border-gray-600 p-4 flex flex-col gap-4 shadow-neo dark:shadow-none z-50">
-             {user ? (
-                 <>
-                    <div className="flex items-center gap-2 pb-4 border-b border-gray-200 dark:border-gray-700">
-                         <div className="w-8 h-8 bg-neo-blue rounded-full flex items-center justify-center border border-black">
-                            <UserIcon className="w-4 h-4 text-black" />
-                         </div>
-                         <span className="font-bold dark:text-white">{user.username || user.email}</span>
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div className="px-4 py-4 space-y-3">
+              {user ? (
+                <>
+                  {/* User Info */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-800">
+                    <div className="w-10 h-10 bg-gradient-to-br from-neo-violet to-neo-blue rounded-full flex items-center justify-center">
+                      <UserIcon className="w-5 h-5 text-white" />
                     </div>
-                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 p-3 border border-black dark:border-gray-600 rounded-md bg-neo-yellow text-black font-bold">
-                        <LayoutDashboard className="w-4 h-4" /> Mon Tableau de Bord
-                    </Link>
-                    <div className="p-3 border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800">
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="font-bold dark:text-white">Crédits: {credits}</span>
-                            <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="text-sm underline text-neo-blue font-bold">Recharger</Link>
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                            {creditsFree} gratuits (hebdo) + {creditsPaid} payants
-                        </div>
-                        {creditsFree < 5 && timeRemaining && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                <Clock className="w-3 h-3" aria-hidden="true" />
-                                <span>Reset crédits gratuits: {timeRemaining}</span>
-                            </div>
-                        )}
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm dark:text-white">{user.username || user.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{credits} crédits</p>
                     </div>
-                    <Link to="/" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md">
-                        Voir les Outils
-                    </Link>
-                    <button onClick={handleLogout} className="block w-full p-3 text-center font-bold border-2 border-neo-red text-neo-red rounded-md bg-white dark:bg-gray-800 mt-2">
-                        Se déconnecter
-                    </button>
-                 </>
-             ) : (
-                 <>
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block p-3 text-center font-bold bg-neo-black dark:bg-white text-white dark:text-black rounded-md shadow-[2px_2px_0px_0px_#000] dark:shadow-none">
-                        Se connecter / S'inscrire
-                    </Link>
-                    <Link to="/studio" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white flex items-center justify-center gap-2">
-                        <Rocket className="w-4 h-4" />
-                        {language === 'fr' ? 'Studio' : 'Studio'}
-                    </Link>
-                    <Link to="/pricing" onClick={() => setIsMenuOpen(false)} className="block p-3 font-bold border border-black dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-center dark:text-white">
-                        {t('nav.pricing')}
-                    </Link>
-                 </>
-             )}
+                  </div>
+
+                  {/* Navigation Links */}
+                  <Link 
+                    to="/dashboard" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <LayoutDashboard className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="font-medium dark:text-white">Tableau de bord</span>
+                  </Link>
+                  <Link 
+                    to="/studio" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <Rocket className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="font-medium dark:text-white">Studio</span>
+                  </Link>
+                  <Link 
+                    to="/pricing" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <Zap className="w-5 h-5 text-neo-orange" />
+                    <span className="font-medium dark:text-white">Acheter des crédits</span>
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">Se déconnecter</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/studio" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <Rocket className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="font-medium dark:text-white">Studio</span>
+                  </Link>
+                  <Link 
+                    to="/pricing" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <span className="font-medium dark:text-white">{t('nav.pricing')}</span>
+                  </Link>
+                  <Link 
+                    to="/blog" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <span className="font-medium dark:text-white">Blog</span>
+                  </Link>
+                  <Link 
+                    to="/login" 
+                    onClick={() => setIsMenuOpen(false)} 
+                    className="block w-full px-4 py-2.5 bg-neo-violet text-white font-semibold rounded-lg hover:bg-neo-violet/90 transition-colors text-center mt-2"
+                  >
+                    {t('nav.login')}
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
       </nav>
