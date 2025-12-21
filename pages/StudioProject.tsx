@@ -34,15 +34,6 @@ export const StudioProject: React.FC = () => {
   const [isAuditOpen, setIsAuditOpen] = useState(false);
   const tools = React.useMemo(() => getTools(language), [language]);
 
-  // Ouvrir automatiquement la section audit si l'audit est débloqué
-  useEffect(() => {
-    if (project?.is_audit_unlocked && project?.ai_score) {
-      setIsAuditOpen(true);
-    } else {
-      setIsAuditOpen(false);
-    }
-  }, [project?.is_audit_unlocked, project?.ai_score]);
-
   useSEO({
     title: project 
       ? `${project.name} | SimplePlate Studio - Audit IA & Avis Communauté`
