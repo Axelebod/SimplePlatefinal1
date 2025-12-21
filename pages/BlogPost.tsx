@@ -128,22 +128,14 @@ export const BlogPost: React.FC = () => {
             ul: ({ node, ...props }) => (
               <ul className="list-none mb-6 space-y-3" {...props} />
             ),
-            li: ({ node, children, ...props }) => {
-              const content = React.Children.toArray(children);
-              const text = content.join('');
-              
-              // Check if it's a link (internal tool link)
-              const hasLink = text.includes('Générateur') || text.includes('outil') || text.includes('tool');
-              
-              return (
-                <li className="flex items-start gap-3 mb-3 text-gray-800 dark:text-gray-200">
-                  <span className="flex-shrink-0 w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5">
-                    •
-                  </span>
-                  <span className="flex-1 text-lg leading-relaxed">{children}</span>
-                </li>
-              );
-            },
+            li: ({ node, children, ...props }) => (
+              <li className="flex items-start gap-3 mb-3 text-gray-800 dark:text-gray-200">
+                <span className="flex-shrink-0 w-6 h-6 bg-neo-violet text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5">
+                  •
+                </span>
+                <span className="flex-1 text-lg leading-relaxed">{children}</span>
+              </li>
+            ),
             ol: ({ node, ...props }) => (
               <ol className="list-decimal list-inside mb-6 space-y-3 text-lg text-gray-800 dark:text-gray-200 ml-4" {...props} />
             ),
