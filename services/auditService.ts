@@ -190,8 +190,17 @@ Respond ONLY with valid JSON, no text before/after.`;
   try {
     const response = await askBot(`${systemPrompt}\n\n${userPrompt}`);
     
-    // Vérifier si la réponse est une erreur
-    if (!response || response.includes("Désolé") || response.includes("erreur") || response.includes("error")) {
+    // Vérifier si la réponse est une erreur (mais pas si c'est juste "json" dans "```json")
+    if (!response) {
+      console.error('AI returned empty response');
+      throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
+    }
+    
+    // Vérifier les messages d'erreur spécifiques (mais ignorer "json" qui peut être dans le markdown)
+    const lowerResponse = response.toLowerCase();
+    if (lowerResponse.includes("désolé") || 
+        (lowerResponse.includes("erreur") && !lowerResponse.includes("```json")) ||
+        (lowerResponse.includes("error") && !lowerResponse.includes("```json") && !lowerResponse.includes("json"))) {
       console.error('AI returned error message:', response);
       throw new Error('L\'IA n\'a pas pu générer l\'audit. Veuillez réessayer.');
     }
