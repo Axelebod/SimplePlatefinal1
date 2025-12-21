@@ -10,16 +10,31 @@ export const Blog: React.FC = () => {
   const posts = React.useMemo(() => getBlogPosts(), []);
 
   useSEO({
-    title: language === 'fr' ? 'Blog | SimplePlate AI' : 'Blog | SimplePlate AI',
+    title: language === 'fr' ? 'Blog SimplePlate | Guides SEO, Outils IA & Productivité' : 'SimplePlate Blog | SEO Guides, AI Tools & Productivity',
     description:
       language === 'fr'
-        ? "Articles SimplePlate: SEO, outils IA, productivité, web et business. Guides pratiques pour utiliser SimplePlate et gagner du temps."
-        : 'SimplePlate blog: SEO, AI tools, productivity, web and business. Practical guides to use SimplePlate and move faster.',
+        ? "Guides pratiques SimplePlate : SEO, outils IA, productivité, développement web et business. Apprenez à utiliser nos outils et boostez votre efficacité. Articles gratuits et conseils d'experts."
+        : 'Practical SimplePlate guides: SEO, AI tools, productivity, web development and business. Learn to use our tools and boost your efficiency. Free articles and expert tips.',
     language,
     keywords:
       language === 'fr'
-        ? ['blog', 'SimplePlate', 'outils IA', 'SEO', 'productivité']
-        : ['blog', 'SimplePlate', 'AI tools', 'SEO', 'productivity'],
+        ? ['blog SimplePlate', 'guides SEO', 'outils IA', 'productivité', 'développement web', 'business', 'tutoriels', 'conseils']
+        : ['SimplePlate blog', 'SEO guides', 'AI tools', 'productivity', 'web development', 'business', 'tutorials', 'tips'],
+    jsonLdId: 'json-ld-blog',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      name: language === 'fr' ? 'Blog SimplePlate' : 'SimplePlate Blog',
+      description: language === 'fr' 
+        ? 'Blog officiel SimplePlate avec guides pratiques sur les outils IA, SEO, productivité et développement web'
+        : 'Official SimplePlate blog with practical guides on AI tools, SEO, productivity and web development',
+      url: `${window.location.origin}/blog`,
+      publisher: {
+        '@type': 'Organization',
+        name: 'SimplePlate AI',
+        url: window.location.origin,
+      },
+    },
   });
 
   return (

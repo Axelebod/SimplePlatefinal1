@@ -9,13 +9,30 @@ export const Contact: React.FC = () => {
   const { t, language } = useTranslation();
 
   useSEO({
-    title: language === 'fr' ? 'Contact | SimplePlate AI' : 'Contact | SimplePlate AI',
+    title: language === 'fr' ? 'Contact SimplePlate | Support, Bugs, Partenariats & Suggestions' : 'Contact SimplePlate | Support, Bugs, Partnerships & Suggestions',
     description:
       language === 'fr'
-        ? 'Contactez SimplePlate AI pour une question, un bug, un partenariat ou une suggestion d’outil.'
-        : 'Contact SimplePlate AI for questions, bug reports, partnerships, or tool suggestions.',
+        ? 'Contactez SimplePlate AI pour toute question, signalement de bug, demande de partenariat ou suggestion d'outil. Réponse sous 24h. Support gratuit et réactif.'
+        : 'Contact SimplePlate AI for any questions, bug reports, partnership requests or tool suggestions. Response within 24h. Free and responsive support.',
     language,
-    keywords: language === 'fr' ? ['contact', 'support', 'SimplePlate AI'] : ['contact', 'support', 'SimplePlate AI'],
+    keywords: language === 'fr' 
+      ? ['contact SimplePlate', 'support SimplePlate', 'bug SimplePlate', 'partenariat', 'suggestion outil', 'aide SimplePlate']
+      : ['contact SimplePlate', 'SimplePlate support', 'SimplePlate bug', 'partnership', 'tool suggestion', 'SimplePlate help'],
+    jsonLdId: 'json-ld-contact',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: language === 'fr' ? 'Contact SimplePlate' : 'Contact SimplePlate',
+      description: language === 'fr'
+        ? 'Page de contact SimplePlate AI pour support, bugs, partenariats et suggestions'
+        : 'SimplePlate AI contact page for support, bugs, partnerships and suggestions',
+      mainEntity: {
+        '@type': 'Organization',
+        name: 'SimplePlate AI',
+        email: SITE_CONFIG.contactEmail,
+        url: window.location.origin,
+      },
+    },
   });
   
   return (

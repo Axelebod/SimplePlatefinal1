@@ -36,6 +36,27 @@ export const Home: React.FC = () => {
     description,
     keywords,
     language,
+    jsonLdId: 'json-ld-home',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'SimplePlate AI',
+      url: window.location.origin,
+      description: description,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${window.location.origin}/?search={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'SimplePlate AI',
+        url: window.location.origin,
+      },
+    },
   });
 
   // Ajouter les sitelinks pour la page d'accueil (Studio)

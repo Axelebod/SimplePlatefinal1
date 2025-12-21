@@ -40,15 +40,15 @@ export const StudioProject: React.FC = () => {
 
   useSEO({
     title: project 
-      ? `${project.name} | SimplePlate Studio - Audit IA & Avis Communauté`
+      ? `${project.name} | SimplePlate Studio - Audit IA ${project.ai_score?.overall_score || ''}/100 & Avis`
       : 'Project | SimplePlate Studio',
     description: project 
-      ? `${project.description || project.name} - Découvrez ce projet Micro-SaaS sur SimplePlate Studio. Score IA: ${project.ai_score?.overall_score || 'N/A'}/100. ${project.votes_count} votes.`
-      : 'Découvrez ce projet Micro-SaaS sur SimplePlate Studio',
+      ? `${project.description || project.name} - Découvrez ce projet Micro-SaaS sur SimplePlate Studio. Score audit IA: ${project.ai_score?.overall_score || 'N/A'}/100. ${project.votes_count} votes. ${project.reviews?.length || 0} avis communautaires.`
+      : 'Découvrez ce projet Micro-SaaS sur SimplePlate Studio - Audit IA gratuit et avis communautaires',
     language,
     keywords: project 
-      ? [project.name, 'Micro-SaaS', 'audit IA', 'SimplePlate Studio', project.category, 'startup', 'projet']
-      : ['SimplePlate Studio', 'Micro-SaaS', 'audit IA'],
+      ? [project.name, 'Micro-SaaS', 'audit IA', 'SimplePlate Studio', project.category, 'startup', 'projet', 'audit gratuit', 'avis communauté', 'score IA']
+      : ['SimplePlate Studio', 'Micro-SaaS', 'audit IA', 'audit gratuit'],
     imagePath: project?.screenshot_url || project?.logo_url,
     jsonLdId: 'json-ld-project',
     jsonLd: project ? {

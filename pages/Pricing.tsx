@@ -9,16 +9,32 @@ export const Pricing: React.FC = () => {
   const { t, language } = useTranslation();
 
   useSEO({
-    title: language === 'fr' ? 'Tarifs & Crédits | SimplePlate AI' : 'Pricing & Credits | SimplePlate AI',
+    title: language === 'fr' ? 'Tarifs & Crédits SimplePlate | Acheter Crédits IA (1€ à 49.99€)' : 'SimplePlate Pricing & Credits | Buy AI Credits (€1 to €49.99)',
     description:
       language === 'fr'
-        ? "Achetez des packs de crédits et utilisez 50+ outils IA (texte, image, dev, business). Paiement sécurisé via Stripe."
-        : 'Buy credit packs and use 50+ AI tools (text, image, dev, business). Secure payments via Stripe.',
+        ? "Achetez des packs de crédits SimplePlate (1€ à 49.99€) et utilisez 50+ outils IA professionnels. Paiement sécurisé Stripe. Crédits gratuits hebdomadaires inclus."
+        : 'Buy SimplePlate credit packs (€1 to €49.99) and use 50+ professional AI tools. Secure Stripe payments. Weekly free credits included.',
     language,
     keywords:
       language === 'fr'
-        ? ['tarifs', 'crédits', 'outils IA', 'générateur IA', 'Stripe', 'SimplePlate AI']
-        : ['pricing', 'credits', 'AI tools', 'AI generator', 'Stripe', 'SimplePlate AI'],
+        ? ['tarifs SimplePlate', 'acheter crédits', 'outils IA', 'générateur IA', 'Stripe', 'SimplePlate AI', 'packs crédits', 'prix crédits']
+        : ['SimplePlate pricing', 'buy credits', 'AI tools', 'AI generator', 'Stripe', 'SimplePlate AI', 'credit packs', 'credit prices'],
+    jsonLdId: 'json-ld-pricing',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: language === 'fr' ? 'Packs de Crédits SimplePlate' : 'SimplePlate Credit Packs',
+      description: language === 'fr'
+        ? 'Packs de crédits pour utiliser 50+ outils IA professionnels'
+        : 'Credit packs to use 50+ professional AI tools',
+      offers: {
+        '@type': 'AggregateOffer',
+        offerCount: '4',
+        lowPrice: '1.00',
+        highPrice: '49.99',
+        priceCurrency: 'EUR',
+      },
+    },
   });
 
   const creditPacks = [

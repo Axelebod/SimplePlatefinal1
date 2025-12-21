@@ -11,15 +11,15 @@ export const About: React.FC = () => {
 
   useSEO({
     title: language === 'fr' 
-      ? 'SimplePlate - La boîte à outils IA + Studio Communautaire'
-      : 'SimplePlate - AI Toolbox + Community Studio',
+      ? 'SimplePlate - 50+ Outils IA Gratuits + Studio Communautaire Micro-SaaS'
+      : 'SimplePlate - 50+ Free AI Tools + Micro-SaaS Community Studio',
     description: language === 'fr'
-      ? '50+ outils IA professionnels + SimplePlate Studio : plateforme communautaire pour découvrir, auditer et promouvoir des Micro-SaaS. Audit IA complet, classements, avis communautaires.'
-      : '50+ professional AI tools + SimplePlate Studio: community platform to discover, audit and promote Micro-SaaS. Complete AI audits, rankings, community reviews.',
+      ? '50+ outils IA professionnels gratuits (dev, business, image) + SimplePlate Studio : plateforme communautaire pour découvrir, auditer et promouvoir des Micro-SaaS. Boostez votre productivité.'
+      : '50+ free professional AI tools (dev, business, image) + SimplePlate Studio: community platform to discover, audit and promote Micro-SaaS. Boost your productivity.',
     language,
     keywords: language === 'fr'
-      ? ['SimplePlate', 'outils IA', 'SimplePlate Studio', 'Micro-SaaS', 'audit IA', 'communauté', 'startup', 'outils développeur']
-      : ['SimplePlate', 'AI tools', 'SimplePlate Studio', 'Micro-SaaS', 'AI audit', 'community', 'startup', 'developer tools'],
+      ? ['SimplePlate', 'outils IA', 'SimplePlate Studio', 'Micro-SaaS', 'audit IA', 'communauté', 'startup', 'outils développeur', 'générateur IA', 'outils gratuits', 'productivité']
+      : ['SimplePlate', 'AI tools', 'SimplePlate Studio', 'Micro-SaaS', 'AI audit', 'community', 'startup', 'developer tools', 'AI generator', 'free tools', 'productivity'],
     jsonLdId: 'json-ld-about',
     jsonLd: {
       '@context': 'https://schema.org',

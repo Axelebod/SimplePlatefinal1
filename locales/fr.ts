@@ -20,11 +20,11 @@ export const fr = {
   // Home (landing page)
   homePage: {
     seo: {
-      title: 'SimplePlate AI - 50+ Outils IA Professionnels (Dev, Image, Business)',
+      title: 'SimplePlate AI - 50+ Outils IA Gratuits (Dev, Image, Business) | Générateur IA',
       description:
-        "Générateur de Business Plan IA, outils de développement web, analyse d'image IA, convertisseurs JSON/CSV, générateur de texte IA, outils SEO, correcteur de style, et 50+ outils professionnels gratuits. Plateforme SaaS avec système de crédits. Créez, codez et produisez plus vite avec l'intelligence artificielle.",
+        "50+ outils IA professionnels gratuits : générateur Business Plan IA, outils développement web, analyse d'image IA, convertisseurs JSON/CSV, générateur texte IA, outils SEO. Créez, codez et produisez plus vite avec l'intelligence artificielle. SimplePlate Studio inclus.",
       keywords:
-        'générateur business plan ia, outils développement web, analyse image ia, générateur texte ia, outils seo, convertisseur json csv, correcteur style, outils dev en ligne, saas outils ia, intelligence artificielle, crédits ia, outils productivité, micro-saas',
+        'générateur business plan ia, outils développement web, analyse image ia, générateur texte ia, outils seo, convertisseur json csv, correcteur style, outils dev en ligne, saas outils ia, intelligence artificielle, crédits ia, outils productivité, micro-saas, outils gratuits, générateur ia',
       ogTitle: 'SimplePlate AI - La Boîte à Outils Ultime',
     },
     hero: {

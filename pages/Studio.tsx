@@ -30,15 +30,15 @@ export const Studio: React.FC = () => {
 
   useSEO({
     title: language === 'fr' 
-      ? 'SimplePlate Studio | Showcase de Micro-SaaS - Audit IA & Communauté'
-      : 'SimplePlate Studio | Micro-SaaS Showcase - AI Audit & Community',
+      ? 'SimplePlate Studio | Showcase Micro-SaaS - Audit IA Gratuit & Communauté'
+      : 'SimplePlate Studio | Micro-SaaS Showcase - Free AI Audit & Community',
     description: language === 'fr' 
-      ? 'Découvrez et votez pour les meilleurs Micro-SaaS de la communauté. Obtenez un audit IA complet (50 crédits) et recevez des retours constructifs. Gagnez 0.5 crédit par avis (max 3 crédits/jour).'
-      : 'Discover and vote for the best Micro-SaaS from the community. Get a complete AI audit (50 credits) and receive constructive feedback. Earn 0.5 credits per review (max 3 credits/day).',
+      ? 'Découvrez les meilleurs Micro-SaaS et obtenez un audit IA complet. Votez, commentez, gagnez des crédits. Plateforme communautaire gratuite pour startups et entrepreneurs.'
+      : 'Discover the best Micro-SaaS and get a complete AI audit. Vote, comment, earn credits. Free community platform for startups and entrepreneurs.',
     language,
     keywords: language === 'fr'
-      ? ['SimplePlate Studio', 'Micro-SaaS', 'audit IA', 'showcase', 'startup', 'communauté', 'vote', 'avis', 'audit automatique']
-      : ['SimplePlate Studio', 'Micro-SaaS', 'AI audit', 'showcase', 'startup', 'community', 'vote', 'review', 'automated audit'],
+      ? ['SimplePlate Studio', 'Micro-SaaS', 'audit IA', 'showcase', 'startup', 'communauté', 'vote', 'avis', 'audit automatique', 'entrepreneur', 'SaaS', 'audit gratuit']
+      : ['SimplePlate Studio', 'Micro-SaaS', 'AI audit', 'showcase', 'startup', 'community', 'vote', 'review', 'automated audit', 'entrepreneur', 'SaaS', 'free audit'],
     jsonLdId: 'json-ld-studio',
     jsonLd: {
       '@context': 'https://schema.org',
