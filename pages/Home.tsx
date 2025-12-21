@@ -109,7 +109,7 @@ export const Home: React.FC = () => {
       <TrustBadges />
 
       {/* Controls */}
-      <div className="sticky top-16 md:top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm py-6 transition-all">
+      <div className="sticky top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 shadow-sm py-6 transition-all -mt-px">
         <div className="max-w-4xl mx-auto px-4 space-y-5">
           {/* Search */}
           <div className="relative max-w-2xl mx-auto">
