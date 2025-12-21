@@ -65,9 +65,9 @@ const createSimpleTool = (
   iconName,
   outputType: 'text',
   seo: {
-    title: seoOverride?.title || `${title} Professionnel | SimplePlate AI`,
-    description: seoOverride?.description || `${description} - Outil professionnel alimenté par l'IA. Système de crédits et abonnement PRO disponible.`,
-    keywords: seoOverride?.keywords || [title, 'IA', 'Générateur', 'Professionnel', 'Outil en ligne', 'Français', 'SaaS', 'Crédits']
+    title: seoOverride?.title || `${title} Gratuit en Ligne | SimplePlate AI - Générateur IA`,
+    description: seoOverride?.description || `${description} Outil ${category.toLowerCase()} gratuit alimenté par l'intelligence artificielle. Résultats professionnels instantanés. SimplePlate AI.`,
+    keywords: seoOverride?.keywords || [title, 'IA', 'Générateur', 'gratuit', 'en ligne', 'outil', category.toLowerCase(), 'SimplePlate AI', 'automatisation']
   },
   inputs: [{ 
     name: 'input', 
