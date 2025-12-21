@@ -727,7 +727,9 @@ export const StudioProject: React.FC = () => {
               </p>
             </div>
           )}
-          </div>
+          </>
+        )}
+      </div>
 
       {/* Reviews Section */}
       <div className="bg-white dark:bg-gray-600 border-2 border-black dark:border-white rounded-lg p-6 md:p-8 shadow-neo dark:shadow-[2px_2px_0px_0px_#fff]">
