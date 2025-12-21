@@ -750,12 +750,13 @@ export async function unlockProjectAudit(
     console.error('Error details:', error?.message, error?.stack);
     
       // Even if audit generation fails, try to save a complete fallback audit
+      console.warn('Audit generation failed, using fallback audit');
       try {
-        // Import the fallback function from auditService
-        const { performCompleteAudit } = await import('./auditService');
-        // The fallback is already complete in generateFallbackAudit, but we'll use performCompleteAudit's fallback
-        // Actually, we need to call generateFallbackAudit directly, but it's not exported
-        // So we'll create a complete fallback here
+        // Import generateFallbackAudit from auditService
+        const { getTools } = await import('../tools-config');
+        const tools = getTools(language);
+        
+        // Create a simple fallback audit
         const fallbackAudit = {
           overall_score: 70,
           categories: [
@@ -767,15 +768,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez l\'espacement et la mise en page' : 'Optimize spacing and layout',
                 language === 'fr' ? 'Améliorez la typographie' : 'Improve typography',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Copywriting & Content' : 'Copywriting & Content',
@@ -785,15 +778,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez vos CTA' : 'Optimize your CTAs',
                 language === 'fr' ? 'Renforcez votre proposition de valeur' : 'Strengthen your value proposition',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'SEO & Métadonnées' : 'SEO & Metadata',
@@ -803,15 +788,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez vos URLs' : 'Optimize your URLs',
                 language === 'fr' ? 'Ajoutez des balises sémantiques' : 'Add semantic tags',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Technical & Code' : 'Technical & Code',
@@ -821,15 +798,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez les performances' : 'Optimize performance',
                 language === 'fr' ? 'Validez vos formats de données' : 'Validate your data formats',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'UX & Usability' : 'UX & Usability',
@@ -839,15 +808,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez le parcours utilisateur' : 'Optimize user journey',
                 language === 'fr' ? 'Vérifiez la clarté des informations' : 'Check information clarity',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Accessibility' : 'Accessibility',
@@ -857,15 +818,7 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Vérifiez le contraste des couleurs' : 'Check color contrast',
                 language === 'fr' ? 'Assurez-vous que le site est navigable au clavier' : 'Ensure keyboard navigation',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
             {
               name: language === 'fr' ? 'Business & Marketing' : 'Business & Marketing',
@@ -875,38 +828,34 @@ export async function unlockProjectAudit(
                 language === 'fr' ? 'Optimisez votre message marketing' : 'Optimize your marketing message',
                 language === 'fr' ? 'Améliorez votre stratégie de contenu' : 'Improve your content strategy',
               ],
-              suggested_tools: category.name.includes('Design') || category.name.includes('UI')
-                ? ['website-generator']
-                : category.name.includes('Copywriting') || category.name.includes('Content') || category.name.includes('Business')
-                ? ['business-plan-pro']
-                : category.name.includes('SEO')
-                ? ['seo-meta-generator']
-                : category.name.includes('Technical') || category.name.includes('Code')
-                ? ['json-formatter']
-                : [],
+              suggested_tools: [],
             },
           ],
           generated_at: new Date().toISOString(),
         };
       
-      // Update project with fallback audit
-      const { error: updateError } = await supabase
-        .from('projects')
-        .update({
-          is_audit_unlocked: true,
-          ai_score: fallbackAudit,
-        })
-        .eq('id', projectId);
-      
-      if (!updateError) {
-        return {
-          success: true,
-          credits_remaining: skipCreditCheck ? userCredits : userCredits - auditCost,
-        };
+        console.log('Saving fallback audit...');
+        // Update project with fallback audit
+        const { error: updateError } = await supabase
+          .from('projects')
+          .update({
+            is_audit_unlocked: true,
+            ai_score: fallbackAudit,
+          })
+          .eq('id', projectId);
+        
+        if (!updateError) {
+          console.log('Fallback audit saved successfully');
+          return {
+            success: true,
+            credits_remaining: skipCreditCheck ? userCredits : userCredits - auditCost,
+          };
+        } else {
+          console.error('Error saving fallback audit:', updateError);
+        }
+      } catch (fallbackError) {
+        console.error('Error in fallback audit process:', fallbackError);
       }
-    } catch (fallbackError) {
-      console.error('Error saving fallback audit:', fallbackError);
-    }
     
     return {
       success: false,
