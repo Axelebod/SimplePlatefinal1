@@ -82,16 +82,16 @@ export const BlogPost: React.FC = () => {
       </Link>
 
       {/* Header */}
-      <header className="mb-8 pb-6 border-b-2 border-black dark:border-white">
-        <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold dark:text-white mb-4 leading-tight">
+      <header className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-4xl md:text-5xl font-bold dark:text-white mb-4 leading-tight">
           {post.h1}
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
           {post.excerpt}
         </p>
         
         {/* Metadata */}
-        <div className="flex items-center gap-6 text-sm font-semibold text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             <span>{post.publishedAt}</span>
