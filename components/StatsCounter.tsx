@@ -9,7 +9,6 @@ interface StatsCounterProps {
 export const StatsCounter: React.FC<StatsCounterProps> = ({ className = '' }) => {
   const [stats, setStats] = useState({
     generations: 0,
-    users: 0,
     tools: 50, // Nombre réel d'outils
   });
   const [loading, setLoading] = useState(true);
