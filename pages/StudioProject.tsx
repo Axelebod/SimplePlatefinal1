@@ -593,11 +593,19 @@ export const StudioProject: React.FC = () => {
           </h2>
           {!project.is_audit_unlocked && project.user_owns && (
             <div className="flex flex-col gap-2">
+              {/* Free audits counter */}
+              {freeAuditsRemaining !== null && freeAuditsRemaining > 0 && (
+                <div className="text-center px-3 py-1 bg-neo-yellow border-2 border-black rounded-md text-xs font-bold">
+                  {language === 'fr' 
+                    ? `${freeAuditsRemaining} audit${freeAuditsRemaining > 1 ? 's' : ''} gratuit${freeAuditsRemaining > 1 ? 's' : ''} restant${freeAuditsRemaining > 1 ? 's' : ''}`
+                    : `${freeAuditsRemaining} free audit${freeAuditsRemaining > 1 ? 's' : ''} remaining`}
+                </div>
+              )}
               <button
                 onClick={handleUnlockAudit}
                 disabled={unlocking || !user}
                 className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded-md font-bold shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50 ${
-                  credits >= 50 
+                  (freeAuditsRemaining !== null && freeAuditsRemaining > 0) || credits >= 50
                     ? 'bg-neo-yellow text-black' 
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                 }`}
@@ -610,9 +618,11 @@ export const StudioProject: React.FC = () => {
                 ) : (
                   <>
                     <Unlock className="w-4 h-4" />
-                    {credits >= 50 
-                      ? (language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)')
-                      : (language === 'fr' ? `Débloquer l'audit (50 crédits - Vous avez ${credits})` : `Unlock audit (50 credits - You have ${credits})`)
+                    {freeAuditsRemaining !== null && freeAuditsRemaining > 0
+                      ? (language === 'fr' ? 'Débloquer l\'audit (GRATUIT)' : 'Unlock audit (FREE)')
+                      : credits >= 50 
+                        ? (language === 'fr' ? 'Débloquer l\'audit (50 crédits)' : 'Unlock audit (50 credits)')
+                        : (language === 'fr' ? `Débloquer l'audit (50 crédits - Vous avez ${credits})` : `Unlock audit (50 credits - You have ${credits})`)
                     }
                   </>
                 )}
