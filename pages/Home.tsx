@@ -38,6 +38,18 @@ export const Home: React.FC = () => {
     language,
   });
 
+  // Ajouter les sitelinks pour la page d'accueil (Studio)
+  useEffect(() => {
+    const baseUrl = window.location.origin;
+    const sitelinks = language === 'fr' ? STUDIO_SITELINKS : STUDIO_SITELINKS_EN;
+    const sitelinksJsonLd = generateSitelinksJsonLd(`${baseUrl}/studio`, sitelinks, language);
+    setJsonLd('json-ld-home-studio-sitelinks', sitelinksJsonLd);
+    
+    return () => {
+      setJsonLd('json-ld-home-studio-sitelinks', null);
+    };
+  }, [language]);
+
   const filteredTools = useMemo(() => {
     return tools.filter(tool => {
       const matchesCategory = selectedCategory === 'All' || tool.category === selectedCategory;
