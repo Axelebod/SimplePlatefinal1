@@ -11,6 +11,8 @@ import { useToast } from '../contexts/ToastContext';
 import { ProjectCardSkeleton } from '../components/LoadingSkeleton';
 import { getProjectImageUrl } from '../utils/faviconUtils';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { generateSitelinksJsonLd, STUDIO_SITELINKS, STUDIO_SITELINKS_EN } from '../utils/sitelinks';
+import { setJsonLd } from '../utils/seo';
 
 export const Studio: React.FC = () => {
   const { user, credits } = useUserStore();
@@ -49,6 +51,18 @@ export const Studio: React.FC = () => {
       operatingSystem: 'Web',
     },
   });
+
+  // Ajouter les sitelinks pour le Studio
+  React.useEffect(() => {
+    const baseUrl = `${window.location.origin}/studio`;
+    const sitelinks = language === 'fr' ? STUDIO_SITELINKS : STUDIO_SITELINKS_EN;
+    const sitelinksJsonLd = generateSitelinksJsonLd(baseUrl, sitelinks, language);
+    setJsonLd('json-ld-studio-sitelinks', sitelinksJsonLd);
+    
+    return () => {
+      setJsonLd('json-ld-studio-sitelinks', null);
+    };
+  }, [language]);
 
   useEffect(() => {
     loadProjects();

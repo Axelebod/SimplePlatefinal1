@@ -32,6 +32,8 @@ import { useToolGeneration } from '../hooks/useToolGeneration';
 import { useDebounce } from '../hooks/useDebounce';
 import { useTranslation } from '../hooks/useTranslation';
 import { useToast } from '../contexts/ToastContext';
+import { generateSitelinksJsonLd, MAIN_TOOLS_SITELINKS } from '../utils/sitelinks';
+import { setJsonLd } from '../utils/seo';
 
 export const ToolPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
